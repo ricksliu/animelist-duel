@@ -25,14 +25,26 @@ body {
     color: #FFF;
 }
 
-#left {
+#user_1 {
     float: left;
     width: 50%;
 }
 
-#right {
+#user_2 {
     float: right;
     width: 50%;
+}
+
+.input {
+    text-align: center;
+}
+
+.user_update_status {
+    display: none;
+}
+
+.stats {
+    display: none;
 }
 
 .heading {

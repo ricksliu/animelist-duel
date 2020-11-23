@@ -17,28 +17,78 @@
     <div class="description">Description</div>
   </div>
 
-  <div class="column" id="left">
-    <div class="user_info">
+  <div class="column" id="user_1">
+    <div class="input">
       <span class="heading">User 1</span>
       <input type="text" class="username_input" id="username_1_input" value="Enter Username">
       <input type="submit" class="username_submit" id="username_1_submit" onclick="submitUsername(1)" value="Enter">
-      <div class="heading" id="username_1"></div>
     </div>
 
-    <div class="heading">Days Watched:</div>
-    <div class="stat" id="days_1"></div>
+    <div class="user_update_status">
+      <div class="text" id="username_1"></div>
+      <div class="text" id="last_updated_1">[Last Updated]</div>
+      <input type="submit" class="user_update" id="user_1_update" onclick="updateUser(1)" value="Enter">
+    </div>
+
+    <div class="stats">
+      <div class="heading">Mean Score:</div>
+      <div class="stat" id="mean_score_1"></div>
+      <div class="heading">Days Watched:</div>
+      <div class="stat" id="days_watched_1"></div>
+      <div class="heading">Episodes Watched:</div>
+      <div class="stat" id="episodes_watched_1"></div>
+      <div class="heading">Total Entries:</div>
+      <div class="stat" id="total_entries_1"></div>
+      <div class="heading">Completed:</div>
+      <div class="stat" id="completed_1"></div>
+      <div class="heading">Watching:</div>
+      <div class="stat" id="watching_1"></div>
+      <div class="heading">On Hold:</div>
+      <div class="stat" id="on_hold_1"></div>
+      <div class="heading">Dropped:</div>
+      <div class="stat" id="dropped_1"></div>
+      <div class="heading">Plan To Watch:</div>
+      <div class="stat" id="plan_to_watch_1"></div>
+      <div class="heading">Rewatched:</div>
+      <div class="stat" id="rewatched_1"></div>
+    </div>
   </div>
 
-  <div class="column" id="right">
-    <div class="user_info">
+  <div class="column" id="user_2">
+    <div class="input">
       <span class="heading">User 2</span>
       <input type="text" class="username_input" id="username_2_input" value="Enter Username">
       <input type="submit" class="username_submit" id="username_2_submit" onclick="submitUsername(2)" value="Enter">
-      <div class="heading" id="username_2"></div>
     </div>
 
-    <div class="heading">Days Watched:</div>
-    <div class="stat" id="days_2"></div>
+    <div class="user_update_status">
+      <div class="text" id="username_2"></div>
+      <div class="text" id="last_updated_2">[Last Updated]</div>
+      <input type="submit" class="user_update" id="user_2_update" onclick="updateUser(2)" value="Enter">
+    </div>
+
+    <div class="stats">
+      <div class="heading">Mean Score:</div>
+      <div class="stat" id="mean_score_2"></div>
+      <div class="heading">Days Watched:</div>
+      <div class="stat" id="days_watched_2"></div>
+      <div class="heading">Episodes Watched:</div>
+      <div class="stat" id="episodes_watched_2"></div>
+      <div class="heading">Total Entries:</div>
+      <div class="stat" id="total_entries_2"></div>
+      <div class="heading">Completed:</div>
+      <div class="stat" id="completed_2"></div>
+      <div class="heading">Watching:</div>
+      <div class="stat" id="watching_2"></div>
+      <div class="heading">On Hold:</div>
+      <div class="stat" id="on_hold_2"></div>
+      <div class="heading">Dropped:</div>
+      <div class="stat" id="dropped_2"></div>
+      <div class="heading">Plan To Watch:</div>
+      <div class="stat" id="plan_to_watch_2"></div>
+      <div class="heading">Rewatched:</div>
+      <div class="stat" id="rewatched_2"></div>
+    </div>
   </div>
 </body>
 </html>
