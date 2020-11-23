@@ -1,0 +1,7 @@
+{
+  "hosting": [ {
+	  "target": "animelist-duel",
+      "public": "public"
+    }
+  ]
+}

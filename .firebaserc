@@ -1,0 +1,14 @@
+{
+  "projects": {
+    "default": "animelist-duel"
+  },
+  "targets": {
+    "animelist-duel": {
+      "hosting": {
+        "animelist-duel": [
+          "animelist-duel"
+        ]
+      }
+    }
+  }
+}

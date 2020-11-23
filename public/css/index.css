@@ -1,0 +1,43 @@
+body {
+    margin: 0%;
+
+    font: medium Verdana, Tahoma, sans-serif;
+}
+
+#top {
+    padding: 1em;
+    background-color: #2E51A2;
+}
+
+.title {
+    font-size: 2em;
+    font-weight: bold;
+    text-align: center;
+
+    color: #FFF;
+}
+
+.description {
+    font-size: 1em;
+    font-weight: bold;
+    text-align: center;
+
+    color: #FFF;
+}
+
+#left {
+    float: left;
+    width: 50%;
+}
+
+#right {
+    float: right;
+    width: 50%;
+}
+
+.heading {
+    font-size: 1em;
+    font-weight: bold;
+
+    color: #000;
+}
