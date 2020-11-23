@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>AnimeList Duel</title>
+  <meta name="author" content="Rick Liu">
+  <meta name="description" content="AnimeList Duel">
+
+  <link href="css/index.css" rel="stylesheet" type="text/css" media="screen">
+  <script src="js/index.js" async></script>
+</head>
+<body>
+  <div id="top">
+    <div class="title">AnimeList Duel</div>
+    <div class="description">Description</div>
+  </div>
+
+  <div class="column" id="left">
+    <div class="user_info">
+      <span class="heading">User 1</span>
+      <input type="text" class="username_input" id="username_1_input" value="Enter Username">
+      <input type="submit" class="username_submit" id="username_1_submit" onclick="submitUsername(1)" value="Enter">
+      <div class="heading" id="username_1"></div>
+    </div>
+
+    <div class="heading">Days Watched:</div>
+    <div class="stat" id="days_1"></div>
+  </div>
+
+  <div class="column" id="right">
+    <div class="user_info">
+      <span class="heading">User 2</span>
+      <input type="text" class="username_input" id="username_2_input" value="Enter Username">
+      <input type="submit" class="username_submit" id="username_2_submit" onclick="submitUsername(2)" value="Enter">
+      <div class="heading" id="username_2"></div>
+    </div>
+
+    <div class="heading">Days Watched:</div>
+    <div class="stat" id="days_2"></div>
+  </div>
+</body>
+</html>
