@@ -5,12 +5,13 @@ body {
 }
 
 #top {
-    padding: 1em;
+    padding: 2em;
+    margin-bottom: 2em;
     background-color: #2E51A2;
 }
 
 .title {
-    font-size: 2em;
+    font-size: 4em;
     font-weight: bold;
     text-align: center;
 
@@ -18,7 +19,7 @@ body {
 }
 
 .description {
-    font-size: 1em;
+    font-size: 2em;
     font-weight: bold;
     text-align: center;
 
@@ -35,21 +36,68 @@ body {
     width: 50%;
 }
 
+.heading {
+    font-size: 2em;
+    font-weight: bold;
+
+    color: #2E51A2;
+}
+
+.text {
+    font-size: 1em;
+    font-weight: bold;
+
+    color: #2E51A2;
+}
+
 .input {
     text-align: center;
 }
 
 .user_update_status {
     display: none;
+    margin-bottom: 2em;
+
+    text-align: center;
 }
 
-.stats {
+#stats {
+    clear: both;
     display: none;
 }
 
-.heading {
-    font-size: 1em;
+#stats .heading {
+    clear: both;
+    margin-bottom: 0.5em;
+
+    text-align: center;
+}
+
+.stat div {
+    width: 50%;
+    margin-bottom: 2em;
+}
+
+.stat .stat_1 {
+    float: left;
+}
+
+.stat .stat_2 {
+    float: right;
+}
+
+.stat div span {
+    display: inline-block;
+    padding: 0.5em;
+
+    font-size: 2em;
     font-weight: bold;
 
-    color: #000;
+    color: #FFF;
+}
+
+.stat .stat_2 span {
+    float: right;
+
+    text-align: right;
 }

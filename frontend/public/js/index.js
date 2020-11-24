@@ -20,7 +20,7 @@ function updateUser(user_number) {
     http_req.onload = () => {
         var user = JSON.parse(http_req.response);
 
-        // Displays stats
+        // Updates stats
         document.getElementById(`mean_score_${user_number}`).textContent = user.mean_score;
         document.getElementById(`days_watched_${user_number}`).textContent = user.days_watched;
         document.getElementById(`episodes_watched_${user_number}`).textContent = user.episodes_watched;
@@ -32,7 +32,70 @@ function updateUser(user_number) {
         document.getElementById(`plan_to_watch_${user_number}`).textContent = user.plan_to_watch;
         document.getElementById(`rewatched_${user_number}`).textContent = user.rewatched;
 
-        // Shows .stats
-        document.querySelectorAll(`#user_${user_number} .stats`).forEach(element => element.style.display = "inherit");
+        // Updates bars
+        const stats = [
+            "mean_score",
+            "days_watched",
+            "episodes_watched",
+            "total_entries",
+            "completed",
+            "watching",
+            "on_hold",
+            "dropped",
+            "plan_to_watch",
+            "rewatched"
+        ]
+
+        // Stats where lower numbers are better
+        const reversed_stats = [0, 0, 0, 0, 0, 0, 1, 1, 0, 0];
+
+        // Stats where comparing doesn't apply
+        const neutral_stats = [1, 0, 0, 0, 0, 0, 0, 0, 1, 0];
+        
+        for (var i = 0; i < stats.length; i++) {
+            // If a neutral stat, makes bars gray
+            if (neutral_stats[i] == 1) {
+                document.getElementById(`${stats[i]}_1_bar`).style.backgroundColor = "#999";
+                document.getElementById(`${stats[i]}_2_bar`).style.backgroundColor = "#999";
+
+            // If not a neutral stat, calculates bar widths and colours
+            } else {
+                // Gets stats
+                const stat_1 = parseFloat(document.getElementById(`${stats[i]}_1`).textContent);
+                const stat_2 = parseFloat(document.getElementById(`${stats[i]}_2`).textContent);
+
+                // Calculates percentage of user 1's bar
+                var scale;
+                if (stat_1 == stat_2) {
+                    scale = 50;
+                } else {
+                    scale = 10 + 80 * stat_1 / (stat_1 + stat_2);
+
+                    // If a reversed stat, reverses the scale
+                    if (reversed_stats[i] == 1) {
+                        scale = 100 - scale;
+                    }
+                }
+
+                // Sets bar widths
+                document.getElementById(`${stats[i]}_1_bar`).style.width = `${scale.toString()}%`;
+                document.getElementById(`${stats[i]}_2_bar`).style.width = `${(100 - scale).toString()}%`;
+
+                // Updates bar colours
+                if (scale > 50.0) {
+                    document.getElementById(`${stats[i]}_1_bar`).style.backgroundColor = "#6C6";
+                    document.getElementById(`${stats[i]}_2_bar`).style.backgroundColor = "#C66";
+                } else if (scale < 50.0) {
+                    document.getElementById(`${stats[i]}_1_bar`).style.backgroundColor = "#C66";
+                    document.getElementById(`${stats[i]}_2_bar`).style.backgroundColor = "#6C6";
+                } else {
+                    document.getElementById(`${stats[i]}_1_bar`).style.backgroundColor = "#999";
+                    document.getElementById(`${stats[i]}_2_bar`).style.backgroundColor = "#999";
+                }
+            }
+        }
+
+        // Shows #stats
+        document.getElementById("stats").style.display = "inherit";
     }
 }
