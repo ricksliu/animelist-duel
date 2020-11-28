@@ -1,1 +1,0 @@
-node C:\rick\Programming\animelist-duel\backend\app.js
