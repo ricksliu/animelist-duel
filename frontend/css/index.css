@@ -1,8 +1,4 @@
-body {
-    margin: 0%;
-
-    font: medium Verdana, Tahoma, sans-serif;
-}
+@import url("main.css");
 
 #top {
     padding: 2em;
@@ -10,7 +6,7 @@ body {
     background-color: #2E51A2;
 }
 
-.title {
+h1 {
     font-size: 4em;
     font-weight: bold;
     text-align: center;
@@ -18,7 +14,7 @@ body {
     color: #FFF;
 }
 
-.description {
+h2 {
     font-size: 2em;
     font-weight: bold;
     text-align: center;
@@ -26,32 +22,25 @@ body {
     color: #FFF;
 }
 
-#user_1 {
+#user_1_section {
     float: left;
     width: 50%;
 }
 
-#user_2 {
+#user_2_section {
     float: right;
     width: 50%;
 }
 
-.heading {
+.username_input {
+    text-align: center;
+}
+
+h3 {
     font-size: 2em;
     font-weight: bold;
 
     color: #2E51A2;
-}
-
-.text {
-    font-size: 1em;
-    font-weight: bold;
-
-    color: #2E51A2;
-}
-
-.input {
-    text-align: center;
 }
 
 .user_update_status {
@@ -61,12 +50,19 @@ body {
     text-align: center;
 }
 
+p {
+    font-size: 1em;
+    font-weight: bold;
+
+    color: #2E51A2;
+}
+
 #stats {
     clear: both;
     display: none;
 }
 
-#stats .heading {
+.stat h3 {
     clear: both;
     margin-bottom: 0.5em;
 
@@ -86,8 +82,7 @@ body {
     float: right;
 }
 
-.stat div span {
-    display: inline-block;
+.stat div p {
     padding: 0.5em;
 
     font-size: 2em;
@@ -96,7 +91,7 @@ body {
     color: #FFF;
 }
 
-.stat .stat_2 span {
+.stat .stat_2 p {
     float: right;
 
     text-align: right;
