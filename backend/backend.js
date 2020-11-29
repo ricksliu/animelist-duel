@@ -6,15 +6,17 @@ const url = require("url");
 const host = "127.0.0.1";
 const port = 3000;
 
-// Returns first number in string that is surrounded by > and < as a string
-function indexOfNumber(str) {
+// Returns first substring in string that is surrounded by 'start_char' and 'end_char'
+//'numeric' forces substring to start with a number
+// 'format' removes certain special characters
+function firstString(str, start_char, end_char, numeric=false, format=false) {  
   const len = str.length;
   const numbers = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0'];
 
   // Finds start
   var start = 0;
   while (start < len) {
-    if (str[start] == '>' && numbers.includes(str[start + 1])) {
+    if (str[start] == start_char && (!numeric || numbers.includes(str[start + 1]))) {
       start++;
       break;
     }
@@ -24,27 +26,19 @@ function indexOfNumber(str) {
   if (start != len) {
     // Finds end
     var end = start;
-    while (str[end] != '<') {
+    while (str[end] != end_char) {
       end++;
     }
 
-    return str.slice(start, end).replace(',', '');
+    if (format) {
+      return str.slice(start, end).replace(',', '');
+    } else {
+      return str.slice(start, end);
+    }
 
   } else {
     return '';
   }
-}
-
-// Finds and returns stats given HTML in string form and list of keywords
-function getStats(page_html, keywords) {
-  var stats = [];
-
-  for (var i = 0; i < keywords.length; i++) {
-    const num = indexOfNumber(page_html.slice(page_html.indexOf(keywords[i])));
-    stats.push(num);
-  }
-
-  return stats;
 }
 
 const server = http.createServer((req, res) => {
@@ -68,40 +62,45 @@ const server = http.createServer((req, res) => {
 
     // When finished getting HTML, gets stats
     mal_res.on('end', function() {
-      // Slices section with the stats
-      page_html = page_html.slice(page_html.indexOf('<div class="stats anime">'), page_html.indexOf('<div class="stats manga">'));
-      
-      // Keywords to look for
-      const keywords = [
-        'Mean Score',
-        'Days',
-        'Episodes',
-        'Total Entries',
-        'Completed',
-        'Watching',
-        'On-Hold',
-        'Rewatched',
-        'Dropped',
-        'Plan to Watch'
+      const pre_info = [
+        ['userimages', '/', ".", true, true],
+        ['Mean Score', '>', '<', true, true],
+        ['Days', '>', '<', true, true],
+        ['Episodes', '>', '<', true, true],
+        ['Total Entries', '>', '<', true, true],
+        ['Completed', '>', '<', true, true],
+        ['Watching', '>', '<', true, true],
+        ['On-Hold', '>', '<', true, true],
+        ['Rewatched', '>', '<', true, true],
+        ['Dropped', '>', '<', true, true],
+        ['Plan to Watch', '>', '<', true, true]
       ]
 
-      const stats = getStats(page_html, keywords);
+      // Stores info
+      var info = [];
+
+      for (var i = 0; i < pre_info.length; i++) {
+        info.push(firstString(page_html.slice(page_html.indexOf(pre_info[i][0])), pre_info[i][1], pre_info[i][2], pre_info[i][3], pre_info[i][4]));
+      }
 
       // Sets headers: designates response as json, allows requests from all domains
       res.writeHead(200, {"Content-Type": "application/json", "Access-Control-Allow-Origin": "*"});
   
       // Sends JSON-encoded string
       res.write(JSON.stringify({
-        mean_score: stats[0],
-        days_watched: stats[1],
-        episodes_watched: stats[2],
-        total_entries: stats[3],
-        completed: stats[4],
-        watching: stats[5],
-        on_hold: stats[6],
-        rewatched: stats[7],
-        dropped: stats[8],
-        plan_to_watch: stats[9]
+        username: username,
+        user_id: info[0],
+        user_image: `https://cdn.myanimelist.net/images/userimages/${info[0]}.jpg`,
+        mean_score: info[1],
+        days_watched: info[2],
+        episodes_watched: info[3],
+        total_entries: info[4],
+        completed: info[5],
+        watching: info[6],
+        on_hold: info[7],
+        rewatched: info[8],
+        dropped: info[9],
+        plan_to_watch: info[10]
       }));
       res.end();
     });

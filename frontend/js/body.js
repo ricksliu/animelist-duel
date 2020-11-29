@@ -17,6 +17,8 @@ var StatInfo = function StatInfo(stat, compare_type) {
   this.compare_type = compare_type;
 };
 
+var info = ['username', 'user_id', 'user_image'];
+
 var stats = [new StatInfo('mean_score', 0), new StatInfo('days_watched', 1), new StatInfo('episodes_watched', 1), new StatInfo('total_entries', 1), new StatInfo('completed', 1), new StatInfo('watching', 1), new StatInfo('on_hold', -1), new StatInfo('rewatched', 1), new StatInfo('dropped', -1), new StatInfo('plan_to_watch', -1)];
 
 // Updates CSS of stats
@@ -92,8 +94,7 @@ var UserSection = function (_React$Component) {
     var _this = _possibleConstructorReturn(this, (UserSection.__proto__ || Object.getPrototypeOf(UserSection)).call(this, props));
 
     _this.state = {
-      username_input: '',
-      username: ''
+      username_input: ''
     };
 
     _this.updateUsernameInput = _this.updateUsernameInput.bind(_this);
@@ -116,7 +117,7 @@ var UserSection = function (_React$Component) {
   }, {
     key: 'submitUsername',
     value: function submitUsername(event) {
-      this.setState({ username: this.state.username_input });
+      this.props.sendInfo('username', this.props.user, this.state.username_input);
 
       // Shows 'user_update_status' form
       document.querySelectorAll('#user_' + this.props.user + '_section .user_update_status').forEach(function (element) {
@@ -133,17 +134,18 @@ var UserSection = function (_React$Component) {
     value: function updateUser(event) {
       var _this2 = this;
 
-      var username = document.getElementById('username_' + this.props.user).textContent;
-
       // Sends http request to backend server
       var http_req = new XMLHttpRequest();
-      http_req.open('GET', 'http://localhost:3000/?username=' + username.replace(' ', '+'));
+      http_req.open('GET', 'http://localhost:3000/?username=' + this.props.username.replace(' ', '+'));
       http_req.send();
 
       // Executes when a response (a JSON-encoded string) is recieved
       http_req.onload = function () {
         var user_data = JSON.parse(http_req.response);
 
+        for (var i = 0; i < info.length; i++) {
+          _this2.props.sendInfo(info[i], _this2.props.user, user_data[info[i]]);
+        }
         for (var i = 0; i < stats.length; i++) {
           _this2.props.sendStat(stats[i].stat, _this2.props.user, user_data[stats[i].stat]);
         }
@@ -176,12 +178,18 @@ var UserSection = function (_React$Component) {
           React.createElement(
             'p',
             { id: 'username_' + this.props.user },
-            this.state.username
+            this.props.username
           ),
           React.createElement(
             'p',
+            { id: 'register_date_' + this.props.user },
+            this.props.register_date
+          ),
+          React.createElement('img', { id: 'user_image_' + this.props.user, src: this.props.user_image, alt: '' }),
+          React.createElement(
+            'p',
             { id: 'last_updated_' + this.props.user },
-            '[Last Updated]'
+            'Data Last Updated: [WIP]'
           ),
           React.createElement('input', { type: 'submit', id: 'user_' + this.props.user + '_update', value: 'Update' })
         )
@@ -252,16 +260,31 @@ var Body = function (_React$Component3) {
     var _this4 = _possibleConstructorReturn(this, (Body.__proto__ || Object.getPrototypeOf(Body)).call(this, props));
 
     _this4.state = {};
+    for (var i = 0; i < info.length; i++) {
+      _this4.state[info[i]] = ['', ''];
+    }
     for (var i = 0; i < stats.length; i++) {
       _this4.state[stats[i].stat] = [0, 0];
     }
     return _this4;
   }
 
-  // Gets stat (from UserSection component)
+  // Gets info (from UserSection component)
 
 
   _createClass(Body, [{
+    key: 'getInfo',
+    value: function getInfo(info, user, info_value) {
+      if (user == 1) {
+        this.setState(_defineProperty({}, info, [info_value, this.state[info][1]]));
+      } else {
+        this.setState(_defineProperty({}, info, [this.state[info][0], info_value]));
+      }
+    }
+
+    // Gets stat (from UserSection component)
+
+  }, {
     key: 'getStat',
     value: function getStat(stat, user, stat_value) {
       if (user == 1) {
@@ -269,8 +292,6 @@ var Body = function (_React$Component3) {
       } else {
         this.setState(_defineProperty({}, stat, [this.state[stat][0], stat_value]));
       }
-
-      console.log(this.state);
     }
   }, {
     key: 'render',
@@ -280,8 +301,8 @@ var Body = function (_React$Component3) {
       return React.createElement(
         'div',
         null,
-        React.createElement(UserSection, { user: 1, sendStat: this.getStat.bind(this) }),
-        React.createElement(UserSection, { user: 2, sendStat: this.getStat.bind(this) }),
+        React.createElement(UserSection, { user: 1, username: this.state.username[0], user_id: this.state.user_id[0], user_image: this.state.user_image[0], sendInfo: this.getInfo.bind(this), sendStat: this.getStat.bind(this) }),
+        React.createElement(UserSection, { user: 2, username: this.state.username[1], user_id: this.state.user_id[1], user_image: this.state.user_image[1], sendInfo: this.getInfo.bind(this), sendStat: this.getStat.bind(this) }),
         React.createElement(
           'div',
           { id: 'stats' },

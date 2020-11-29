@@ -7,6 +7,12 @@ class StatInfo {
   }
 }
 
+const info = [
+  'username',
+  'user_id',
+  'user_image'
+]
+
 const stats = [
   new StatInfo('mean_score', 0),
   new StatInfo('days_watched', 1),
@@ -88,8 +94,7 @@ class UserSection extends React.Component {
     super(props);
 
     this.state = {
-      username_input: '',
-      username: ''
+      username_input: ''
     };
     
     this.updateUsernameInput = this.updateUsernameInput.bind(this);
@@ -104,7 +109,7 @@ class UserSection extends React.Component {
 
   // Updates selected user
   submitUsername(event) {
-    this.setState({username: this.state.username_input});
+    this.props.sendInfo('username', this.props.user, this.state.username_input);
 
     // Shows 'user_update_status' form
     document.querySelectorAll(`#user_${this.props.user}_section .user_update_status`).forEach(element => element.style.display = 'inherit');
@@ -113,18 +118,19 @@ class UserSection extends React.Component {
   }
 
   // Updates user's data
-  updateUser(event) {   
-    var username = document.getElementById(`username_${this.props.user}`).textContent;
-  
+  updateUser(event) {     
     // Sends http request to backend server
     const http_req = new XMLHttpRequest();
-    http_req.open('GET', `http://localhost:3000/?username=${username.replace(' ', '+')}`);
+    http_req.open('GET', `http://localhost:3000/?username=${this.props.username.replace(' ', '+')}`);
     http_req.send();
   
     // Executes when a response (a JSON-encoded string) is recieved
     http_req.onload = () => {
       var user_data = JSON.parse(http_req.response);
       
+      for (var i = 0; i < info.length; i++) {
+        this.props.sendInfo(info[i], this.props.user, user_data[info[i]]);
+      }
       for (var i = 0; i < stats.length; i++) {
         this.props.sendStat(stats[i].stat, this.props.user, user_data[stats[i].stat]);
       }
@@ -145,8 +151,10 @@ class UserSection extends React.Component {
         </form>
 
         <form className='user_update_status' onSubmit={this.updateUser}>
-          <p id={`username_${this.props.user}`}>{this.state.username}</p>
-          <p id={`last_updated_${this.props.user}`}>[Last Updated]</p>
+          <p id={`username_${this.props.user}`}>{this.props.username}</p>
+          <p id={`register_date_${this.props.user}`}>{this.props.register_date}</p>
+          <img id={`user_image_${this.props.user}`} src={this.props.user_image} alt='' />
+          <p id={`last_updated_${this.props.user}`}>Data Last Updated: [WIP]</p>
           <input type='submit' id={`user_${this.props.user}_update`} value='Update' />
         </form>
       </div>
@@ -173,8 +181,20 @@ class Body extends React.Component {
     super(props);
 
     this.state = {};
+    for (var i = 0; i < info.length; i++) {
+      this.state[info[i]] = ['', ''];
+    }
     for (var i = 0; i < stats.length; i++) {
       this.state[stats[i].stat] = [0, 0];
+    }
+  }
+
+  // Gets info (from UserSection component)
+  getInfo(info, user, info_value) {
+    if (user == 1) {
+      this.setState({[info]: [info_value, this.state[info][1]]});
+    } else {
+      this.setState({[info]: [this.state[info][0], info_value]});
     }
   }
 
@@ -185,15 +205,13 @@ class Body extends React.Component {
     } else {
       this.setState({[stat]: [this.state[stat][0], stat_value]});
     }
-
-    console.log(this.state);
   }
 
   render() {
     return (
       <div>
-        <UserSection user={1} sendStat={this.getStat.bind(this)} />
-        <UserSection user={2} sendStat={this.getStat.bind(this)} />
+        <UserSection user={1} username={this.state.username[0]} user_id={this.state.user_id[0]} user_image={this.state.user_image[0]} sendInfo={this.getInfo.bind(this)} sendStat={this.getStat.bind(this)} />
+        <UserSection user={2} username={this.state.username[1]} user_id={this.state.user_id[1]} user_image={this.state.user_image[1]} sendInfo={this.getInfo.bind(this)} sendStat={this.getStat.bind(this)} />
         <div id='stats'>
           {stats.map(stat => (
             <Stat key={stat.stat} stat={stat.stat} stat_values={this.state[stat.stat]} />

@@ -61,6 +61,13 @@ p {
     color: #2E51A2;
 }
 
+.user_update_status img {
+    display: block;
+    height: 8em;
+    margin-left: auto;
+    margin-right: auto;
+}
+
 #stats {
     clear: both;
     display: none;
