@@ -17,7 +17,7 @@ var StatInfo = function StatInfo(stat, compare_type) {
   this.compare_type = compare_type;
 };
 
-var stats = [new StatInfo('mean_score', 0), new StatInfo('days_watched', 1), new StatInfo('episodes_watched', 1), new StatInfo('total_entries', 1), new StatInfo('completed', 1), new StatInfo('watching', 1), new StatInfo('on_hold', -1), new StatInfo('dropped', -1), new StatInfo('plan_to_watch', 0), new StatInfo('rewatched', 1)];
+var stats = [new StatInfo('mean_score', 0), new StatInfo('days_watched', 1), new StatInfo('episodes_watched', 1), new StatInfo('total_entries', 1), new StatInfo('completed', 1), new StatInfo('watching', 1), new StatInfo('on_hold', -1), new StatInfo('rewatched', 1), new StatInfo('dropped', -1), new StatInfo('plan_to_watch', -1)];
 
 // Updates CSS of stats
 function updateUserStatGraphics() {
@@ -240,7 +240,7 @@ var Stat = function (_React$Component2) {
   return Stat;
 }(React.Component);
 
-// Component for entire body of page
+// Component for body of page
 
 
 var Body = function (_React$Component3) {

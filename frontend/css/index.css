@@ -22,6 +22,10 @@ h2 {
     color: #FFF;
 }
 
+#body {
+    margin: 0em 2em 0em;
+}
+
 #user_1_section {
     float: left;
     width: 50%;

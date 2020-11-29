@@ -15,9 +15,9 @@ const stats = [
   new StatInfo('completed', 1),
   new StatInfo('watching', 1),
   new StatInfo('on_hold', -1),
+  new StatInfo('rewatched', 1),
   new StatInfo('dropped', -1),
-  new StatInfo('plan_to_watch', 0),
-  new StatInfo('rewatched', 1)
+  new StatInfo('plan_to_watch', -1)
 ]
 
 // Updates CSS of stats
@@ -167,7 +167,7 @@ class Stat extends React.Component {
   }
 }
 
-// Component for entire body of page
+// Component for body of page
 class Body extends React.Component {
   constructor(props) {
     super(props);

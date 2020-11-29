@@ -6,77 +6,37 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-// Given 'mean_score', returns 'Mean Score'
-function processText(text) {
-  text = text.replaceAll('_', ' ');
+// Component for top of page
+var Top = function (_React$Component) {
+  _inherits(Top, _React$Component);
 
-  for (var j = -1; j < text.length; j++) {
-    if (j == -1 || text.charAt(j) == ' ') {
-      text = text.slice(0, j + 1) + text.charAt(j + 1).toUpperCase() + text.slice(j + 2);
-    }
+  function Top() {
+    _classCallCheck(this, Top);
+
+    return _possibleConstructorReturn(this, (Top.__proto__ || Object.getPrototypeOf(Top)).apply(this, arguments));
   }
 
-  return text;
-}
-
-// Component for displaying a stat
-
-var Stat = function (_React$Component) {
-  _inherits(Stat, _React$Component);
-
-  function Stat(props) {
-    _classCallCheck(this, Stat);
-
-    var _this = _possibleConstructorReturn(this, (Stat.__proto__ || Object.getPrototypeOf(Stat)).call(this, props));
-
-    _this.stat = props.stat;
-
-    _this.state = {
-      stat_1: 0,
-      stat_2: 0
-    };
-    return _this;
-  }
-
-  _createClass(Stat, [{
+  _createClass(Top, [{
     key: 'render',
     value: function render() {
       return React.createElement(
         'div',
         null,
         React.createElement(
-          'h3',
+          'h1',
           null,
-          processText(this.stat) + ':'
+          'AnimeList Duel'
         ),
         React.createElement(
-          'div',
-          { className: 'stat_1', id: this.stat + '_1_bar' },
-          React.createElement(
-            'p',
-            { id: this.stat + '_1' },
-            this.state.stat_1
-          )
-        ),
-        React.createElement(
-          'div',
-          { className: 'stat_2', id: this.stat + '_2_bar' },
-          React.createElement(
-            'p',
-            { id: this.stat + '_2' },
-            this.state.stat_2
-          )
+          'h2',
+          null,
+          '"Only the dead have seen the end of anime." -Sun Tzu'
         )
       );
     }
   }]);
 
-  return Stat;
+  return Top;
 }(React.Component);
 
-// Adds Stat components
-
-
-for (var i = 0; i < stats.length; i++) {
-  ReactDOM.render(React.createElement(Stat, { stat: stats[i] }), document.querySelector('#' + stats[i]));
-}
+ReactDOM.render(React.createElement(Top, null), document.querySelector('#top'));
