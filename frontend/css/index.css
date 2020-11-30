@@ -47,6 +47,12 @@ h3 {
     color: #2E51A2;
 }
 
+.username_error {
+    display: none;
+
+    text-align: center;
+}
+
 .user_update_status {
     display: none;
     margin-bottom: 2em;

@@ -65,9 +65,6 @@ function updateUserStatGraphics() {
       }
     }
   }
-
-  // Shows 'stats'
-  document.getElementById('stats').style.display = 'inherit';
 }
 
 // Given 'mean_score', returns 'Mean Score'
@@ -98,8 +95,9 @@ var UserSection = function (_React$Component) {
     };
 
     _this.updateUsernameInput = _this.updateUsernameInput.bind(_this);
-    _this.submitUsername = _this.submitUsername.bind(_this);
+    _this.getUser = _this.getUser.bind(_this);
     _this.updateUser = _this.updateUser.bind(_this);
+    _this.sendRequest = _this.sendRequest.bind(_this);
     return _this;
   }
 
@@ -112,48 +110,86 @@ var UserSection = function (_React$Component) {
       this.setState({ username_input: event.target.value });
     }
 
-    // Updates selected user
+    // Gets user's data from backend (and ultimately from a database)
 
   }, {
-    key: 'submitUsername',
-    value: function submitUsername(event) {
-      this.props.sendInfo('username', this.props.user, this.state.username_input);
-
-      // Shows 'user_update_status' form
-      document.querySelectorAll('#user_' + this.props.user + '_section .user_update_status').forEach(function (element) {
-        return element.style.display = 'inherit';
-      });
-
+    key: 'getUser',
+    value: function getUser(event) {
+      this.sendRequest('get');
       event.preventDefault();
     }
 
-    // Updates user's data
+    // Updates user's data from backend (ultimately by scraping MyAnimeList)
 
   }, {
     key: 'updateUser',
     value: function updateUser(event) {
+      this.sendRequest('update');
+      event.preventDefault();
+    }
+
+    // Sends http request to backend server
+
+  }, {
+    key: 'sendRequest',
+    value: function sendRequest(request) {
       var _this2 = this;
 
-      // Sends http request to backend server
       var http_req = new XMLHttpRequest();
-      http_req.open('GET', 'http://localhost:3000/?username=' + this.props.username.replace(' ', '+'));
+      http_req.open('GET', 'http://localhost:3000/?username=' + this.state.username_input.replace(' ', '+') + '&request=' + request);
       http_req.send();
 
       // Executes when a response (a JSON-encoded string) is recieved
       http_req.onload = function () {
         var user_data = JSON.parse(http_req.response);
 
-        for (var i = 0; i < info.length; i++) {
-          _this2.props.sendInfo(info[i], _this2.props.user, user_data[info[i]]);
-        }
-        for (var i = 0; i < stats.length; i++) {
-          _this2.props.sendStat(stats[i].stat, _this2.props.user, user_data[stats[i].stat]);
-        }
+        // If update was successful
+        if (user_data.user_id != '') {
+          // Updates parent's state with info and stats
+          for (var i = 0; i < info.length; i++) {
+            _this2.props.sendInfo(info[i], _this2.props.user, user_data[info[i]]);
+          }
+          for (var i = 0; i < stats.length; i++) {
+            _this2.props.sendStat(stats[i].stat, _this2.props.user, user_data[stats[i].stat]);
+          }
 
-        updateUserStatGraphics();
+          // Hides error message
+          document.getElementById('username_error_' + _this2.props.user).style.display = 'none';
+          // Shows user_update_status form
+          document.querySelectorAll('#user_' + _this2.props.user + '_section .user_update_status').forEach(function (element) {
+            return element.style.display = 'inherit';
+          });
+          // Updates and shows stat graphics
+          updateUserStatGraphics();
+          document.getElementById('stats').style.display = 'inherit';
+
+          // If update was unsuccessful
+        } else {
+          if (request == 'get') {
+            console.log('sendRequest get unsuccessful, trying update instead');
+            _this2.sendRequest('update');
+          } else {
+            console.log('sendRequest update unsuccessful');
+
+            // Updates parent's state with zeros
+            for (var i = 0; i < info.length; i++) {
+              _this2.props.sendInfo(info[i], _this2.props.user, '');
+            }
+            for (var i = 0; i < stats.length; i++) {
+              _this2.props.sendStat(stats[i].stat, _this2.props.user, 0);
+            }
+
+            // Shows error message
+            document.getElementById('username_error_' + _this2.props.user).style.display = 'inherit';
+            // Hides user_update_status form
+            document.querySelectorAll('#user_' + _this2.props.user + '_section .user_update_status').forEach(function (element) {
+              return element.style.display = 'none';
+            });
+            // Updates and shows stat graphics
+            updateUserStatGraphics();
+          }
+        }
       };
-
-      event.preventDefault();
     }
   }, {
     key: 'render',
@@ -163,7 +199,7 @@ var UserSection = function (_React$Component) {
         { id: 'user_' + this.props.user + '_section' },
         React.createElement(
           'form',
-          { className: 'username_input', onSubmit: this.submitUsername },
+          { className: 'username_input', onSubmit: this.getUser },
           React.createElement(
             'h3',
             null,
@@ -171,6 +207,12 @@ var UserSection = function (_React$Component) {
           ),
           React.createElement('input', { type: 'text', id: 'username_' + this.props.user + '_input', value: this.state.username_input, onChange: this.updateUsernameInput }),
           React.createElement('input', { type: 'submit', id: 'username_' + this.props.user + '_submit', value: 'Select' })
+        ),
+        React.createElement(
+          'p',
+          { className: 'username_error', id: 'username_error_' + this.props.user },
+          this.state.username_input,
+          ' Not Found'
         ),
         React.createElement(
           'form',

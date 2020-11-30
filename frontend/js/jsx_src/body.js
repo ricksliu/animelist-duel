@@ -70,9 +70,6 @@ function updateUserStatGraphics() {
       }
     }
   }
-
-  // Shows 'stats'
-  document.getElementById('stats').style.display = 'inherit';
 }
 
 // Given 'mean_score', returns 'Mean Score'
@@ -98,8 +95,9 @@ class UserSection extends React.Component {
     };
     
     this.updateUsernameInput = this.updateUsernameInput.bind(this);
-    this.submitUsername = this.submitUsername.bind(this);
+    this.getUser = this.getUser.bind(this);
     this.updateUser = this.updateUser.bind(this);
+    this.sendRequest = this.sendRequest.bind(this);
   }
 
   // Updates text in input box
@@ -107,49 +105,82 @@ class UserSection extends React.Component {
     this.setState({username_input: event.target.value});
   }
 
-  // Updates selected user
-  submitUsername(event) {
-    this.props.sendInfo('username', this.props.user, this.state.username_input);
-
-    // Shows 'user_update_status' form
-    document.querySelectorAll(`#user_${this.props.user}_section .user_update_status`).forEach(element => element.style.display = 'inherit');
-
+  // Gets user's data from backend (and ultimately from a database)
+  getUser(event) {
+    this.sendRequest('get');
     event.preventDefault();
   }
 
-  // Updates user's data
-  updateUser(event) {     
-    // Sends http request to backend server
+  // Updates user's data from backend (ultimately by scraping MyAnimeList)
+  updateUser(event) {
+    this.sendRequest('update');
+    event.preventDefault();
+  }
+
+  // Sends http request to backend server
+  sendRequest(request) {
     const http_req = new XMLHttpRequest();
-    http_req.open('GET', `http://localhost:3000/?username=${this.props.username.replace(' ', '+')}`);
+    http_req.open('GET', `http://localhost:3000/?username=${this.state.username_input.replace(' ', '+')}&request=${request}`);
     http_req.send();
   
     // Executes when a response (a JSON-encoded string) is recieved
     http_req.onload = () => {
       var user_data = JSON.parse(http_req.response);
-      
-      for (var i = 0; i < info.length; i++) {
-        this.props.sendInfo(info[i], this.props.user, user_data[info[i]]);
-      }
-      for (var i = 0; i < stats.length; i++) {
-        this.props.sendStat(stats[i].stat, this.props.user, user_data[stats[i].stat]);
-      }
 
-      updateUserStatGraphics();
+      // If update was successful
+      if (user_data.user_id != '') {
+        // Updates parent's state with info and stats
+        for (var i = 0; i < info.length; i++) {
+          this.props.sendInfo(info[i], this.props.user, user_data[info[i]]);
+        }
+        for (var i = 0; i < stats.length; i++) {
+          this.props.sendStat(stats[i].stat, this.props.user, user_data[stats[i].stat]);
+        }
+
+        // Hides error message
+        document.getElementById(`username_error_${this.props.user}`).style.display = 'none';
+        // Shows user_update_status form
+        document.querySelectorAll(`#user_${this.props.user}_section .user_update_status`).forEach(element => element.style.display = 'inherit');
+        // Updates and shows stat graphics
+        updateUserStatGraphics();
+        document.getElementById('stats').style.display = 'inherit';
+      
+      // If update was unsuccessful
+      } else {
+        if (request == 'get') {
+          console.log('sendRequest get unsuccessful, trying update instead');
+          this.sendRequest('update');
+        } else {
+          console.log('sendRequest update unsuccessful');
+
+          // Updates parent's state with zeros
+          for (var i = 0; i < info.length; i++) {
+            this.props.sendInfo(info[i], this.props.user, '');
+          }
+          for (var i = 0; i < stats.length; i++) {
+            this.props.sendStat(stats[i].stat, this.props.user, 0);
+          }
+
+          // Shows error message
+          document.getElementById(`username_error_${this.props.user}`).style.display = 'inherit';
+          // Hides user_update_status form
+          document.querySelectorAll(`#user_${this.props.user}_section .user_update_status`).forEach(element => element.style.display = 'none');
+          // Updates and shows stat graphics
+          updateUserStatGraphics();
+        }
+      }
     }
-    
-    event.preventDefault();
   }
 
   render() {
     return (
       <div id={`user_${this.props.user}_section`}>
-        <form className='username_input' onSubmit={this.submitUsername}>
+        <form className='username_input' onSubmit={this.getUser}>
           <h3>{`User ${this.props.user}`}</h3>
           <input type='text' id={`username_${this.props.user}_input`} value={this.state.username_input} onChange={this.updateUsernameInput} />
           <input type='submit' id={`username_${this.props.user}_submit`} value='Select' />
         </form>
-
+        <p className='username_error' id={`username_error_${this.props.user}`}>{this.state.username_input} Not Found</p>
         <form className='user_update_status' onSubmit={this.updateUser}>
           <p id={`username_${this.props.user}`}>{this.props.username}</p>
           <p id={`register_date_${this.props.user}`}>{this.props.register_date}</p>
