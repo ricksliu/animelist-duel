@@ -2,13 +2,11 @@
 
 h1 {
     text-align: center;
-
     color: #FFF;
 }
 
 h2 {
     text-align: center;
-
     color: #FFF;
 }
 
@@ -23,6 +21,8 @@ h2 {
 }
 
 .username_input {
+    margin-bottom: 2em;
+
     text-align: center;
 }
 
@@ -61,41 +61,53 @@ p {
 }
 
 #stats {
-    clear: both;
     display: none;
+    clear: both;
+}
+
+.stat {
+    margin-bottom: 8em;
 }
 
 .stat h3 {
-    clear: both;
-    margin-bottom: 0.5em;
-
     text-align: center;
 }
 
 .stat div {
+    position: relative;
+}
+
+.stat div div {
+    position: absolute;
+    top: 1em;
     width: 50%;
-    margin-bottom: 2em;
+    height: 4em;
 }
 
-.stat .stat_1 {
-    float: left;
+.stat div .stat_1_bar {
+    left: 0em;
 }
 
-.stat .stat_2 {
-    float: right;
+.stat div .stat_2_bar {
+    right: 0em;
 }
 
 .stat div p {
-    padding: 0.5em;
+    z-index: 1;
+    position: absolute;
+    top: 1em;
 
     font-size: 2em;
-    font-weight: bold;
-
+    line-height: 1em;
     color: #FFF;
 }
 
-.stat .stat_2 p {
-    float: right;
+.stat div .stat_1 {
+    left: 0.5em;
+}
+
+.stat div .stat_2 {
+    right: 0.5em;
 
     text-align: right;
 }

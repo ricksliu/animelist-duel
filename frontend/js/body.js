@@ -43,7 +43,7 @@ function updateUserStatGraphics() {
       if (stat_1 == stat_2) {
         scale = 50;
       } else {
-        scale = 10 + 80 * stat_1 / (stat_1 + stat_2);
+        scale = 1 + 98 * stat_1 / (stat_1 + stat_2);
 
         // If a reversed stat (lower number is better), reverses the bar width
         if (stats[i].compare_type == -1) {
@@ -251,7 +251,7 @@ var UserSection = function (_React$Component) {
           'form',
           { className: 'user_update_status', onSubmit: this.updateUser },
           React.createElement(
-            'p',
+            'h3',
             { id: 'username_' + this.props.user },
             this.props.username
           ),
@@ -259,10 +259,10 @@ var UserSection = function (_React$Component) {
           React.createElement(
             'p',
             { id: 'last_updated_' + this.props.user },
-            'Last Updated: ',
+            'Data From ',
             this.props.last_updated
           ),
-          React.createElement('input', { type: 'submit', id: 'user_' + this.props.user + '_update', value: 'Update' })
+          React.createElement('input', { type: 'submit', id: 'user_' + this.props.user + '_update', value: 'Update Data' })
         )
       );
     }
@@ -296,19 +296,17 @@ var Stat = function (_React$Component2) {
         ),
         React.createElement(
           'div',
-          { className: 'stat_1', id: this.props.stat + '_1_bar' },
+          null,
+          React.createElement('div', { className: 'stat_1_bar', id: this.props.stat + '_1_bar' }),
           React.createElement(
             'p',
-            { id: this.props.stat + '_1' },
+            { className: 'stat_1', id: this.props.stat + '_1' },
             this.props.stat_values[0]
-          )
-        ),
-        React.createElement(
-          'div',
-          { className: 'stat_2', id: this.props.stat + '_2_bar' },
+          ),
+          React.createElement('div', { className: 'stat_2_bar', id: this.props.stat + '_2_bar' }),
           React.createElement(
             'p',
-            { id: this.props.stat + '_2' },
+            { className: 'stat_2', id: this.props.stat + '_2' },
             this.props.stat_values[1]
           )
         )

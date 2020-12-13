@@ -46,7 +46,7 @@ function updateUserStatGraphics() {
       if (stat_1 == stat_2) {
         scale = 50;
       } else {
-        scale = 10 + 80 * stat_1 / (stat_1 + stat_2);
+        scale = 1 + 98 * stat_1 / (stat_1 + stat_2);
 
         // If a reversed stat (lower number is better), reverses the bar width
         if (stats[i].compare_type == -1) {
@@ -207,10 +207,10 @@ class UserSection extends React.Component {
         <p className='backend_error' id={`backend_error_${this.props.user}`}>This Website Is Offline Right Now</p>
         <p className='username_error' id={`username_error_${this.props.user}`}>User Not Found</p>
         <form className='user_update_status' onSubmit={this.updateUser}>
-          <p id={`username_${this.props.user}`}>{this.props.username}</p>
+          <h3 id={`username_${this.props.user}`}>{this.props.username}</h3>
           <img id={`user_image_${this.props.user}`} src={this.props.user_image} alt='' />
-          <p id={`last_updated_${this.props.user}`}>Last Updated: {this.props.last_updated}</p>
-          <input type='submit' id={`user_${this.props.user}_update`} value='Update' />
+          <p id={`last_updated_${this.props.user}`}>Data From {this.props.last_updated}</p>
+          <input type='submit' id={`user_${this.props.user}_update`} value='Update Data' />
         </form>
       </div>
     );
@@ -223,8 +223,12 @@ class Stat extends React.Component {
     return (
       <div className='stat' id={this.props.stat}>
         <h3>{`${formatText(this.props.stat)}:`}</h3>
-        <div className='stat_1' id={`${this.props.stat}_1_bar`}><p id={`${this.props.stat}_1`}>{this.props.stat_values[0]}</p></div>
-        <div className='stat_2' id={`${this.props.stat}_2_bar`}><p id={`${this.props.stat}_2`}>{this.props.stat_values[1]}</p></div>
+        <div>
+          <div className='stat_1_bar' id={`${this.props.stat}_1_bar`}></div>
+          <p className='stat_1' id={`${this.props.stat}_1`}>{this.props.stat_values[0]}</p>
+          <div className='stat_2_bar' id={`${this.props.stat}_2_bar`}></div>
+          <p className='stat_2' id={`${this.props.stat}_2`}>{this.props.stat_values[1]}</p>
+        </div>
       </div>
     );
   }
