@@ -17,9 +17,12 @@ var StatInfo = function StatInfo(stat, compare_type) {
   this.compare_type = compare_type;
 };
 
-var info = ['username', 'user_id', 'last_updated', 'user_image'];
+// Following two arrays store the names (and additional info) of user data that the website handles
 
-var stats = [new StatInfo('mean_score', 0), new StatInfo('days_watched', 1), new StatInfo('episodes_watched', 1), new StatInfo('total_entries', 1), new StatInfo('completed', 1), new StatInfo('watching', 1), new StatInfo('on_hold', -1), new StatInfo('rewatched', 1), new StatInfo('dropped', -1), new StatInfo('plan_to_watch', -1)];
+
+var info = ['username', 'user_id', 'last_updated', 'user_image'];
+var stats = [new StatInfo('mean_score', 0), // 0 because it doesn't make sense to compare mean score
+new StatInfo('days_watched', 1), new StatInfo('episodes_watched', 1), new StatInfo('total_entries', 1), new StatInfo('completed', 1), new StatInfo('watching', 1), new StatInfo('on_hold', -1), new StatInfo('rewatched', 1), new StatInfo('dropped', -1), new StatInfo('plan_to_watch', -1)];
 
 // Updates CSS of stats
 function updateUserStatGraphics() {
@@ -35,14 +38,14 @@ function updateUserStatGraphics() {
       var stat_1 = parseFloat(document.getElementById(stats[i].stat + '_1').textContent);
       var stat_2 = parseFloat(document.getElementById(stats[i].stat + '_2').textContent);
 
-      // Calculates percentage of user 1's bar
+      // Scale is the percentage of the bar occupied by user 1
       var scale;
       if (stat_1 == stat_2) {
         scale = 50;
       } else {
         scale = 10 + 80 * stat_1 / (stat_1 + stat_2);
 
-        // If a reversed stat, reverses the scale
+        // If a reversed stat (lower number is better), reverses the bar width
         if (stats[i].compare_type == -1) {
           scale = 100 - scale;
         }
@@ -52,7 +55,7 @@ function updateUserStatGraphics() {
       document.getElementById(stats[i].stat + '_1_bar').style.width = scale.toString() + '%';
       document.getElementById(stats[i].stat + '_2_bar').style.width = (100 - scale).toString() + '%';
 
-      // Updates bar colours
+      // Updates bar colours to be green, red or gray depending on the numbers
       if (scale > 50.0) {
         document.getElementById(stats[i].stat + '_1_bar').style.backgroundColor = '#6C6';
         document.getElementById(stats[i].stat + '_2_bar').style.backgroundColor = '#C66';
@@ -67,8 +70,8 @@ function updateUserStatGraphics() {
   }
 }
 
-// Given 'mean_score', returns 'Mean Score'
-function processText(text) {
+// Given a string like 'mean_score', returns 'Mean Score'
+function formatText(text) {
   text = text.replaceAll('_', ' ');
 
   for (var j = -1; j < text.length; j++) {
@@ -88,6 +91,8 @@ var UserSection = function (_React$Component) {
   function UserSection(props) {
     _classCallCheck(this, UserSection);
 
+    // username_input is necessary in order to keep the text inside the input form up to date
+    // No need to be a prop passed from a parent since it's only needed by this component
     var _this = _possibleConstructorReturn(this, (UserSection.__proto__ || Object.getPrototypeOf(UserSection)).call(this, props));
 
     _this.state = {
@@ -101,7 +106,7 @@ var UserSection = function (_React$Component) {
     return _this;
   }
 
-  // Updates text in input box as user types
+  // Updates text in input form as user types
 
 
   _createClass(UserSection, [{
@@ -110,42 +115,25 @@ var UserSection = function (_React$Component) {
       this.setState({ username_input: event.target.value });
     }
 
-    // Gets user's data from backend (and ultimately from a database)
-
-  }, {
-    key: 'getUser',
-    value: function getUser(event) {
-      this.sendRequest('get');
-      event.preventDefault();
-    }
-
-    // Updates user's data from backend (ultimately by scraping MyAnimeList)
-
-  }, {
-    key: 'updateUser',
-    value: function updateUser(event) {
-      this.sendRequest('update');
-      event.preventDefault();
-    }
-
-    // Sends http request to backend server
+    // Sends HTTP request to backend server to get or update data for the user that this component is for
 
   }, {
     key: 'sendRequest',
     value: function sendRequest(request) {
       var _this2 = this;
 
+      // Sends HTTP request
       var http_req = new XMLHttpRequest();
-      http_req.open('GET', 'http://localhost:3000/?username=' + this.state.username_input.toLowerCase().replace(' ', '+') + '&request=' + request);
+      http_req.open('GET', 'http://localhost:3000/?username=' + this.state.username_input.replace(' ', '+') + '&request=' + request);
       http_req.send();
 
       // Executes when a response (a JSON-encoded string) is recieved
       http_req.onload = function () {
         var user_data = JSON.parse(http_req.response);
 
-        // If update was successful
+        // If update was successful (backend sets user_id to an empty string if it was unsuccessful)
         if (user_data.user_id != '') {
-          // Updates parent's state with info and stats
+          // Updates parent's state with info and stats using callback function in props
           for (var i = 0; i < info.length; i++) {
             _this2.props.sendInfo(info[i], _this2.props.user, user_data[info[i]]);
           }
@@ -168,12 +156,12 @@ var UserSection = function (_React$Component) {
           if (request == 'get') {
             _this2.sendRequest('update');
           } else {
-            // Updates parent's state with zeros
+            // Updates parent's state with blank strings and zeroes instead of actual stats
             for (var i = 0; i < info.length; i++) {
               _this2.props.sendInfo(info[i], _this2.props.user, '');
             }
             for (var i = 0; i < stats.length; i++) {
-              _this2.props.sendStat(stats[i].stat, _this2.props.user, 0);
+              _this2.props.sendStat(stats[i].stat, _this2.props.user, 0); // Stat bars break if an empty string is sent instead of a number
             }
 
             // Shows error message
@@ -182,12 +170,33 @@ var UserSection = function (_React$Component) {
             document.querySelectorAll('#user_' + _this2.props.user + '_section .user_update_status').forEach(function (element) {
               return element.style.display = 'none';
             });
-            // Updates and shows stat graphics
+            // Updates stat graphics (no need to hide it; the other user may have stats to show)
             updateUserStatGraphics();
           }
         }
       };
     }
+
+    // The following functions are used as shortcuts for the function above
+
+  }, {
+    key: 'getUser',
+    value: function getUser(event) {
+      this.sendRequest('get');
+      event.preventDefault();
+    }
+  }, {
+    key: 'updateUser',
+    value: function updateUser(event) {
+      this.sendRequest('update');
+      event.preventDefault();
+    }
+
+    // Composed of three parts
+    // form.username_input is for inputting and selecting a user to display
+    // p.username_error is only visible if an error occurred with form.username_input
+    // form.user_update_status displays how up to date the current stats are, and a button to update them
+
   }, {
     key: 'render',
     value: function render() {
@@ -219,16 +228,12 @@ var UserSection = function (_React$Component) {
             { id: 'username_' + this.props.user },
             this.props.username
           ),
-          React.createElement(
-            'p',
-            { id: 'register_date_' + this.props.user },
-            this.props.register_date
-          ),
           React.createElement('img', { id: 'user_image_' + this.props.user, src: this.props.user_image, alt: '' }),
           React.createElement(
             'p',
             { id: 'last_updated_' + this.props.user },
-            'Data Last Updated: [WIP]'
+            'Last Updated: ',
+            this.props.last_updated
           ),
           React.createElement('input', { type: 'submit', id: 'user_' + this.props.user + '_update', value: 'Update' })
         )
@@ -239,7 +244,7 @@ var UserSection = function (_React$Component) {
   return UserSection;
 }(React.Component);
 
-// Component for displaying a stat
+// Component that displaying a stat (two numbers and a bar for each number)
 
 
 var Stat = function (_React$Component2) {
@@ -260,7 +265,7 @@ var Stat = function (_React$Component2) {
         React.createElement(
           'h3',
           null,
-          processText(this.props.stat) + ':'
+          formatText(this.props.stat) + ':'
         ),
         React.createElement(
           'div',
@@ -296,6 +301,8 @@ var Body = function (_React$Component3) {
   function Body(props) {
     _classCallCheck(this, Body);
 
+    // State has a length 2 array corresponding to each item in the 'info' and 'stats' arrays
+    // These arrays are used to store data for each user
     var _this4 = _possibleConstructorReturn(this, (Body.__proto__ || Object.getPrototypeOf(Body)).call(this, props));
 
     _this4.state = {};
@@ -308,7 +315,8 @@ var Body = function (_React$Component3) {
     return _this4;
   }
 
-  // Gets info (from UserSection component)
+  // Following two functions are used as callback function by UserSection components to update this component's state
+  // Takes info/stat in question, which user to update, and the data itself
 
 
   _createClass(Body, [{
@@ -320,9 +328,6 @@ var Body = function (_React$Component3) {
         this.setState(_defineProperty({}, info, [this.state[info][0], info_value]));
       }
     }
-
-    // Gets stat (from UserSection component)
-
   }, {
     key: 'getStat',
     value: function getStat(stat, user, stat_value) {
@@ -332,6 +337,11 @@ var Body = function (_React$Component3) {
         this.setState(_defineProperty({}, stat, [this.state[stat][0], stat_value]));
       }
     }
+
+    // Info for user passed down as props to UserSection components; getInfo() and getStat() passed to be used as callback functions
+    // The map function inside div#stats creates a Stat component for each item in the array 'stats'
+    // Corresponding stat passed down as prop to each Stat component
+
   }, {
     key: 'render',
     value: function render() {
@@ -340,8 +350,8 @@ var Body = function (_React$Component3) {
       return React.createElement(
         'div',
         null,
-        React.createElement(UserSection, { user: 1, username: this.state.username[0], user_id: this.state.user_id[0], user_image: this.state.user_image[0], sendInfo: this.getInfo.bind(this), sendStat: this.getStat.bind(this) }),
-        React.createElement(UserSection, { user: 2, username: this.state.username[1], user_id: this.state.user_id[1], user_image: this.state.user_image[1], sendInfo: this.getInfo.bind(this), sendStat: this.getStat.bind(this) }),
+        React.createElement(UserSection, { user: 1, username: this.state.username[0], user_id: this.state.user_id[0], last_updated: this.state.last_updated[0], user_image: this.state.user_image[0], sendInfo: this.getInfo.bind(this), sendStat: this.getStat.bind(this) }),
+        React.createElement(UserSection, { user: 2, username: this.state.username[1], user_id: this.state.user_id[1], last_updated: this.state.last_updated[1], user_image: this.state.user_image[1], sendInfo: this.getInfo.bind(this), sendStat: this.getStat.bind(this) }),
         React.createElement(
           'div',
           { id: 'stats' },
