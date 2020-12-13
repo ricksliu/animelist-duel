@@ -1,29 +1,15 @@
 @import url("main.css");
 
-#top {
-    padding: 2em;
-    margin-bottom: 2em;
-    background-color: #2E51A2;
-}
-
 h1 {
-    font-size: 4em;
-    font-weight: bold;
     text-align: center;
 
     color: #FFF;
 }
 
 h2 {
-    font-size: 2em;
-    font-weight: bold;
     text-align: center;
 
     color: #FFF;
-}
-
-#body {
-    margin: 0em 2em 0em;
 }
 
 #user_1_section {
@@ -41,9 +27,6 @@ h2 {
 }
 
 h3 {
-    font-size: 2em;
-    font-weight: bold;
-
     color: #2E51A2;
 }
 
@@ -61,9 +44,6 @@ h3 {
 }
 
 p {
-    font-size: 1em;
-    font-weight: bold;
-
     color: #2E51A2;
 }
 

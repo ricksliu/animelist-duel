@@ -10,6 +10,7 @@ class StatInfo {
 const info = [
   'username',
   'user_id',
+  'last_updated',
   'user_image'
 ]
 
@@ -100,7 +101,7 @@ class UserSection extends React.Component {
     this.sendRequest = this.sendRequest.bind(this);
   }
 
-  // Updates text in input box
+  // Updates text in input box as user types
   updateUsernameInput(event) {
     this.setState({username_input: event.target.value});
   }
@@ -120,7 +121,7 @@ class UserSection extends React.Component {
   // Sends http request to backend server
   sendRequest(request) {
     const http_req = new XMLHttpRequest();
-    http_req.open('GET', `http://localhost:3000/?username=${this.state.username_input.replace(' ', '+')}&request=${request}`);
+    http_req.open('GET', `http://localhost:3000/?username=${this.state.username_input..replace(' ', '+')}&request=${request}`);
     http_req.send();
   
     // Executes when a response (a JSON-encoded string) is recieved
@@ -148,11 +149,8 @@ class UserSection extends React.Component {
       // If update was unsuccessful
       } else {
         if (request == 'get') {
-          console.log('sendRequest get unsuccessful, trying update instead');
           this.sendRequest('update');
         } else {
-          console.log('sendRequest update unsuccessful');
-
           // Updates parent's state with zeros
           for (var i = 0; i < info.length; i++) {
             this.props.sendInfo(info[i], this.props.user, '');
@@ -206,7 +204,7 @@ class Stat extends React.Component {
   }
 }
 
-// Component for body of page
+// Component for body of page; uses the two components above
 class Body extends React.Component {
   constructor(props) {
     super(props);

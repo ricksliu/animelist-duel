@@ -17,7 +17,7 @@ var StatInfo = function StatInfo(stat, compare_type) {
   this.compare_type = compare_type;
 };
 
-var info = ['username', 'user_id', 'user_image'];
+var info = ['username', 'user_id', 'last_updated', 'user_image'];
 
 var stats = [new StatInfo('mean_score', 0), new StatInfo('days_watched', 1), new StatInfo('episodes_watched', 1), new StatInfo('total_entries', 1), new StatInfo('completed', 1), new StatInfo('watching', 1), new StatInfo('on_hold', -1), new StatInfo('rewatched', 1), new StatInfo('dropped', -1), new StatInfo('plan_to_watch', -1)];
 
@@ -101,7 +101,7 @@ var UserSection = function (_React$Component) {
     return _this;
   }
 
-  // Updates text in input box
+  // Updates text in input box as user types
 
 
   _createClass(UserSection, [{
@@ -136,7 +136,7 @@ var UserSection = function (_React$Component) {
       var _this2 = this;
 
       var http_req = new XMLHttpRequest();
-      http_req.open('GET', 'http://localhost:3000/?username=' + this.state.username_input.replace(' ', '+') + '&request=' + request);
+      http_req.open('GET', 'http://localhost:3000/?username=' + this.state.username_input.toLowerCase().replace(' ', '+') + '&request=' + request);
       http_req.send();
 
       // Executes when a response (a JSON-encoded string) is recieved
@@ -166,11 +166,8 @@ var UserSection = function (_React$Component) {
           // If update was unsuccessful
         } else {
           if (request == 'get') {
-            console.log('sendRequest get unsuccessful, trying update instead');
             _this2.sendRequest('update');
           } else {
-            console.log('sendRequest update unsuccessful');
-
             // Updates parent's state with zeros
             for (var i = 0; i < info.length; i++) {
               _this2.props.sendInfo(info[i], _this2.props.user, '');
@@ -290,7 +287,7 @@ var Stat = function (_React$Component2) {
   return Stat;
 }(React.Component);
 
-// Component for body of page
+// Component for body of page; uses the two components above
 
 
 var Body = function (_React$Component3) {

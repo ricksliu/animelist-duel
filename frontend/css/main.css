@@ -4,18 +4,40 @@ body {
     font: medium Verdana, Tahoma, sans-serif;
 }
 
+#top {
+    padding: 2em;
+    margin-bottom: 2em;
+    background-color: #2E51A2;
+}
+
+#body {
+    margin: 0em 2em 0em;
+}
+
 h1 {
     margin: 0em;
+
+    font-size: 4em;
+    font-weight: bold;
 }
 
 h2 {
     margin: 0em;
+
+    font-size: 2em;
+    font-weight: bold;
 }
 
 h3 {
     margin: 0em;
+
+    font-size: 2em;
+    font-weight: bold;
 }
 
 p {
     margin: 0em;
+
+    font-size: 1em;
+    font-weight: bold;
 }
