@@ -121,7 +121,7 @@ class UserSection extends React.Component {
   // Sends http request to backend server
   sendRequest(request) {
     const http_req = new XMLHttpRequest();
-    http_req.open('GET', `http://localhost:3000/?username=${this.state.username_input..replace(' ', '+')}&request=${request}`);
+    http_req.open('GET', `http://localhost:3000/?username=${this.state.username_input.replace(' ', '+')}&request=${request}`);
     http_req.send();
   
     // Executes when a response (a JSON-encoded string) is recieved
