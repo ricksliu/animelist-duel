@@ -129,7 +129,8 @@ class UserSection extends React.Component {
           this.props.sendStat(stats[i].stat, this.props.user, user_data[stats[i].stat]);
         }
 
-        // Hides error message
+        // Toggles error messages
+        document.getElementById(`backend_error_${this.props.user}`).style.display = 'none';
         document.getElementById(`username_error_${this.props.user}`).style.display = 'none';
         // Shows user_update_status form
         document.querySelectorAll(`#user_${this.props.user}_section .user_update_status`).forEach(element => element.style.display = 'inherit');
@@ -150,7 +151,8 @@ class UserSection extends React.Component {
             this.props.sendStat(stats[i].stat, this.props.user, 0);  // Stat bars break if an empty string is sent instead of a number
           }
 
-          // Shows error message
+          // Toggles error messages
+          document.getElementById(`backend_error_${this.props.user}`).style.display = 'none';
           document.getElementById(`username_error_${this.props.user}`).style.display = 'inherit';
           // Hides user_update_status form
           document.querySelectorAll(`#user_${this.props.user}_section .user_update_status`).forEach(element => element.style.display = 'none');
@@ -158,6 +160,25 @@ class UserSection extends React.Component {
           updateUserStatGraphics();
         }
       }
+    }
+
+    // Executes when backend is offline
+    http_req.onerror = () => {
+      // Updates parent's state with blank strings and zeroes instead of actual stats
+      for (var i = 0; i < info.length; i++) {
+        this.props.sendInfo(info[i], this.props.user, '');
+      }
+      for (var i = 0; i < stats.length; i++) {
+        this.props.sendStat(stats[i].stat, this.props.user, 0);  // Stat bars break if an empty string is sent instead of a number
+      }
+
+      // Toggles error messages
+      document.getElementById(`backend_error_${this.props.user}`).style.display = 'inherit';
+      document.getElementById(`username_error_${this.props.user}`).style.display = 'none';
+      // Hides user_update_status form
+      document.querySelectorAll(`#user_${this.props.user}_section .user_update_status`).forEach(element => element.style.display = 'none');
+      // Updates stat graphics (no need to hide it; the other user may have stats to show)
+      updateUserStatGraphics();
     }
   }
 
@@ -173,7 +194,7 @@ class UserSection extends React.Component {
 
   // Composed of three parts
   // form.username_input is for inputting and selecting a user to display
-  // p.username_error is only visible if an error occurred with form.username_input
+  // p.backend_error and p.username_error appear for self-explanatory reasons
   // form.user_update_status displays how up to date the current stats are, and a button to update them
   render() {
     return (
@@ -183,7 +204,8 @@ class UserSection extends React.Component {
           <input type='text' id={`username_${this.props.user}_input`} value={this.state.username_input} onChange={this.updateUsernameInput} />
           <input type='submit' id={`username_${this.props.user}_submit`} value='Select' />
         </form>
-        <p className='username_error' id={`username_error_${this.props.user}`}>{this.state.username_input} Not Found</p>
+        <p className='backend_error' id={`backend_error_${this.props.user}`}>This Website Is Offline Right Now</p>
+        <p className='username_error' id={`username_error_${this.props.user}`}>User Not Found</p>
         <form className='user_update_status' onSubmit={this.updateUser}>
           <p id={`username_${this.props.user}`}>{this.props.username}</p>
           <img id={`user_image_${this.props.user}`} src={this.props.user_image} alt='' />

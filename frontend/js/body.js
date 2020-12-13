@@ -141,7 +141,8 @@ var UserSection = function (_React$Component) {
             _this2.props.sendStat(stats[i].stat, _this2.props.user, user_data[stats[i].stat]);
           }
 
-          // Hides error message
+          // Toggles error messages
+          document.getElementById('backend_error_' + _this2.props.user).style.display = 'none';
           document.getElementById('username_error_' + _this2.props.user).style.display = 'none';
           // Shows user_update_status form
           document.querySelectorAll('#user_' + _this2.props.user + '_section .user_update_status').forEach(function (element) {
@@ -164,7 +165,8 @@ var UserSection = function (_React$Component) {
               _this2.props.sendStat(stats[i].stat, _this2.props.user, 0); // Stat bars break if an empty string is sent instead of a number
             }
 
-            // Shows error message
+            // Toggles error messages
+            document.getElementById('backend_error_' + _this2.props.user).style.display = 'none';
             document.getElementById('username_error_' + _this2.props.user).style.display = 'inherit';
             // Hides user_update_status form
             document.querySelectorAll('#user_' + _this2.props.user + '_section .user_update_status').forEach(function (element) {
@@ -174,6 +176,27 @@ var UserSection = function (_React$Component) {
             updateUserStatGraphics();
           }
         }
+      };
+
+      // Executes when backend is offline
+      http_req.onerror = function () {
+        // Updates parent's state with blank strings and zeroes instead of actual stats
+        for (var i = 0; i < info.length; i++) {
+          _this2.props.sendInfo(info[i], _this2.props.user, '');
+        }
+        for (var i = 0; i < stats.length; i++) {
+          _this2.props.sendStat(stats[i].stat, _this2.props.user, 0); // Stat bars break if an empty string is sent instead of a number
+        }
+
+        // Toggles error messages
+        document.getElementById('backend_error_' + _this2.props.user).style.display = 'inherit';
+        document.getElementById('username_error_' + _this2.props.user).style.display = 'none';
+        // Hides user_update_status form
+        document.querySelectorAll('#user_' + _this2.props.user + '_section .user_update_status').forEach(function (element) {
+          return element.style.display = 'none';
+        });
+        // Updates stat graphics (no need to hide it; the other user may have stats to show)
+        updateUserStatGraphics();
       };
     }
 
@@ -194,7 +217,7 @@ var UserSection = function (_React$Component) {
 
     // Composed of three parts
     // form.username_input is for inputting and selecting a user to display
-    // p.username_error is only visible if an error occurred with form.username_input
+    // p.backend_error and p.username_error appear for self-explanatory reasons
     // form.user_update_status displays how up to date the current stats are, and a button to update them
 
   }, {
@@ -216,9 +239,13 @@ var UserSection = function (_React$Component) {
         ),
         React.createElement(
           'p',
+          { className: 'backend_error', id: 'backend_error_' + this.props.user },
+          'This Website Is Offline Right Now'
+        ),
+        React.createElement(
+          'p',
           { className: 'username_error', id: 'username_error_' + this.props.user },
-          this.state.username_input,
-          ' Not Found'
+          'User Not Found'
         ),
         React.createElement(
           'form',

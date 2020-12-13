@@ -30,6 +30,12 @@ h3 {
     color: #2E51A2;
 }
 
+.backend_error {
+    display: none;
+
+    text-align: center;
+}
+
 .username_error {
     display: none;
 
