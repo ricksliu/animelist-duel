@@ -8,7 +8,7 @@ const host = '127.0.0.1';
 const port = 3000;
 
 // Info for pool of connections to MySQL database
-var mysql_connection_pool = mysql.createPool({
+let mysql_connection_pool = mysql.createPool({
   connectionLimit: 10,
   host: 'localhost',
   user: 'root',
@@ -25,7 +25,7 @@ function firstString(str, start_char, end_char, numeric=false, format=false) {
   const numbers = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0'];
 
   // Finds start
-  var start = 0;
+  let start = 0;
   while (start < len) {
     if (str[start] == start_char && (!numeric || numbers.includes(str[start + 1]))) {
       start++;
@@ -36,7 +36,7 @@ function firstString(str, start_char, end_char, numeric=false, format=false) {
 
   if (start != len) {
     // Finds end
-    var end = start;
+    let end = start;
     while (str[end] != end_char) {
       end++;
     }
@@ -117,7 +117,7 @@ const server = http.createServer((req, res) => {
     // Sends HTTPS request to MyAnimeList
     https.get(options, (mal_res) => {
       // Gets HTML of user's profile page as string
-      var page_html;
+      let page_html;
       mal_res.on('data', function (chunk) {
         page_html += chunk;
       });
@@ -140,9 +140,9 @@ const server = http.createServer((req, res) => {
         ]
 
         // Retrieved info is stored here
-        var info = [];
+        let info = [];
         // Gets info
-        for (var i = 0; i < pre_info.length; i++) {
+        for (let i = 0; i < pre_info.length; i++) {
           info.push(firstString(page_html.slice(page_html.indexOf(pre_info[i][0])), ...(pre_info[i].slice(1))));
         }
         // Formats date to a string consistent with the MySQL TIMESTAMP datatype

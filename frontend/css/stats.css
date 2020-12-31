@@ -4,7 +4,6 @@
 }
 
 .stat {
-    height: 9em;
 }
 
 .stat h3 {
@@ -47,4 +46,11 @@
     right: 0.5em;
 
     text-align: right;
+}
+
+.stat_fact {
+    visibility: hidden;
+    margin-top: 6em;
+
+    text-align: center;
 }
