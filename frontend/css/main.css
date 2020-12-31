@@ -6,38 +6,48 @@ body {
 
 #top {
     padding: 2em;
-    margin-bottom: 2em;
     background-color: #2E51A2;
 }
 
 #body {
-    margin: 0em 2em 0em;
+    margin: 2em;
 }
 
 h1 {
     margin: 0em;
 
     font-size: 4em;
+    line-height: 1em;
     font-weight: bold;
+    text-align: center;
+    color: #FFF;
 }
 
 h2 {
     margin: 0em;
 
     font-size: 2em;
+    line-height: 1em;
     font-weight: bold;
+    text-align: center;
+    color: #FFF;
 }
 
 h3 {
     margin: 0em;
 
     font-size: 2em;
+    line-height: 1em;
     font-weight: bold;
+    text-align: center;
+    color: #2E51A2;
 }
 
 p {
     margin: 0em;
 
     font-size: 1em;
+    line-height: 1em;
     font-weight: bold;
+    color: #2E51A2;
 }

@@ -2,8 +2,7 @@
 class StatInfo {
   constructor(stat, compare_type) {
     this.stat = stat;
-    // 1 if bigger is better, 0 if incomparable, -1 if smaller is better
-    this.compare_type = compare_type;
+    this.compare_type = compare_type;  // 1 if bigger is better, 0 if incomparable, -1 if smaller is better
   }
 }
 
@@ -198,11 +197,13 @@ class UserSection extends React.Component {
   // form.user_update_status displays how up to date the current stats are, and a button to update them
   render() {
     return (
-      <div id={`user_${this.props.user}_section`}>
+      <div className='user_section' id={`user_${this.props.user}_section`}>
         <form className='username_input' onSubmit={this.getUser}>
-          <h3>{`User ${this.props.user}`}</h3>
-          <input type='text' id={`username_${this.props.user}_input`} value={this.state.username_input} onChange={this.updateUsernameInput} />
-          <input type='submit' id={`username_${this.props.user}_submit`} value='Select' />
+          <h3>{`User ${this.props.user}:`}</h3>
+          <div>
+            <input type='text' id={`username_${this.props.user}_input`} value={this.state.username_input} onChange={this.updateUsernameInput} />
+            <input type='submit' id={`username_${this.props.user}_submit`} value='Select' />
+          </div>
         </form>
         <p className='backend_error' id={`backend_error_${this.props.user}`}>This Website Is Offline Right Now</p>
         <p className='username_error' id={`username_error_${this.props.user}`}>User Not Found</p>
@@ -224,10 +225,10 @@ class Stat extends React.Component {
       <div className='stat' id={this.props.stat}>
         <h3>{`${formatText(this.props.stat)}:`}</h3>
         <div>
-          <div className='stat_1_bar' id={`${this.props.stat}_1_bar`}></div>
-          <p className='stat_1' id={`${this.props.stat}_1`}>{this.props.stat_values[0]}</p>
-          <div className='stat_2_bar' id={`${this.props.stat}_2_bar`}></div>
-          <p className='stat_2' id={`${this.props.stat}_2`}>{this.props.stat_values[1]}</p>
+          <div className='stat_bar stat_1_bar' id={`${this.props.stat}_1_bar`}></div>
+          <p className='stat_value stat_1_value' id={`${this.props.stat}_1`}>{this.props.stat_values[0]}</p>
+          <div className='stat_bar stat_2_bar' id={`${this.props.stat}_2_bar`}></div>
+          <p className='stat_value stat_2_value' id={`${this.props.stat}_2`}>{this.props.stat_values[1]}</p>
         </div>
       </div>
     );
@@ -250,7 +251,7 @@ class Body extends React.Component {
     }
   }
 
-  // Following two functions are used as callback function by UserSection components to update this component's state
+  // Following two functions are used as callback functions by UserSection components to update this component's state
   // Takes info/stat in question, which user to update, and the data itself
   getInfo(info, user, info_value) {
     if (user == 1) {

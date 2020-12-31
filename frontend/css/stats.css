@@ -1,0 +1,50 @@
+#stats {
+    display: none;
+    clear: both;
+}
+
+.stat {
+    height: 9em;
+}
+
+.stat h3 {
+    padding-top: 1em;
+}
+
+.stat > div {
+    position: relative;
+}
+
+.stat_bar {
+    position: absolute;
+    top: 1em;
+    width: 50%;
+    height: 4em;
+}
+
+.stat_1_bar {
+    left: 0em;
+}
+
+.stat_2_bar {
+    right: 0em;
+}
+
+.stat_value {
+    z-index: 1;
+    position: absolute;
+    top: 1em;
+
+    font-size: 2em;
+    color: #FFF;
+}
+
+.stat_1_value {
+    left: 0.5em;
+}
+
+.stat_2_value {
+    right: 0.5em;
+
+    text-align: right;
+}

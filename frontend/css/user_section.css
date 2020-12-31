@@ -1,0 +1,42 @@
+.user_section {
+    width: 50%;
+
+    text-align: center;
+}
+
+#user_1_section {
+    float: left;
+}
+
+#user_2_section {
+    float: right;
+}
+
+.username_input > div {
+    margin-top: 1em;
+}
+
+.backend_error {
+    display: none;
+    margin-top: 1em;
+}
+
+.username_error {
+    display: none;
+    margin-top: 1em;
+}
+
+.user_update_status {
+    display: none;
+    margin-top: 2em;
+}
+
+.user_update_status img {
+    display: block;
+    height: 8em;
+    margin: 1em auto 0em;
+}
+
+.user_update_status p {
+    margin-top: 1em;
+}

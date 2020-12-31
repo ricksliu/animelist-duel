@@ -13,8 +13,7 @@ var StatInfo = function StatInfo(stat, compare_type) {
   _classCallCheck(this, StatInfo);
 
   this.stat = stat;
-  // 1 if bigger is better, 0 if incomparable, -1 if smaller is better
-  this.compare_type = compare_type;
+  this.compare_type = compare_type; // 1 if bigger is better, 0 if incomparable, -1 if smaller is better
 };
 
 // Following two arrays store the names (and additional info) of user data that the website handles
@@ -225,17 +224,21 @@ var UserSection = function (_React$Component) {
     value: function render() {
       return React.createElement(
         'div',
-        { id: 'user_' + this.props.user + '_section' },
+        { className: 'user_section', id: 'user_' + this.props.user + '_section' },
         React.createElement(
           'form',
           { className: 'username_input', onSubmit: this.getUser },
           React.createElement(
             'h3',
             null,
-            'User ' + this.props.user
+            'User ' + this.props.user + ':'
           ),
-          React.createElement('input', { type: 'text', id: 'username_' + this.props.user + '_input', value: this.state.username_input, onChange: this.updateUsernameInput }),
-          React.createElement('input', { type: 'submit', id: 'username_' + this.props.user + '_submit', value: 'Select' })
+          React.createElement(
+            'div',
+            null,
+            React.createElement('input', { type: 'text', id: 'username_' + this.props.user + '_input', value: this.state.username_input, onChange: this.updateUsernameInput }),
+            React.createElement('input', { type: 'submit', id: 'username_' + this.props.user + '_submit', value: 'Select' })
+          )
         ),
         React.createElement(
           'p',
@@ -297,16 +300,16 @@ var Stat = function (_React$Component2) {
         React.createElement(
           'div',
           null,
-          React.createElement('div', { className: 'stat_1_bar', id: this.props.stat + '_1_bar' }),
+          React.createElement('div', { className: 'stat_bar stat_1_bar', id: this.props.stat + '_1_bar' }),
           React.createElement(
             'p',
-            { className: 'stat_1', id: this.props.stat + '_1' },
+            { className: 'stat_value stat_1_value', id: this.props.stat + '_1' },
             this.props.stat_values[0]
           ),
-          React.createElement('div', { className: 'stat_2_bar', id: this.props.stat + '_2_bar' }),
+          React.createElement('div', { className: 'stat_bar stat_2_bar', id: this.props.stat + '_2_bar' }),
           React.createElement(
             'p',
-            { className: 'stat_2', id: this.props.stat + '_2' },
+            { className: 'stat_value stat_2_value', id: this.props.stat + '_2' },
             this.props.stat_values[1]
           )
         )
@@ -340,7 +343,7 @@ var Body = function (_React$Component3) {
     return _this4;
   }
 
-  // Following two functions are used as callback function by UserSection components to update this component's state
+  // Following two functions are used as callback functions by UserSection components to update this component's state
   // Takes info/stat in question, which user to update, and the data itself
 
 

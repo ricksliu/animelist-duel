@@ -3,7 +3,7 @@ const https = require('https');
 const url = require('url');
 const mysql = require('mysql');
 
-// Info for backend server
+// Info for backend
 const host = '127.0.0.1';
 const port = 3000;
 
@@ -208,5 +208,5 @@ const server = http.createServer((req, res) => {
 });
 
 server.listen(port, host, () => {
-    console.log(`Backend Server Online: http://${host}:${port}/`);
+    console.log(`Backend Online: http://${host}:${port}/`);
 });
