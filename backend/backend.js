@@ -104,8 +104,8 @@ const server = http.createServer((req, res) => {
             last_updated: results[0].date.toISOString().slice(0, 19).replace('T', ' ') + ' UTC',
             username: username,
             user_image: results[0].user_image,
-            mean_score: results[0].mean_score.toString().replace(/^0+/, ''),  // Removes leading zeroes
-            days_watched: results[0].days_watched.toString().replace(/^0+/, ''),  // Removes leading zeroes
+            mean_score: results[0].mean_score.toFixed(2).replace(/^0+/, ''),  // Removes leading zeroes
+            days_watched: results[0].days_watched.toFixed(1).replace(/^0+/, ''),  // Removes leading zeroes
             episodes_watched: results[0].episodes_watched,
             total_entries: results[0].total_entries,
             completed: results[0].completed,

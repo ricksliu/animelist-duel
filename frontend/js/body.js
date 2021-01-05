@@ -494,7 +494,7 @@ var Body = function (_React$Component3) {
           React.createElement(
             'p',
             { className: 'main_p' },
-            '"Starting Life From Zero"'
+            '"Starting Life From 0.0"'
           ),
           [].concat(_toConsumableArray(Array(stats.length).keys())).map(function (i) {
             return React.createElement(Stat, { key: stats[i].stat, stat: stats[i].stat, stat_values: _this5.state.stats[i], stat_fact: _this5.state.stat_facts[i] });
