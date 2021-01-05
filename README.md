@@ -10,4 +10,4 @@ The website is meant to function with both the Node.js backend and the MySQL dat
 
 The React portion was coded with JSX syntax. Running frontend/js/jsx_src/jsx_preprocessor.bat in the background will automatically convert it.
 
-![Screenshot of Website](docs/screenshot_1.png)
+![Screenshot of Website](docs/screenshot_1.jpg)
