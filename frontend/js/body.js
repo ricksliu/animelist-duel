@@ -34,6 +34,11 @@ var StatInfo = function () {
       var diff = Math.abs(stat_1 - stat_2).toFixed(2);
       var diff_int = Math.abs(stat_1 - stat_2).toFixed(0);
 
+      // Only 1 user is selected
+      if (user_1 == '' || user_2 == '') {
+        return '';
+      }
+
       // Both zero
       if (stat_1 == 0 && stat_2 == 0 && this.fact_both_zero != '') {
         return this.fact_both_zero.replaceAll('user_1', user_1).replaceAll('user_2', user_2);
@@ -475,9 +480,33 @@ var Body = function (_React$Component3) {
         React.createElement(
           'div',
           { id: 'stats' },
+          React.createElement(
+            'h2',
+            null,
+            'Stat Face-Off'
+          ),
+          React.createElement(
+            'p',
+            { className: 'main_p' },
+            '"Starting Life From Zero"'
+          ),
           [].concat(_toConsumableArray(Array(stats.length).keys())).map(function (i) {
             return React.createElement(Stat, { key: stats[i].stat, stat: stats[i].stat, stat_values: _this5.state.stats[i], stat_fact: _this5.state.stat_facts[i] });
           })
+        ),
+        React.createElement(
+          'div',
+          { id: 'score_differences' },
+          React.createElement(
+            'h2',
+            null,
+            'Opinion Clash'
+          ),
+          React.createElement(
+            'p',
+            { className: 'main_p' },
+            '"Your Opinion Is Wrong As I Expected"'
+          )
         )
       );
     }

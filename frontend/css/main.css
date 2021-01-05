@@ -4,15 +4,6 @@ body {
     font: medium Verdana, Tahoma, sans-serif;
 }
 
-#top {
-    padding: 2em;
-    background-color: #2E51A2;
-}
-
-#body {
-    margin: 2em;
-}
-
 h1 {
     margin: 0em;
 
@@ -26,11 +17,11 @@ h1 {
 h2 {
     margin: 0em;
 
-    font-size: 2em;
+    font-size: 4em;
     line-height: 1em;
     font-weight: bold;
     text-align: center;
-    color: #FFF;
+    color: #2E51A2;
 }
 
 h3 {

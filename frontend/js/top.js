@@ -28,7 +28,7 @@ var Top = function (_React$Component) {
           'AnimeList Duel'
         ),
         React.createElement(
-          'h2',
+          'h3',
           null,
           '"Only the dead have seen the end of anime." -Sun Tzu'
         )

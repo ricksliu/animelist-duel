@@ -186,66 +186,71 @@ const server = http.createServer((req, res) => {
         }));
         res.end();
 
-        console.log(`Sent response with data for user '${username}' from MyAnimeList.`);
+        if (info[0] != '') { 
+          console.log(`Sent response with data for user '${username}' from MyAnimeList.`);
 
-        // Tries to update 'profile' database
-        mysql_connection_pool.query(
-          `REPLACE INTO profiles (
-            user_id,
-            last_updated,
-            username,
-            user_image
-          ) VALUES (
-            ${info[0]},
-            ${mysql.escape(date)},
-            ${mysql.escape(username)},
-            'https://cdn.myanimelist.net/images/userimages/${info[0]}.jpg'
-          )`,
-          (e, results, fields) => {
-            if (e) {
-              console.log(`Failed to update profile for user '${username}' in database 'profiles'. (${e})`);
-            } else {
-              console.log(`Updated profile for user '${username}' in database 'profiles'.`);
+          // Tries to update 'profile' database
+          mysql_connection_pool.query(
+            `REPLACE INTO profiles (
+              user_id,
+              last_updated,
+              username,
+              user_image
+            ) VALUES (
+              ${info[0]},
+              ${mysql.escape(date)},
+              ${mysql.escape(username)},
+              'https://cdn.myanimelist.net/images/userimages/${info[0]}.jpg'
+            )`,
+            (e, results, fields) => {
+              if (e) {
+                console.log(`Failed to update profile for user '${username}' in database 'profiles'. (${e})`);
+              } else {
+                console.log(`Updated profile for user '${username}' in database 'profiles'.`);
+              }
             }
-          }
-        );
-        // Tries to insert into 'profile_stats' database
-        mysql_connection_pool.query(
-          `INSERT INTO profile_stats (
-            date,
-            user_id,
-            mean_score, 
-            days_watched,
-            episodes_watched,
-            total_entries,
-            completed,
-            watching,
-            on_hold,
-            rewatched,
-            dropped,
-            plan_to_watch
-          ) VALUES (
-            ${mysql.escape(date)},
-            ${info[0]},
-            ${info[1]}, 
-            ${info[2]},
-            ${info[3]},
-            ${info[4]},
-            ${info[5]},
-            ${info[6]}, 
-            ${info[7]},
-            ${info[8]},
-            ${info[9]},
-            ${info[10]}
-          )`,
-          (e, results, fields) => {
-            if (e) {
-              console.log(`Failed to insert stats for user '${username}' into database 'profile_stats'. (${e})`);
-            } else {
-              console.log(`Inserted stats for user '${username}' into database 'profile_stats'.`);
+          );
+          // Tries to insert into 'profile_stats' database
+          mysql_connection_pool.query(
+            `INSERT INTO profile_stats (
+              date,
+              user_id,
+              mean_score, 
+              days_watched,
+              episodes_watched,
+              total_entries,
+              completed,
+              watching,
+              on_hold,
+              rewatched,
+              dropped,
+              plan_to_watch
+            ) VALUES (
+              ${mysql.escape(date)},
+              ${info[0]},
+              ${info[1]}, 
+              ${info[2]},
+              ${info[3]},
+              ${info[4]},
+              ${info[5]},
+              ${info[6]}, 
+              ${info[7]},
+              ${info[8]},
+              ${info[9]},
+              ${info[10]}
+            )`,
+            (e, results, fields) => {
+              if (e) {
+                console.log(`Failed to insert stats for user '${username}' into database 'profile_stats'. (${e})`);
+              } else {
+                console.log(`Inserted stats for user '${username}' into database 'profile_stats'.`);
+              }
             }
-          }
-        );
+          );
+
+        } else {
+          console.log(`Failed to find data for user '${username}' from MyAnimeList.`);
+        }
       });
 
     // If could not send HTTPS request to MyAnimeList, sends response with empty user_id

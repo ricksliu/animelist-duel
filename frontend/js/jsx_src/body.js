@@ -16,6 +16,11 @@ class StatInfo {
     const diff = Math.abs(stat_1 - stat_2).toFixed(2);
     const diff_int = Math.abs(stat_1 - stat_2).toFixed(0);
 
+    // Only 1 user is selected
+    if (user_1 == '' || user_2 == '') {
+      return '';
+    }
+
     // Both zero
     if (stat_1 == 0 && stat_2 == 0 && this.fact_both_zero != '') {
       return this.fact_both_zero.replaceAll('user_1', user_1).replaceAll('user_2', user_2);
@@ -403,9 +408,15 @@ class Body extends React.Component {
         <UserSection user={1} username={this.state.username[0]} user_id={this.state.user_id[0]} last_updated={this.state.last_updated[0]} user_image={this.state.user_image[0]} sendInfo={this.setInfo.bind(this)} sendStat={this.setStat.bind(this)} updateStatFacts={this.updateStatFacts.bind(this)} />
         <UserSection user={2} username={this.state.username[1]} user_id={this.state.user_id[1]} last_updated={this.state.last_updated[1]} user_image={this.state.user_image[1]} sendInfo={this.setInfo.bind(this)} sendStat={this.setStat.bind(this)} updateStatFacts={this.updateStatFacts.bind(this)} />
         <div id='stats'>
+          <h2>Stat Face-Off</h2>
+          <p className='main_p'>"Starting Life From Zero"</p>
           {[...Array(stats.length).keys()].map(i => (
             <Stat key={stats[i].stat} stat={stats[i].stat} stat_values={this.state.stats[i]} stat_fact={this.state.stat_facts[i]} />
           ))}
+        </div>
+        <div id='score_differences'>
+          <h2>Opinion Clash</h2>
+          <p className='main_p'>"Your Opinion Is Wrong As I Expected"</p>
         </div>
       </div>
     );
