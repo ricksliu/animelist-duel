@@ -172,15 +172,20 @@ function updateUserStatGraphics() {
     }
   }
 
-  // Shows/hides stat facts
+  // Shows/hides elements that only appear if 2 users have been inputted
   let stat_facts = document.getElementsByClassName('stat_fact');
-  if (document.getElementById('username_1').textContent == '' || document.getElementById('username_2').textContent == '') {
-    for (let i = 0; i < stat_facts.length; i++) {
-      stat_facts[i].style.visibility = 'hidden';
-    }
-  } else {
+  if (document.getElementById('username_1').textContent != '' && document.getElementById('username_2').textContent != '') {
+    document.getElementById('vs').style.display = 'inherit';
+
     for (let i = 0; i < stat_facts.length; i++) {
       stat_facts[i].style.visibility = 'inherit';
+    }
+
+  } else {
+    document.getElementById('vs').style.display = 'none';
+
+    for (let i = 0; i < stat_facts.length; i++) {
+      stat_facts[i].style.visibility = 'hidden';
     }
   }
 }
@@ -317,8 +322,8 @@ class UserSection extends React.Component {
         <form className='username_input' onSubmit={this.getUser}>
           <h3>{`User ${this.props.user}:`}</h3>
           <div>
-            <input type='text' id={`username_${this.props.user}_input`} value={this.state.username_input} onChange={this.updateUsernameInput} />
-            <input type='submit' id={`username_${this.props.user}_submit`} value='Select' />
+            <input type='text' className='input_text' id={`username_${this.props.user}_input`} value={this.state.username_input} onChange={this.updateUsernameInput} />
+            <input type='submit' className='input_submit' id={`username_${this.props.user}_submit`} value='Select' />
           </div>
         </form>
         <p className='backend_error' id={`backend_error_${this.props.user}`}>This Website Is Offline Right Now</p>
@@ -327,7 +332,7 @@ class UserSection extends React.Component {
           <h3 id={`username_${this.props.user}`}>{this.props.username}</h3>
           <img id={`user_image_${this.props.user}`} src={this.props.user_image} alt='' />
           <p id={`last_updated_${this.props.user}`}>Data From {this.props.last_updated}</p>
-          <input type='submit' id={`user_${this.props.user}_update`} value='Update Data' />
+          <input type='submit' className='input_submit' id={`user_${this.props.user}_update`} value='Update Data' />
         </form>
       </div>
     );
@@ -394,9 +399,6 @@ class Body extends React.Component {
       new_stat_facts[i] = stats[i].getFact(this.state.username[0], this.state.stats[i][0], this.state.username[1], this.state.stats[i][1]);
     }
     this.setState({stat_facts: new_stat_facts});
-    console.log(this.state.stat_facts[1]);
-    console.log(this.state.stats[1][0]);
-    console.log(this.state.stats[1][1]);
   }
 
   // Info for user passed down as props to UserSection components; getInfo(), getStat(), updateStatFacts() passed to be used as callback functions
@@ -405,14 +407,17 @@ class Body extends React.Component {
   render() {
     return (
       <div>
+        <h3 id='vs'>VS</h3>
         <UserSection user={1} username={this.state.username[0]} user_id={this.state.user_id[0]} last_updated={this.state.last_updated[0]} user_image={this.state.user_image[0]} sendInfo={this.setInfo.bind(this)} sendStat={this.setStat.bind(this)} updateStatFacts={this.updateStatFacts.bind(this)} />
         <UserSection user={2} username={this.state.username[1]} user_id={this.state.user_id[1]} last_updated={this.state.last_updated[1]} user_image={this.state.user_image[1]} sendInfo={this.setInfo.bind(this)} sendStat={this.setStat.bind(this)} updateStatFacts={this.updateStatFacts.bind(this)} />
+        
         <div id='stats'>
           <h2>Stat Face-Off</h2>
           <p className='main_p'>"Starting Life From Zero"</p>
           {[...Array(stats.length).keys()].map(i => (
             <Stat key={stats[i].stat} stat={stats[i].stat} stat_values={this.state.stats[i]} stat_fact={this.state.stat_facts[i]} />
           ))}
+        
         </div>
         <div id='score_differences'>
           <h2>Opinion Clash</h2>

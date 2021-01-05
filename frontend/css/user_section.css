@@ -1,3 +1,12 @@
+h3#vs {
+    display: none;
+    position: absolute;
+    top: 3.5em;
+    width: 100%;
+
+    text-align: center;
+}
+
 .user_section {
     width: 50%;
 
@@ -14,6 +23,35 @@
 
 .username_input > div {
     margin-top: 1em;
+}
+
+input.input_text {
+    padding: 0.25em;
+    width: 8em;
+    height: 1em;
+    background-color: #FFF;
+
+    border-width: 0.25em;
+    border-style: solid;
+    border-color: #2E51A2;
+
+    font: medium Verdana, Tahoma, sans-serif;
+    font-size: 1em;
+    font-weight: bold;
+    color: #2E51A2;
+}
+
+input.input_submit {
+    padding: 0em 0.5em 0em;
+    height: 2em;
+    background-color: #2E51A2;
+
+    border-style: none;
+
+    font: medium Verdana, Tahoma, sans-serif;
+    font-size: 1em;
+    font-weight: bold;
+    color: #FFF;
 }
 
 .backend_error {
@@ -38,5 +76,9 @@
 }
 
 .user_update_status p {
+    margin-top: 1em;
+}
+
+.user_update_status input {
     margin-top: 1em;
 }

@@ -129,15 +129,19 @@ function updateUserStatGraphics() {
     }
   }
 
-  // Shows/hides stat facts
+  // Shows/hides elements that only appear if 2 users have been inputted
   var stat_facts = document.getElementsByClassName('stat_fact');
-  if (document.getElementById('username_1').textContent == '' || document.getElementById('username_2').textContent == '') {
+  if (document.getElementById('username_1').textContent != '' && document.getElementById('username_2').textContent != '') {
+    document.getElementById('vs').style.display = 'inherit';
+
     for (var _i = 0; _i < stat_facts.length; _i++) {
-      stat_facts[_i].style.visibility = 'hidden';
+      stat_facts[_i].style.visibility = 'inherit';
     }
   } else {
+    document.getElementById('vs').style.display = 'none';
+
     for (var _i2 = 0; _i2 < stat_facts.length; _i2++) {
-      stat_facts[_i2].style.visibility = 'inherit';
+      stat_facts[_i2].style.visibility = 'hidden';
     }
   }
 }
@@ -312,8 +316,8 @@ var UserSection = function (_React$Component) {
           React.createElement(
             'div',
             null,
-            React.createElement('input', { type: 'text', id: 'username_' + this.props.user + '_input', value: this.state.username_input, onChange: this.updateUsernameInput }),
-            React.createElement('input', { type: 'submit', id: 'username_' + this.props.user + '_submit', value: 'Select' })
+            React.createElement('input', { type: 'text', className: 'input_text', id: 'username_' + this.props.user + '_input', value: this.state.username_input, onChange: this.updateUsernameInput }),
+            React.createElement('input', { type: 'submit', className: 'input_submit', id: 'username_' + this.props.user + '_submit', value: 'Select' })
           )
         ),
         React.createElement(
@@ -341,7 +345,7 @@ var UserSection = function (_React$Component) {
             'Data From ',
             this.props.last_updated
           ),
-          React.createElement('input', { type: 'submit', id: 'user_' + this.props.user + '_update', value: 'Update Data' })
+          React.createElement('input', { type: 'submit', className: 'input_submit', id: 'user_' + this.props.user + '_update', value: 'Update Data' })
         )
       );
     }
@@ -458,9 +462,6 @@ var Body = function (_React$Component3) {
         new_stat_facts[i] = stats[i].getFact(this.state.username[0], this.state.stats[i][0], this.state.username[1], this.state.stats[i][1]);
       }
       this.setState({ stat_facts: new_stat_facts });
-      console.log(this.state.stat_facts[1]);
-      console.log(this.state.stats[1][0]);
-      console.log(this.state.stats[1][1]);
     }
 
     // Info for user passed down as props to UserSection components; getInfo(), getStat(), updateStatFacts() passed to be used as callback functions
@@ -475,6 +476,11 @@ var Body = function (_React$Component3) {
       return React.createElement(
         'div',
         null,
+        React.createElement(
+          'h3',
+          { id: 'vs' },
+          'VS'
+        ),
         React.createElement(UserSection, { user: 1, username: this.state.username[0], user_id: this.state.user_id[0], last_updated: this.state.last_updated[0], user_image: this.state.user_image[0], sendInfo: this.setInfo.bind(this), sendStat: this.setStat.bind(this), updateStatFacts: this.updateStatFacts.bind(this) }),
         React.createElement(UserSection, { user: 2, username: this.state.username[1], user_id: this.state.user_id[1], last_updated: this.state.last_updated[1], user_image: this.state.user_image[1], sendInfo: this.setInfo.bind(this), sendStat: this.setStat.bind(this), updateStatFacts: this.updateStatFacts.bind(this) }),
         React.createElement(
