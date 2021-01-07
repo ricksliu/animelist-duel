@@ -7,7 +7,10 @@ const mysql = require('mysql');
 const host = '127.0.0.1';
 const port = 3000;
 
-// Info for pool of connections to MySQL database
+// Headers used for HTTP responses; designates response as JSON, allows requests from all domains
+const headers = {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'};
+
+// Info for (pool of) connections to MySQL database
 let mysql_connection_pool = mysql.createPool({
   connectionLimit: 10,
   host: 'localhost',
@@ -17,36 +20,46 @@ let mysql_connection_pool = mysql.createPool({
   timezone: 'UTC'
 });
 
-// Returns first substring that is surrounded by 'start_char' and 'end_char'
-// 'numeric' forces substring to start with a number
-// 'format' removes certain special characters
-function firstString(str, start_char, end_char, numeric=false, format=false) {  
+// Info used for scraping data from MyAnimeList
+const scraping_info = [
+  ['userimages', '/', '.'],
+  ['Mean Score', '>', '<'],
+  ['Days', '>', '<'],
+  ['Episodes', '>', '<'],
+  ['Total Entries', '>', '<'],
+  ['Completed', '>', '<'],
+  ['Watching', '>', '<'],
+  ['On-Hold', '>', '<'],
+  ['Rewatched', '>', '<'],
+  ['Dropped', '>', '<'],
+  ['Plan to Watch', '>', '<']
+]
+
+// Returns first substring surrounded by the two chars in 'surrounding_chars'
+// 'source' is the raw HTML, 'substring' is a substring to start searching from
+function scrapeNumber(source, substring, start_char, end_char) {
+  const str = source.slice(source.indexOf(substring));
   const len = str.length;
   const numbers = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0'];
-
+  
   // Finds start
   let start = 0;
   while (start < len) {
-    if (str[start] == start_char && (!numeric || numbers.includes(str[start + 1]))) {
+    if (str[start] == start_char && numbers.includes(str[start + 1])) {
       start++;
       break;
     }
     start++;
   }
-
+  
   if (start != len) {
     // Finds end
     let end = start;
     while (str[end] != end_char) {
       end++;
     }
-
-    if (format) {
-      return str.slice(start, end).replace(',', '');
-    } else {
-      return str.slice(start, end);
-    }
-
+    return str.slice(start, end).replace(',', '');
+  
   } else {
     return '';
   }
@@ -78,11 +91,9 @@ const server = http.createServer((req, res) => {
       ) ps ON p.user_id = ps.user_id
       ORDER BY id DESC`,
       (e, results, fields) => {
-        // If error or could not find matching username in database, sends response with empty user_id
+        // If error or could not find matching username in database, sends blank string as user_id
         if (e || results.length == 0) {
-          // Sets response's headers; designates response as JSON, allows requests from all domains
-          res.writeHead(200, {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'});
-          // Sends JSON-encoded string
+          res.writeHead(200, headers);
           res.write(JSON.stringify({
             user_id: ''
           }));
@@ -94,18 +105,15 @@ const server = http.createServer((req, res) => {
             console.log(`Failed to find data for user '${username}' in databases.`);
           }
 
-        // Else, sends response with data
         } else {
-          // Sets response's headers; designates response as JSON, allows requests from all domains
-          res.writeHead(200, {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'});
-          // Sends JSON-encoded string
+          res.writeHead(200, headers);
           res.write(JSON.stringify({
             user_id: results[0].user_id,
             last_updated: results[0].date.toISOString().slice(0, 19).replace('T', ' ') + ' UTC',
             username: username,
             user_image: results[0].user_image,
-            mean_score: results[0].mean_score.toFixed(2).replace(/^0+/, ''),  // Removes leading zeroes
-            days_watched: results[0].days_watched.toFixed(1).replace(/^0+/, ''),  // Removes leading zeroes
+            mean_score: results[0].mean_score.toFixed(2).replace(/^0+/, ''),  // Removes extra zeroes; 2 decimals
+            days_watched: results[0].days_watched.toFixed(1).replace(/^0+/, ''),  // Removes extra zeroes; 1 decimal
             episodes_watched: results[0].episodes_watched,
             total_entries: results[0].total_entries,
             completed: results[0].completed,
@@ -116,7 +124,6 @@ const server = http.createServer((req, res) => {
             plan_to_watch: results[0].plan_to_watch
           }));
           res.end();
-
           console.log(`Sent response with data for user '${username}' from databases.`);
         }
       }
@@ -124,7 +131,6 @@ const server = http.createServer((req, res) => {
 
   // If frontend requested new data from MyAnimeList
   } else if (request == 'update') {
-    // Info for HTTPS request to MyAnimeList
     const options = {
       host: 'myanimelist.net',
       path: `/profile/${username}`,
@@ -134,59 +140,46 @@ const server = http.createServer((req, res) => {
     // Sends HTTPS request to MyAnimeList
     https.get(options, (mal_res) => {
       // Gets HTML of user's profile page as string
-      let page_html;
+      let page_source;
       mal_res.on('data', function (chunk) {
-        page_html += chunk;
+        page_source += chunk;
       });
 
-      // When finished getting HTML
+      // When finished
       mal_res.on('end', function() {
-        // Arguments passed into firstString function
-        const pre_info = [
-          ['userimages', '/', '.', true, true],
-          ['Mean Score', '>', '<', true, true],
-          ['Days', '>', '<', true, true],
-          ['Episodes', '>', '<', true, true],
-          ['Total Entries', '>', '<', true, true],
-          ['Completed', '>', '<', true, true],
-          ['Watching', '>', '<', true, true],
-          ['On-Hold', '>', '<', true, true],
-          ['Rewatched', '>', '<', true, true],
-          ['Dropped', '>', '<', true, true],
-          ['Plan to Watch', '>', '<', true, true]
-        ]
+        const info = scraping_info.map(i => scrapeNumber(page_source, ...i));
 
-        // Retrieved info is stored here
-        let info = [];
-        // Gets info
-        for (let i = 0; i < pre_info.length; i++) {
-          info.push(firstString(page_html.slice(page_html.indexOf(pre_info[i][0])), ...(pre_info[i].slice(1))));
-        }
-        // Formats date to a string consistent with the MySQL TIMESTAMP datatype
-        const date = new Date().toISOString().slice(0, 19).replace('T', ' ');
+        // If user does not exist, sends blank string as user_id
+        if (info[0] == '') {
+          res.writeHead(200, headers);
+          res.write(JSON.stringify({
+            user_id: ''
+          }));
+          res.end();
+          console.log(`Failed to find data for user '${username}' from MyAnimeList.`);
+        
+        } else {
+          // Formats date to a string consistent with the MySQL TIMESTAMP datatype
+          const date = new Date().toISOString().slice(0, 19).replace('T', ' ');
 
-        // Sets response's headers; designates response as JSON, allows requests from all domains
-        res.writeHead(200, {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'});
-        // Sends JSON-encoded string
-        res.write(JSON.stringify({
-          user_id: info[0],
-          last_updated: date + ' UTC',
-          username: username,
-          user_image: `https://cdn.myanimelist.net/images/userimages/${info[0]}.jpg`,
-          mean_score: info[1],
-          days_watched: info[2],
-          episodes_watched: info[3],
-          total_entries: info[4],
-          completed: info[5],
-          watching: info[6],
-          on_hold: info[7],
-          rewatched: info[8],
-          dropped: info[9],
-          plan_to_watch: info[10]
-        }));
-        res.end();
-
-        if (info[0] != '') { 
+          res.writeHead(200, headers);
+          res.write(JSON.stringify({
+            user_id: info[0],
+            last_updated: date + ' UTC',
+            username: username,
+            user_image: `https://cdn.myanimelist.net/images/userimages/${info[0]}.jpg`,
+            mean_score: info[1],
+            days_watched: info[2],
+            episodes_watched: info[3],
+            total_entries: info[4],
+            completed: info[5],
+            watching: info[6],
+            on_hold: info[7],
+            rewatched: info[8],
+            dropped: info[9],
+            plan_to_watch: info[10]
+          }));
+          res.end();
           console.log(`Sent response with data for user '${username}' from MyAnimeList.`);
 
           // Tries to update 'profile' database
@@ -210,6 +203,7 @@ const server = http.createServer((req, res) => {
               }
             }
           );
+
           // Tries to insert into 'profile_stats' database
           mysql_connection_pool.query(
             `INSERT INTO profile_stats (
@@ -247,22 +241,16 @@ const server = http.createServer((req, res) => {
               }
             }
           );
-
-        } else {
-          console.log(`Failed to find data for user '${username}' from MyAnimeList.`);
         }
       });
 
-    // If could not send HTTPS request to MyAnimeList, sends response with empty user_id
+    // If could not send HTTPS request to MyAnimeList, sends blank string as user_id
     }).on('error', (e) => {
-      // Sets response's headers; designates response as JSON, allows requests from all domains
-      res.writeHead(200, {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'});
-      // Sends JSON-encoded string
+      res.writeHead(200, headers);
       res.write(JSON.stringify({
         user_id: ''
       }));
       res.end();
-
       console.log(`Failed to send HTTPS request to MyAnimeList. (${e})`);
     });
   }
