@@ -15,18 +15,17 @@ class StatInfo {
     const diff = Math.abs(stat_1 - stat_2).toFixed(2);
     const diff_int = Math.abs(stat_1 - stat_2).toFixed(0);
 
-    // Only 1 user is selected
+    // Returns blank string if only one user is selected; although the string will be hidden, it will still affect the page layout
     if (user_1 == '' || user_2 == '') {
       return '';
     }
 
     if (this.fact_one_zero != '') {
-      // Both stats are zero
+      // Both stats are 0
       if (stat_1 == 0 && stat_2 == 0) {
         return this.fact_both_zero.replaceAll('user_1', user_1).replaceAll('user_2', user_2);
       }
-
-      // One stat is zero
+      // One stat is 0
       if (stat_1 == 0) {
         return this.fact_one_zero.replaceAll('user_2', user_1).replaceAll('user_1', user_2).replaceAll('stat_diff_int', diff_int).replaceAll('stat_diff', diff);
       }
@@ -56,6 +55,7 @@ const info = [
   'last_updated',
   'user_image'
 ]
+
 const stats = [
   new StatInfo('mean_score', 0,
     "user_1's mean score is stat_diff higher than user_2's. Does user_2 watch worse shows or is user_1 just overly generous?",
@@ -119,65 +119,6 @@ const stats = [
   ),
 ]
 
-// Updates CSS of stats
-function updateStatCSS() {
-  // Updates each stat bar
-  for (let i = 0; i < stats.length; i++) {
-    // If a neutral stat, makes bars gray
-    if (stats[i].compare_type == 0) {
-      document.getElementById(`${stats[i].stat}_1_bar`).style.backgroundColor = '#999';
-      document.getElementById(`${stats[i].stat}_2_bar`).style.backgroundColor = '#999';
-
-    // If not a neutral stat, calculates bar widths and colours
-    } else {
-      // Gets stats
-      const stat_1 = parseFloat(document.getElementById(`${stats[i].stat}_1`).textContent);
-      const stat_2 = parseFloat(document.getElementById(`${stats[i].stat}_2`).textContent);
-
-      // Scale is the percentage of the bar occupied by user 1
-      let scale;
-      if (stat_1 == stat_2) {
-        scale = 50;
-      } else {
-        scale = 1 + 98 * stat_1 / (stat_1 + stat_2);
-
-        // If a reversed stat (lower number is better), reverses the bar width
-        if (stats[i].compare_type == -1) {
-          scale = 100 - scale;
-        }
-      }
-
-      // Sets bar widths
-      document.getElementById(`${stats[i].stat}_1_bar`).style.width = `${scale.toString()}%`;
-      document.getElementById(`${stats[i].stat}_2_bar`).style.width = `${(100 - scale).toString()}%`;
-
-      // Updates bar colours to be green, red or gray depending on the numbers
-      if (scale > 50.0) {
-        document.getElementById(`${stats[i].stat}_1_bar`).style.backgroundColor = '#6C6';
-        document.getElementById(`${stats[i].stat}_2_bar`).style.backgroundColor = '#C66';
-      } else if (scale < 50.0) {
-        document.getElementById(`${stats[i].stat}_1_bar`).style.backgroundColor = '#C66';
-        document.getElementById(`${stats[i].stat}_2_bar`).style.backgroundColor = '#6C6';
-      } else {
-        document.getElementById(`${stats[i].stat}_1_bar`).style.backgroundColor = '#999';
-        document.getElementById(`${stats[i].stat}_2_bar`).style.backgroundColor = '#999';
-      }
-    }
-  }
-
-  // Shows/hides elements that only appear if 2 users have been inputted
-  if (document.getElementById('username_1').textContent != '' && document.getElementById('username_2').textContent != '') {
-    document.getElementById('vs').style.display = 'inherit';
-    [].forEach.call(document.getElementsByClassName('stat_fact'), element => element.style.visibility = 'inherit');
-    document.getElementById('score_differences').style.display = 'inherit';
-
-  } else {
-    document.getElementById('vs').style.display = 'none';
-    [].forEach.call(document.getElementsByClassName('stat_fact'), element => element.style.visibility = 'hidden');
-    document.getElementById('score_differences').style.display = 'none';
-  }
-}
-
 // Given a string like 'mean_score', returns 'Mean Score'
 function capitalize(text) {
   return text.replaceAll('_', ' ').split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
@@ -208,7 +149,12 @@ class UserSection extends React.Component {
   sendRequest(request) {
     // Sends HTTP request
     const http_req = new XMLHttpRequest();
-    http_req.open('GET', `http://localhost:3000/?username=${this.state.username_input.replace(' ', '+')}&request=${request}`);
+    // If request was 'get', uses (possibly newly entered) username in input form 
+    if (request == 'get') {
+      http_req.open('GET', `http://localhost:3000/?username=${this.state.username_input.replace(' ', '+')}&request=${request}`);
+    } else {
+      http_req.open('GET', `http://localhost:3000/?username=${this.props.username.replace(' ', '+')}&request=${request}`);
+    }
     http_req.send();
   
     // Executes when a response (a JSON-encoded string) is recieved
@@ -217,67 +163,43 @@ class UserSection extends React.Component {
 
       // If update was successful (backend sets user_id to an empty string if it was unsuccessful)
       if (user_data.user_id != '') {
-        // Updates parent's state with info and stats using callback function in props
-        for (let i = 0; i < info.length; i++) {
-          this.props.sendInfo(this.props.user, info[i], user_data[info[i]]);
-        }
-        for (let i = 0; i < stats.length; i++) {
-          this.props.sendStat(this.props.user, i, user_data[stats[i].stat]);
-        }
+        info.forEach(i => this.props.sendInfo(this.props.user, i, user_data[i]));
+        stats.forEach(s => this.props.sendStat(this.props.user, s.stat, user_data[s.stat]));
         this.props.updateStatFacts();
 
-        // Toggles error messages
         document.getElementById(`backend_error_${this.props.user}`).style.display = 'none';
         document.getElementById(`username_error_${this.props.user}`).style.display = 'none';
-        // Shows user_update_status form
-        document.querySelectorAll(`#user_${this.props.user}_section .user_update_status`).forEach(element => element.style.display = 'inherit');
-        // Updates and shows stat graphics
-        updateStatCSS();
-        document.getElementById('stats').style.display = 'inherit';
+        document.querySelectorAll(`#user_${this.props.user}_section .user_update_status`).forEach(e => e.style.display = 'inherit');
+        this.props.updateCSS();
       
       // If update was unsuccessful
       } else {
         if (request == 'get') {
           this.sendRequest('update');
+
         } else {
-          // Updates parent's state with blank strings and zeroes instead of actual stats
-          for (let i = 0; i < info.length; i++) {
-            this.props.sendInfo(this.props.user, info[i], '');
-          }
-          for (let i = 0; i < stats.length; i++) {
-            this.props.sendStat(this.props.user, i, 0);
-          }
+          info.forEach(i => this.props.sendInfo(this.props.user, i, ''));
+          stats.forEach(s => this.props.sendStat(this.props.user, s.stat, 0));
           this.props.updateStatFacts();
 
-          // Toggles error messages
           document.getElementById(`backend_error_${this.props.user}`).style.display = 'none';
           document.getElementById(`username_error_${this.props.user}`).style.display = 'inherit';
-          // Hides user_update_status form
-          document.querySelectorAll(`#user_${this.props.user}_section .user_update_status`).forEach(element => element.style.display = 'none');
-          // Updates stat graphics (no need to hide it; the other user may have stats to show)
-          updateStatCSS();
+          document.querySelectorAll(`#user_${this.props.user}_section .user_update_status`).forEach(e => e.style.display = 'none');
+          this.props.updateCSS();
         }
       }
     }
 
-    // Executes when backend is offline
+    // Executes if backend is offline
     http_req.onerror = () => {
-      // Updates parent's state with blank strings and zeroes instead of actual stats
-      for (let i = 0; i < info.length; i++) {
-        this.props.sendInfo(this.props.user, info[i], '');
-      }
-      for (let i = 0; i < stats.length; i++) {
-        this.props.sendStat(this.props.user, i, 0);
-      }
+      info.forEach(i => this.props.sendInfo(this.props.user, i, ''));
+      stats.forEach(s => this.props.sendStat(this.props.user, s.stat, 0));
       this.props.updateStatFacts();
 
-      // Toggles error messages
       document.getElementById(`backend_error_${this.props.user}`).style.display = 'inherit';
       document.getElementById(`username_error_${this.props.user}`).style.display = 'none';
-      // Hides user_update_status form
-      document.querySelectorAll(`#user_${this.props.user}_section .user_update_status`).forEach(element => element.style.display = 'none');
-      // Updates stat graphics (no need to hide it; the other user may have stats to show)
-      updateStatCSS();
+      document.querySelectorAll(`#user_${this.props.user}_section .user_update_status`).forEach(e => e.style.display = 'none');
+      this.props.updateCSS();
     }
   }
 
@@ -344,40 +266,94 @@ class Body extends React.Component {
     for (let i = 0; i < info.length; i++) {
       this.state[info[i]] = ['', ''];
     }
-    this.state.stats = [];
     for (let i = 0; i < stats.length; i++) {
-      this.state.stats.push([0, 0]);
-    }
-    this.state.stat_facts = [];
-    for (let i = 0; i < stats.length; i++) {
-      this.state.stat_facts.push('');
+      this.state[stats[i].stat] = [0, 0];
+      this.state[stats[i].stat + '_fact'] = '';
     }
   }
 
-  // Following functions are used as callback functions by UserSection components to update this component's state
-  
-  setInfo(user, i, info_value) {
+  // Sets specific info for specific user
+  setInfo(user, info, value) {
     if (user == 1) {
-      this.setState({[i]: [info_value, this.state[i][1]]});
+      this.setState({[info]: [value, this.state[info][1]]});
     } else {
-      this.setState({[i]: [this.state[i][0], info_value]});
+      this.setState({[info]: [this.state[info][0], value]});
     }
   }
-  setStat(user, i, stat_value) {
-    let new_stats = this.state.stats;
+
+  // Sets specific stat for specific user
+  setStat(user, stat, value) {
     if (user == 1) {
-      new_stats[i] = [stat_value, this.state.stats[i][1]];
+      this.setState({[stat]: [value, this.state[stat][1]]});
     } else {
-      new_stats[i] = [this.state.stats[i][0], stat_value];
+      this.setState({[stat]: [this.state[stat][0], value]});
     }
-    this.setState({stats: new_stats});
   }
+
+  // Updates all stat facts for both users
   updateStatFacts() {
-    let new_stat_facts = this.state.stat_facts;
     for (let i = 0; i < stats.length; i++) {
-      new_stat_facts[i] = stats[i].getFact(this.state.username[0], this.state.stats[i][0], this.state.username[1], this.state.stats[i][1]);
+      this.setState({[stats[i].stat + '_fact']: stats[i].getFact(this.state.username[0], this.state[stats[i].stat][0], this.state.username[1], this.state[stats[i].stat][1])});
     }
-    this.setState({stat_facts: new_stat_facts});
+  }
+
+  updateCSS() {
+    // Updates stat bars
+    for (let i = 0; i < stats.length; i++) {
+      // If a neutral stat, makes bars gray
+      if (stats[i].compare_type == 0) {
+        document.getElementById(`${stats[i].stat}_1_bar`).style.backgroundColor = '#999';
+        document.getElementById(`${stats[i].stat}_2_bar`).style.backgroundColor = '#999';
+
+      // If not a neutral stat, calculates bar widths and colours
+      } else {
+        let scale = 50;  // Percentage of bar occupied by user 1
+        // Prevents division by 0
+        if (Number(this.state[stats[i].stat][0]) != 0 || Number(this.state[stats[i].stat][1] != 0)) {
+          scale = 1 + 98 * this.state[stats[i].stat][0] / (Number(this.state[stats[i].stat][0]) + Number(this.state[stats[i].stat][1]));
+          // If a reversed stat, reverses the bar width
+          if (stats[i].compare_type == -1) {
+            scale = 100 - scale;
+          }
+        }
+
+        // Sets bar widths
+        document.getElementById(`${stats[i].stat}_1_bar`).style.width = `${scale.toString()}%`;
+        document.getElementById(`${stats[i].stat}_2_bar`).style.width = `${(100 - scale).toString()}%`;
+
+        // Updates bar colours to be green/red/gray
+        if (scale > 50.0) {
+          document.getElementById(`${stats[i].stat}_1_bar`).style.backgroundColor = '#6C6';
+          document.getElementById(`${stats[i].stat}_2_bar`).style.backgroundColor = '#C66';
+        } else if (scale < 50.0) {
+          document.getElementById(`${stats[i].stat}_1_bar`).style.backgroundColor = '#C66';
+          document.getElementById(`${stats[i].stat}_2_bar`).style.backgroundColor = '#6C6';
+        } else {
+          document.getElementById(`${stats[i].stat}_1_bar`).style.backgroundColor = '#999';
+          document.getElementById(`${stats[i].stat}_2_bar`).style.backgroundColor = '#999';
+        }
+      }
+    }
+
+    // Shows/hides elements based on how many valid users have been entered (2, 1, 0)
+    if (document.getElementById('username_1').textContent != '' && document.getElementById('username_2').textContent != '') {
+      document.getElementById('vs').style.display = 'inherit';
+      document.getElementById('stats').style.display = 'inherit';
+      [].forEach.call(document.getElementsByClassName('stat_fact'), e => e.style.visibility = 'inherit');
+      document.getElementById('score_differences').style.display = 'inherit';
+
+    } else if (document.getElementById('username_1').textContent != '' || document.getElementById('username_2').textContent != '') {
+      document.getElementById('vs').style.display = 'none';
+      document.getElementById('stats').style.display = 'inherit';
+      [].forEach.call(document.getElementsByClassName('stat_fact'), e => e.style.visibility = 'hidden');
+      document.getElementById('score_differences').style.display = 'none';
+
+    } else {
+      document.getElementById('vs').style.display = 'none';
+      document.getElementById('stats').style.display = 'none';
+      [].forEach.call(document.getElementsByClassName('stat_fact'), e => e.style.visibility = 'hidden');
+      document.getElementById('score_differences').style.display = 'none';
+    }
   }
 
   // Info for user passed down as props to UserSection components; getInfo(), getStat(), updateStatFacts() passed to be used as callback functions
@@ -387,14 +363,14 @@ class Body extends React.Component {
     return (
       <div>
         <h3 id='vs'>VS</h3>
-        <UserSection user={1} username={this.state.username[0]} user_id={this.state.user_id[0]} last_updated={this.state.last_updated[0]} user_image={this.state.user_image[0]} sendInfo={this.setInfo.bind(this)} sendStat={this.setStat.bind(this)} updateStatFacts={this.updateStatFacts.bind(this)} />
-        <UserSection user={2} username={this.state.username[1]} user_id={this.state.user_id[1]} last_updated={this.state.last_updated[1]} user_image={this.state.user_image[1]} sendInfo={this.setInfo.bind(this)} sendStat={this.setStat.bind(this)} updateStatFacts={this.updateStatFacts.bind(this)} />
+        <UserSection user={1} username={this.state.username[0]} user_id={this.state.user_id[0]} last_updated={this.state.last_updated[0]} user_image={this.state.user_image[0]} sendInfo={this.setInfo.bind(this)} sendStat={this.setStat.bind(this)} updateStatFacts={this.updateStatFacts.bind(this)} updateCSS={this.updateCSS.bind(this)} />
+        <UserSection user={2} username={this.state.username[1]} user_id={this.state.user_id[1]} last_updated={this.state.last_updated[1]} user_image={this.state.user_image[1]} sendInfo={this.setInfo.bind(this)} sendStat={this.setStat.bind(this)} updateStatFacts={this.updateStatFacts.bind(this)} updateCSS={this.updateCSS.bind(this)} />
         
         <div id='stats'>
           <h2>Stat Face-Off</h2>
           <p className='main_p'>"Starting Life From 0.00"</p>
-          {[...Array(stats.length).keys()].map(i => (
-            <Stat key={stats[i].stat} stat={stats[i].stat} stat_values={this.state.stats[i]} stat_fact={this.state.stat_facts[i]} />
+          {stats.map(stat => (
+            <Stat key={stat.stat} stat={stat.stat} stat_values={this.state[stat.stat]} stat_fact={this.state[stat.stat + '_fact']} />
           ))}
         
         </div>

@@ -1,7 +1,5 @@
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
-
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
 function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
@@ -33,18 +31,17 @@ var StatInfo = function () {
       var diff = Math.abs(stat_1 - stat_2).toFixed(2);
       var diff_int = Math.abs(stat_1 - stat_2).toFixed(0);
 
-      // Only 1 user is selected
+      // Returns blank string if only one user is selected; although the string will be hidden, it will still affect the page layout
       if (user_1 == '' || user_2 == '') {
         return '';
       }
 
       if (this.fact_one_zero != '') {
-        // Both stats are zero
+        // Both stats are 0
         if (stat_1 == 0 && stat_2 == 0) {
           return this.fact_both_zero.replaceAll('user_1', user_1).replaceAll('user_2', user_2);
         }
-
-        // One stat is zero
+        // One stat is 0
         if (stat_1 == 0) {
           return this.fact_one_zero.replaceAll('user_2', user_1).replaceAll('user_1', user_2).replaceAll('stat_diff_int', diff_int).replaceAll('stat_diff', diff);
         }
@@ -74,69 +71,8 @@ var StatInfo = function () {
 
 
 var info = ['username', 'user_id', 'last_updated', 'user_image'];
+
 var stats = [new StatInfo('mean_score', 0, "user_1's mean score is stat_diff higher than user_2's. Does user_2 watch worse shows or is user_1 just overly generous?", "user_1 and user_2 have the same mean score. Spooky.", "", ""), new StatInfo('days_watched', 1, "user_1 has watched stat_prod times as much anime as user_2. user_1 desperately needs to get a life.", "user_1 and user_2 have watched the same amount of anime. It's anyone's game.", "user_2 has never watched anime at all. user_1 wins, but user_2 is probably the true winner here.", "Both user_1 and user_2 have never watched anime. Let's hope it stays that way."), new StatInfo('episodes_watched', 1, "user_1 has watched stat_prod times as many episodes as user_2. Time for a stat_diff_int episode binge, user_2?", "user_1 and user_2 have watched the same number of episodes. Not all episodes are created equal though.", "user_2 has never watched an episode of anime. Good or bad? Probably good.", "Both user_1 and user_2 have never watched an episode of anime. Good on them."), new StatInfo('total_entries', 1, "user_1 has stat_prod times as many total entries as user_2. Total entries is a meaningless stat anyways.", "user_1 and user_2 have the same number of total entries. Total entries is a meaningless stat anyways.", "", ""), new StatInfo('completed', 1, "user_1 has completed stat_prod times as many entries as user_2. Time for user_2 to watch stat_diff_int 1-minute shorts?", "user_1 and user_2 have completed the same number of entries. Commence the argument on how some entries are way larger than others.", "", ""), new StatInfo('watching', 1, "user_1 is watching stat_prod times as many entries as user_2. How does user_1 do it?", "user_1 and user_2 are watching the same number of entries. We'll see how the situation develops next season.", "user_2 is not watching any anime right now. They'll be back. They always come back.", "Both user_1 and user_2 are not watching any anime right now. They'll be back. They always come back."), new StatInfo('on_hold', -1, "user_1 has stat_prod times as many entries on hold as user_2. user_1 bit off more than they could chew.", "user_1 and user_2 have the same number of entries on hold. They both have some work to do.", "user_2 has no entries on hold. user_1 has some work to do.", "Both user_1 and user_2 have no entries on hold. At least they commit all the way."), new StatInfo('rewatched', 1, "user_1 has rewatched stat_prod times as many entries as user_2. user_1, don't you have anything better to do?", "user_1 and user_2 have rewatched the same number of entries. They both need something better to do.", "user_2 has never rewatched anything. To user_2, watching something twice is apparently too far.", "Both user_1 and user_2 have never rewatched anything. Watching something twice is apparently too far."), new StatInfo('dropped', -1, "user_1 has dropped stat_prod times as many entries as user_2. user_1 really can't make up their mind.", "user_1 and user_2 have dropped the same number of entries. They really can't make up their mind.", "user_2 has never dropped anything. Dedication or masochism?", "Both user_1 and user_2 have never dropped anything. Dedication or masochism?"), new StatInfo('plan_to_watch', -1, "user_1 plans to watch stat_prod times as many entries as user_2. user_1 needs to get grinding.", "user_1 and user_2 plan to watch the same number of entries. Get grinding.", "user_2 doesn't plan to watch anything. user_2 has defeated anime (for now).", "Both user_1 and user_2 don't plan to watch anything. They've defeated anime (for now).")];
-
-// Updates CSS of stats
-function updateStatCSS() {
-  // Updates each stat bar
-  for (var i = 0; i < stats.length; i++) {
-    // If a neutral stat, makes bars gray
-    if (stats[i].compare_type == 0) {
-      document.getElementById(stats[i].stat + '_1_bar').style.backgroundColor = '#999';
-      document.getElementById(stats[i].stat + '_2_bar').style.backgroundColor = '#999';
-
-      // If not a neutral stat, calculates bar widths and colours
-    } else {
-      // Gets stats
-      var stat_1 = parseFloat(document.getElementById(stats[i].stat + '_1').textContent);
-      var stat_2 = parseFloat(document.getElementById(stats[i].stat + '_2').textContent);
-
-      // Scale is the percentage of the bar occupied by user 1
-      var scale = void 0;
-      if (stat_1 == stat_2) {
-        scale = 50;
-      } else {
-        scale = 1 + 98 * stat_1 / (stat_1 + stat_2);
-
-        // If a reversed stat (lower number is better), reverses the bar width
-        if (stats[i].compare_type == -1) {
-          scale = 100 - scale;
-        }
-      }
-
-      // Sets bar widths
-      document.getElementById(stats[i].stat + '_1_bar').style.width = scale.toString() + '%';
-      document.getElementById(stats[i].stat + '_2_bar').style.width = (100 - scale).toString() + '%';
-
-      // Updates bar colours to be green, red or gray depending on the numbers
-      if (scale > 50.0) {
-        document.getElementById(stats[i].stat + '_1_bar').style.backgroundColor = '#6C6';
-        document.getElementById(stats[i].stat + '_2_bar').style.backgroundColor = '#C66';
-      } else if (scale < 50.0) {
-        document.getElementById(stats[i].stat + '_1_bar').style.backgroundColor = '#C66';
-        document.getElementById(stats[i].stat + '_2_bar').style.backgroundColor = '#6C6';
-      } else {
-        document.getElementById(stats[i].stat + '_1_bar').style.backgroundColor = '#999';
-        document.getElementById(stats[i].stat + '_2_bar').style.backgroundColor = '#999';
-      }
-    }
-  }
-
-  // Shows/hides elements that only appear if 2 users have been inputted
-  if (document.getElementById('username_1').textContent != '' && document.getElementById('username_2').textContent != '') {
-    document.getElementById('vs').style.display = 'inherit';
-    [].forEach.call(document.getElementsByClassName('stat_fact'), function (element) {
-      return element.style.visibility = 'inherit';
-    });
-    document.getElementById('score_differences').style.display = 'inherit';
-  } else {
-    document.getElementById('vs').style.display = 'none';
-    [].forEach.call(document.getElementsByClassName('stat_fact'), function (element) {
-      return element.style.visibility = 'hidden';
-    });
-    document.getElementById('score_differences').style.display = 'none';
-  }
-}
 
 // Given a string like 'mean_score', returns 'Mean Score'
 function capitalize(text) {
@@ -185,7 +121,12 @@ var UserSection = function (_React$Component) {
 
       // Sends HTTP request
       var http_req = new XMLHttpRequest();
-      http_req.open('GET', 'http://localhost:3000/?username=' + this.state.username_input.replace(' ', '+') + '&request=' + request);
+      // If request was 'get', uses (possibly newly entered) username in input form 
+      if (request == 'get') {
+        http_req.open('GET', 'http://localhost:3000/?username=' + this.state.username_input.replace(' ', '+') + '&request=' + request);
+      } else {
+        http_req.open('GET', 'http://localhost:3000/?username=' + this.props.username.replace(' ', '+') + '&request=' + request);
+      }
       http_req.send();
 
       // Executes when a response (a JSON-encoded string) is recieved
@@ -194,73 +135,60 @@ var UserSection = function (_React$Component) {
 
         // If update was successful (backend sets user_id to an empty string if it was unsuccessful)
         if (user_data.user_id != '') {
-          // Updates parent's state with info and stats using callback function in props
-          for (var i = 0; i < info.length; i++) {
-            _this2.props.sendInfo(_this2.props.user, info[i], user_data[info[i]]);
-          }
-          for (var _i = 0; _i < stats.length; _i++) {
-            _this2.props.sendStat(_this2.props.user, _i, user_data[stats[_i].stat]);
-          }
+          info.forEach(function (i) {
+            return _this2.props.sendInfo(_this2.props.user, i, user_data[i]);
+          });
+          stats.forEach(function (s) {
+            return _this2.props.sendStat(_this2.props.user, s.stat, user_data[s.stat]);
+          });
           _this2.props.updateStatFacts();
 
-          // Toggles error messages
           document.getElementById('backend_error_' + _this2.props.user).style.display = 'none';
           document.getElementById('username_error_' + _this2.props.user).style.display = 'none';
-          // Shows user_update_status form
-          document.querySelectorAll('#user_' + _this2.props.user + '_section .user_update_status').forEach(function (element) {
-            return element.style.display = 'inherit';
+          document.querySelectorAll('#user_' + _this2.props.user + '_section .user_update_status').forEach(function (e) {
+            return e.style.display = 'inherit';
           });
-          // Updates and shows stat graphics
-          updateStatCSS();
-          document.getElementById('stats').style.display = 'inherit';
+          _this2.props.updateCSS();
 
           // If update was unsuccessful
         } else {
           if (request == 'get') {
             _this2.sendRequest('update');
           } else {
-            // Updates parent's state with blank strings and zeroes instead of actual stats
-            for (var _i2 = 0; _i2 < info.length; _i2++) {
-              _this2.props.sendInfo(_this2.props.user, info[_i2], '');
-            }
-            for (var _i3 = 0; _i3 < stats.length; _i3++) {
-              _this2.props.sendStat(_this2.props.user, _i3, 0);
-            }
+            info.forEach(function (i) {
+              return _this2.props.sendInfo(_this2.props.user, i, '');
+            });
+            stats.forEach(function (s) {
+              return _this2.props.sendStat(_this2.props.user, s.stat, 0);
+            });
             _this2.props.updateStatFacts();
 
-            // Toggles error messages
             document.getElementById('backend_error_' + _this2.props.user).style.display = 'none';
             document.getElementById('username_error_' + _this2.props.user).style.display = 'inherit';
-            // Hides user_update_status form
-            document.querySelectorAll('#user_' + _this2.props.user + '_section .user_update_status').forEach(function (element) {
-              return element.style.display = 'none';
+            document.querySelectorAll('#user_' + _this2.props.user + '_section .user_update_status').forEach(function (e) {
+              return e.style.display = 'none';
             });
-            // Updates stat graphics (no need to hide it; the other user may have stats to show)
-            updateStatCSS();
+            _this2.props.updateCSS();
           }
         }
       };
 
-      // Executes when backend is offline
+      // Executes if backend is offline
       http_req.onerror = function () {
-        // Updates parent's state with blank strings and zeroes instead of actual stats
-        for (var i = 0; i < info.length; i++) {
-          _this2.props.sendInfo(_this2.props.user, info[i], '');
-        }
-        for (var _i4 = 0; _i4 < stats.length; _i4++) {
-          _this2.props.sendStat(_this2.props.user, _i4, 0);
-        }
+        info.forEach(function (i) {
+          return _this2.props.sendInfo(_this2.props.user, i, '');
+        });
+        stats.forEach(function (s) {
+          return _this2.props.sendStat(_this2.props.user, s.stat, 0);
+        });
         _this2.props.updateStatFacts();
 
-        // Toggles error messages
         document.getElementById('backend_error_' + _this2.props.user).style.display = 'inherit';
         document.getElementById('username_error_' + _this2.props.user).style.display = 'none';
-        // Hides user_update_status form
-        document.querySelectorAll('#user_' + _this2.props.user + '_section .user_update_status').forEach(function (element) {
-          return element.style.display = 'none';
+        document.querySelectorAll('#user_' + _this2.props.user + '_section .user_update_status').forEach(function (e) {
+          return e.style.display = 'none';
         });
-        // Updates stat graphics (no need to hide it; the other user may have stats to show)
-        updateStatCSS();
+        _this2.props.updateCSS();
       };
     }
 
@@ -404,47 +332,110 @@ var Body = function (_React$Component3) {
     for (var i = 0; i < info.length; i++) {
       _this4.state[info[i]] = ['', ''];
     }
-    _this4.state.stats = [];
-    for (var _i5 = 0; _i5 < stats.length; _i5++) {
-      _this4.state.stats.push([0, 0]);
-    }
-    _this4.state.stat_facts = [];
-    for (var _i6 = 0; _i6 < stats.length; _i6++) {
-      _this4.state.stat_facts.push('');
+    for (var _i = 0; _i < stats.length; _i++) {
+      _this4.state[stats[_i].stat] = [0, 0];
+      _this4.state[stats[_i].stat + '_fact'] = '';
     }
     return _this4;
   }
 
-  // Following functions are used as callback functions by UserSection components to update this component's state
+  // Sets specific info for specific user
+
 
   _createClass(Body, [{
     key: 'setInfo',
-    value: function setInfo(user, i, info_value) {
+    value: function setInfo(user, info, value) {
       if (user == 1) {
-        this.setState(_defineProperty({}, i, [info_value, this.state[i][1]]));
+        this.setState(_defineProperty({}, info, [value, this.state[info][1]]));
       } else {
-        this.setState(_defineProperty({}, i, [this.state[i][0], info_value]));
+        this.setState(_defineProperty({}, info, [this.state[info][0], value]));
       }
     }
+
+    // Sets specific stat for specific user
+
   }, {
     key: 'setStat',
-    value: function setStat(user, i, stat_value) {
-      var new_stats = this.state.stats;
+    value: function setStat(user, stat, value) {
       if (user == 1) {
-        new_stats[i] = [stat_value, this.state.stats[i][1]];
+        this.setState(_defineProperty({}, stat, [value, this.state[stat][1]]));
       } else {
-        new_stats[i] = [this.state.stats[i][0], stat_value];
+        this.setState(_defineProperty({}, stat, [this.state[stat][0], value]));
       }
-      this.setState({ stats: new_stats });
     }
+
+    // Updates all stat facts for both users
+
   }, {
     key: 'updateStatFacts',
     value: function updateStatFacts() {
-      var new_stat_facts = this.state.stat_facts;
       for (var i = 0; i < stats.length; i++) {
-        new_stat_facts[i] = stats[i].getFact(this.state.username[0], this.state.stats[i][0], this.state.username[1], this.state.stats[i][1]);
+        this.setState(_defineProperty({}, stats[i].stat + '_fact', stats[i].getFact(this.state.username[0], this.state[stats[i].stat][0], this.state.username[1], this.state[stats[i].stat][1])));
       }
-      this.setState({ stat_facts: new_stat_facts });
+    }
+  }, {
+    key: 'updateCSS',
+    value: function updateCSS() {
+      // Updates stat bars
+      for (var i = 0; i < stats.length; i++) {
+        // If a neutral stat, makes bars gray
+        if (stats[i].compare_type == 0) {
+          document.getElementById(stats[i].stat + '_1_bar').style.backgroundColor = '#999';
+          document.getElementById(stats[i].stat + '_2_bar').style.backgroundColor = '#999';
+
+          // If not a neutral stat, calculates bar widths and colours
+        } else {
+          var scale = 50; // Percentage of bar occupied by user 1
+          // Prevents division by 0
+          if (Number(this.state[stats[i].stat][0]) != 0 || Number(this.state[stats[i].stat][1] != 0)) {
+            scale = 1 + 98 * this.state[stats[i].stat][0] / (Number(this.state[stats[i].stat][0]) + Number(this.state[stats[i].stat][1]));
+            // If a reversed stat, reverses the bar width
+            if (stats[i].compare_type == -1) {
+              scale = 100 - scale;
+            }
+          }
+
+          // Sets bar widths
+          document.getElementById(stats[i].stat + '_1_bar').style.width = scale.toString() + '%';
+          document.getElementById(stats[i].stat + '_2_bar').style.width = (100 - scale).toString() + '%';
+
+          // Updates bar colours to be green/red/gray
+          if (scale > 50.0) {
+            document.getElementById(stats[i].stat + '_1_bar').style.backgroundColor = '#6C6';
+            document.getElementById(stats[i].stat + '_2_bar').style.backgroundColor = '#C66';
+          } else if (scale < 50.0) {
+            document.getElementById(stats[i].stat + '_1_bar').style.backgroundColor = '#C66';
+            document.getElementById(stats[i].stat + '_2_bar').style.backgroundColor = '#6C6';
+          } else {
+            document.getElementById(stats[i].stat + '_1_bar').style.backgroundColor = '#999';
+            document.getElementById(stats[i].stat + '_2_bar').style.backgroundColor = '#999';
+          }
+        }
+      }
+
+      // Shows/hides elements based on how many valid users have been entered (2, 1, 0)
+      if (document.getElementById('username_1').textContent != '' && document.getElementById('username_2').textContent != '') {
+        document.getElementById('vs').style.display = 'inherit';
+        document.getElementById('stats').style.display = 'inherit';
+        [].forEach.call(document.getElementsByClassName('stat_fact'), function (e) {
+          return e.style.visibility = 'inherit';
+        });
+        document.getElementById('score_differences').style.display = 'inherit';
+      } else if (document.getElementById('username_1').textContent != '' || document.getElementById('username_2').textContent != '') {
+        document.getElementById('vs').style.display = 'none';
+        document.getElementById('stats').style.display = 'inherit';
+        [].forEach.call(document.getElementsByClassName('stat_fact'), function (e) {
+          return e.style.visibility = 'hidden';
+        });
+        document.getElementById('score_differences').style.display = 'none';
+      } else {
+        document.getElementById('vs').style.display = 'none';
+        document.getElementById('stats').style.display = 'none';
+        [].forEach.call(document.getElementsByClassName('stat_fact'), function (e) {
+          return e.style.visibility = 'hidden';
+        });
+        document.getElementById('score_differences').style.display = 'none';
+      }
     }
 
     // Info for user passed down as props to UserSection components; getInfo(), getStat(), updateStatFacts() passed to be used as callback functions
@@ -464,8 +455,8 @@ var Body = function (_React$Component3) {
           { id: 'vs' },
           'VS'
         ),
-        React.createElement(UserSection, { user: 1, username: this.state.username[0], user_id: this.state.user_id[0], last_updated: this.state.last_updated[0], user_image: this.state.user_image[0], sendInfo: this.setInfo.bind(this), sendStat: this.setStat.bind(this), updateStatFacts: this.updateStatFacts.bind(this) }),
-        React.createElement(UserSection, { user: 2, username: this.state.username[1], user_id: this.state.user_id[1], last_updated: this.state.last_updated[1], user_image: this.state.user_image[1], sendInfo: this.setInfo.bind(this), sendStat: this.setStat.bind(this), updateStatFacts: this.updateStatFacts.bind(this) }),
+        React.createElement(UserSection, { user: 1, username: this.state.username[0], user_id: this.state.user_id[0], last_updated: this.state.last_updated[0], user_image: this.state.user_image[0], sendInfo: this.setInfo.bind(this), sendStat: this.setStat.bind(this), updateStatFacts: this.updateStatFacts.bind(this), updateCSS: this.updateCSS.bind(this) }),
+        React.createElement(UserSection, { user: 2, username: this.state.username[1], user_id: this.state.user_id[1], last_updated: this.state.last_updated[1], user_image: this.state.user_image[1], sendInfo: this.setInfo.bind(this), sendStat: this.setStat.bind(this), updateStatFacts: this.updateStatFacts.bind(this), updateCSS: this.updateCSS.bind(this) }),
         React.createElement(
           'div',
           { id: 'stats' },
@@ -479,8 +470,8 @@ var Body = function (_React$Component3) {
             { className: 'main_p' },
             '"Starting Life From 0.00"'
           ),
-          [].concat(_toConsumableArray(Array(stats.length).keys())).map(function (i) {
-            return React.createElement(Stat, { key: stats[i].stat, stat: stats[i].stat, stat_values: _this5.state.stats[i], stat_fact: _this5.state.stat_facts[i] });
+          stats.map(function (stat) {
+            return React.createElement(Stat, { key: stat.stat, stat: stat.stat, stat_values: _this5.state[stat.stat], stat_fact: _this5.state[stat.stat + '_fact'] });
           })
         ),
         React.createElement(
