@@ -1,10 +1,9 @@
-// Class that stores some info about a stat
 class StatInfo {
   constructor(stat, compare_type, fact_not_tied, fact_tied, fact_one_zero, fact_both_zero) {
     this.stat = stat;
-    this.compare_type = compare_type;  // 1 if bigger is better, 0 if incomparable, -1 if smaller is better
+    this.compare_type = compare_type;  // How the bars are calculated; 1 = bigger is better, 0 = do not compare, -1 = smaller is better
 
-    // Strings that will be displayed under stat bars
+    // Strings that will be displayed under stat bars under certain conditions
     this.fact_not_tied = fact_not_tied;
     this.fact_tied = fact_tied;
     this.fact_one_zero = fact_one_zero;
@@ -21,13 +20,13 @@ class StatInfo {
       return '';
     }
 
-    // Both zero
-    if (stat_1 == 0 && stat_2 == 0 && this.fact_both_zero != '') {
-      return this.fact_both_zero.replaceAll('user_1', user_1).replaceAll('user_2', user_2);
-    }
-
-    // One zero
     if (this.fact_one_zero != '') {
+      // Both stats are zero
+      if (stat_1 == 0 && stat_2 == 0) {
+        return this.fact_both_zero.replaceAll('user_1', user_1).replaceAll('user_2', user_2);
+      }
+
+      // One stat is zero
       if (stat_1 == 0) {
         return this.fact_one_zero.replaceAll('user_2', user_1).replaceAll('user_1', user_2).replaceAll('stat_diff_int', diff_int).replaceAll('stat_diff', diff);
       }
@@ -36,24 +35,17 @@ class StatInfo {
       }
     }
 
-    // Tied
-    if (stat_1 == stat_2 && this.fact_tied != '') {
+    // Both stats are tied
+    if (stat_1 == stat_2) {
       return this.fact_tied.replaceAll('user_1', user_1).replaceAll('user_2', user_2);
+    // Stats are not tied
+    } else if (parseFloat(stat_1) < parseFloat(stat_2)) {
+      const prod = (stat_2 / stat_1).toFixed(2);
+      return this.fact_not_tied.replaceAll('user_2', user_1).replaceAll('user_1', user_2).replaceAll('stat_diff_int', diff_int).replaceAll('stat_diff', diff).replaceAll('stat_prod', prod);
+    } else {
+      const prod = (stat_1 / stat_2).toFixed(2);
+      return this.fact_not_tied.replaceAll('user_1', user_1).replaceAll('user_2', user_2).replaceAll('stat_diff_int', diff_int).replaceAll('stat_diff', diff).replaceAll('stat_prod', prod);
     }
-
-    // Not tied
-    if (this.fact_not_tied != '') {
-      if (parseFloat(stat_1) < parseFloat(stat_2)) {
-        const prod = (stat_2 / stat_1).toFixed(2);
-        return this.fact_not_tied.replaceAll('user_2', user_1).replaceAll('user_1', user_2).replaceAll('stat_diff_int', diff_int).replaceAll('stat_diff', diff).replaceAll('stat_prod', prod);
-      }
-      if (parseFloat(stat_1) > parseFloat(stat_2)) {
-        const prod = (stat_1 / stat_2).toFixed(2);
-        return this.fact_not_tied.replaceAll('user_1', user_1).replaceAll('user_2', user_2).replaceAll('stat_diff_int', diff_int).replaceAll('stat_diff', diff).replaceAll('stat_prod', prod);
-      }
-    }
-
-    return "...cool.";
   }
 }
 
@@ -128,7 +120,8 @@ const stats = [
 ]
 
 // Updates CSS of stats
-function updateUserStatGraphics() {
+function updateStatCSS() {
+  // Updates each stat bar
   for (let i = 0; i < stats.length; i++) {
     // If a neutral stat, makes bars gray
     if (stats[i].compare_type == 0) {
@@ -173,34 +166,21 @@ function updateUserStatGraphics() {
   }
 
   // Shows/hides elements that only appear if 2 users have been inputted
-  let stat_facts = document.getElementsByClassName('stat_fact');
   if (document.getElementById('username_1').textContent != '' && document.getElementById('username_2').textContent != '') {
     document.getElementById('vs').style.display = 'inherit';
-
-    for (let i = 0; i < stat_facts.length; i++) {
-      stat_facts[i].style.visibility = 'inherit';
-    }
+    [].forEach.call(document.getElementsByClassName('stat_fact'), element => element.style.visibility = 'inherit');
+    document.getElementById('score_differences').style.display = 'inherit';
 
   } else {
     document.getElementById('vs').style.display = 'none';
-
-    for (let i = 0; i < stat_facts.length; i++) {
-      stat_facts[i].style.visibility = 'hidden';
-    }
+    [].forEach.call(document.getElementsByClassName('stat_fact'), element => element.style.visibility = 'hidden');
+    document.getElementById('score_differences').style.display = 'none';
   }
 }
 
 // Given a string like 'mean_score', returns 'Mean Score'
-function formatText(text) {
-  text = text.replaceAll('_', ' ');
-
-  for (let j = -1; j < text.length; j++) {
-    if (j == -1 || text.charAt(j) == ' ') {
-      text = text.slice(0, j + 1) + text.charAt(j + 1).toUpperCase() + text.slice(j + 2);
-    }
-  }
-
-  return text;
+function capitalize(text) {
+  return text.replaceAll('_', ' ').split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
 }
 
 // Component for inputting username and updating user data
@@ -209,7 +189,6 @@ class UserSection extends React.Component {
     super(props);
 
     // username_input is necessary in order to keep the text inside the input form up to date
-    // No need to be a prop passed from a parent since it's only needed by this component
     this.state = {
       username_input: ''
     };
@@ -240,10 +219,10 @@ class UserSection extends React.Component {
       if (user_data.user_id != '') {
         // Updates parent's state with info and stats using callback function in props
         for (let i = 0; i < info.length; i++) {
-          this.props.sendInfo(info[i], this.props.user, user_data[info[i]]);
+          this.props.sendInfo(this.props.user, info[i], user_data[info[i]]);
         }
         for (let i = 0; i < stats.length; i++) {
-          this.props.sendStat(i, this.props.user, user_data[stats[i].stat]);
+          this.props.sendStat(this.props.user, i, user_data[stats[i].stat]);
         }
         this.props.updateStatFacts();
 
@@ -253,7 +232,7 @@ class UserSection extends React.Component {
         // Shows user_update_status form
         document.querySelectorAll(`#user_${this.props.user}_section .user_update_status`).forEach(element => element.style.display = 'inherit');
         // Updates and shows stat graphics
-        updateUserStatGraphics();
+        updateStatCSS();
         document.getElementById('stats').style.display = 'inherit';
       
       // If update was unsuccessful
@@ -263,10 +242,10 @@ class UserSection extends React.Component {
         } else {
           // Updates parent's state with blank strings and zeroes instead of actual stats
           for (let i = 0; i < info.length; i++) {
-            this.props.sendInfo(info[i], this.props.user, '');
+            this.props.sendInfo(this.props.user, info[i], '');
           }
           for (let i = 0; i < stats.length; i++) {
-            this.props.sendStat(i, this.props.user, 0);  // Stat bars break if an empty string is sent instead of a number
+            this.props.sendStat(this.props.user, i, 0);
           }
           this.props.updateStatFacts();
 
@@ -276,7 +255,7 @@ class UserSection extends React.Component {
           // Hides user_update_status form
           document.querySelectorAll(`#user_${this.props.user}_section .user_update_status`).forEach(element => element.style.display = 'none');
           // Updates stat graphics (no need to hide it; the other user may have stats to show)
-          updateUserStatGraphics();
+          updateStatCSS();
         }
       }
     }
@@ -285,10 +264,10 @@ class UserSection extends React.Component {
     http_req.onerror = () => {
       // Updates parent's state with blank strings and zeroes instead of actual stats
       for (let i = 0; i < info.length; i++) {
-        this.props.sendInfo(info[i], this.props.user, '');
+        this.props.sendInfo(this.props.user, info[i], '');
       }
       for (let i = 0; i < stats.length; i++) {
-        this.props.sendStat(i, this.props.user, 0);  // Stat bars break if an empty string is sent instead of a number
+        this.props.sendStat(this.props.user, i, 0);
       }
       this.props.updateStatFacts();
 
@@ -298,7 +277,7 @@ class UserSection extends React.Component {
       // Hides user_update_status form
       document.querySelectorAll(`#user_${this.props.user}_section .user_update_status`).forEach(element => element.style.display = 'none');
       // Updates stat graphics (no need to hide it; the other user may have stats to show)
-      updateUserStatGraphics();
+      updateStatCSS();
     }
   }
 
@@ -312,10 +291,9 @@ class UserSection extends React.Component {
     event.preventDefault();
   }
 
-  // Composed of three parts
-  // form.username_input is for inputting and selecting a user to display
-  // p.backend_error and p.username_error appear for self-explanatory reasons
-  // form.user_update_status displays how up to date the current stats are, and a button to update them
+  // 'form.username_input' is for inputting and selecting a user to display
+  // 'p.backend_error' and 'p.username_error' are usually not displayed
+  // 'form.user_update_status' displays how up to date the current stats are and a button to update them
   render() {
     return (
       <div className='user_section' id={`user_${this.props.user}_section`}>
@@ -344,7 +322,7 @@ class Stat extends React.Component {
   render() {
     return (
       <div className='stat' id={this.props.stat}>
-        <h3>{`${formatText(this.props.stat)}:`}</h3>
+        <h3>{`${capitalize(this.props.stat)}:`}</h3>
         <div>
           <div className='stat_bar stat_1_bar' id={`${this.props.stat}_1_bar`}></div>
           <p className='stat_value stat_1_value' id={`${this.props.stat}_1`}>{this.props.stat_values[0]}</p>
@@ -357,7 +335,7 @@ class Stat extends React.Component {
   }
 }
 
-// Component for body of page; uses the two components above
+// Component for body of page; uses the components above
 class Body extends React.Component {
   constructor(props) {
     super(props);
@@ -377,14 +355,15 @@ class Body extends React.Component {
   }
 
   // Following functions are used as callback functions by UserSection components to update this component's state
-  setInfo(info, user, info_value) {
+  
+  setInfo(user, i, info_value) {
     if (user == 1) {
-      this.setState({[info]: [info_value, this.state[info][1]]});
+      this.setState({[i]: [info_value, this.state[i][1]]});
     } else {
-      this.setState({[info]: [this.state[info][0], info_value]});
+      this.setState({[i]: [this.state[i][0], info_value]});
     }
   }
-  setStat(i, user, stat_value) {
+  setStat(user, i, stat_value) {
     let new_stats = this.state.stats;
     if (user == 1) {
       new_stats[i] = [stat_value, this.state.stats[i][1]];
@@ -402,7 +381,7 @@ class Body extends React.Component {
   }
 
   // Info for user passed down as props to UserSection components; getInfo(), getStat(), updateStatFacts() passed to be used as callback functions
-  // The map function inside div#stats creates a Stat component for each item in the array 'stats'
+  // Map function inside div#stats creates a Stat component for each item in the array 'stats'
   // Corresponding stat passed down as prop to each Stat component
   render() {
     return (
@@ -413,7 +392,7 @@ class Body extends React.Component {
         
         <div id='stats'>
           <h2>Stat Face-Off</h2>
-          <p className='main_p'>"Starting Life From Zero"</p>
+          <p className='main_p'>"Starting Life From 0.00"</p>
           {[...Array(stats.length).keys()].map(i => (
             <Stat key={stats[i].stat} stat={stats[i].stat} stat_values={this.state.stats[i]} stat_fact={this.state.stat_facts[i]} />
           ))}

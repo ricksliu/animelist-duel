@@ -10,15 +10,14 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-// Class that stores some info about a stat
 var StatInfo = function () {
   function StatInfo(stat, compare_type, fact_not_tied, fact_tied, fact_one_zero, fact_both_zero) {
     _classCallCheck(this, StatInfo);
 
     this.stat = stat;
-    this.compare_type = compare_type; // 1 if bigger is better, 0 if incomparable, -1 if smaller is better
+    this.compare_type = compare_type; // How the bars are calculated; 1 = bigger is better, 0 = do not compare, -1 = smaller is better
 
-    // Strings that will be displayed under stat bars
+    // Strings that will be displayed under stat bars under certain conditions
     this.fact_not_tied = fact_not_tied;
     this.fact_tied = fact_tied;
     this.fact_one_zero = fact_one_zero;
@@ -39,13 +38,13 @@ var StatInfo = function () {
         return '';
       }
 
-      // Both zero
-      if (stat_1 == 0 && stat_2 == 0 && this.fact_both_zero != '') {
-        return this.fact_both_zero.replaceAll('user_1', user_1).replaceAll('user_2', user_2);
-      }
-
-      // One zero
       if (this.fact_one_zero != '') {
+        // Both stats are zero
+        if (stat_1 == 0 && stat_2 == 0) {
+          return this.fact_both_zero.replaceAll('user_1', user_1).replaceAll('user_2', user_2);
+        }
+
+        // One stat is zero
         if (stat_1 == 0) {
           return this.fact_one_zero.replaceAll('user_2', user_1).replaceAll('user_1', user_2).replaceAll('stat_diff_int', diff_int).replaceAll('stat_diff', diff);
         }
@@ -54,24 +53,17 @@ var StatInfo = function () {
         }
       }
 
-      // Tied
-      if (stat_1 == stat_2 && this.fact_tied != '') {
+      // Both stats are tied
+      if (stat_1 == stat_2) {
         return this.fact_tied.replaceAll('user_1', user_1).replaceAll('user_2', user_2);
+        // Stats are not tied
+      } else if (parseFloat(stat_1) < parseFloat(stat_2)) {
+        var prod = (stat_2 / stat_1).toFixed(2);
+        return this.fact_not_tied.replaceAll('user_2', user_1).replaceAll('user_1', user_2).replaceAll('stat_diff_int', diff_int).replaceAll('stat_diff', diff).replaceAll('stat_prod', prod);
+      } else {
+        var _prod = (stat_1 / stat_2).toFixed(2);
+        return this.fact_not_tied.replaceAll('user_1', user_1).replaceAll('user_2', user_2).replaceAll('stat_diff_int', diff_int).replaceAll('stat_diff', diff).replaceAll('stat_prod', _prod);
       }
-
-      // Not tied
-      if (this.fact_not_tied != '') {
-        if (parseFloat(stat_1) < parseFloat(stat_2)) {
-          var prod = (stat_2 / stat_1).toFixed(2);
-          return this.fact_not_tied.replaceAll('user_2', user_1).replaceAll('user_1', user_2).replaceAll('stat_diff_int', diff_int).replaceAll('stat_diff', diff).replaceAll('stat_prod', prod);
-        }
-        if (parseFloat(stat_1) > parseFloat(stat_2)) {
-          var _prod = (stat_1 / stat_2).toFixed(2);
-          return this.fact_not_tied.replaceAll('user_1', user_1).replaceAll('user_2', user_2).replaceAll('stat_diff_int', diff_int).replaceAll('stat_diff', diff).replaceAll('stat_prod', _prod);
-        }
-      }
-
-      return "...cool.";
     }
   }]);
 
@@ -85,7 +77,8 @@ var info = ['username', 'user_id', 'last_updated', 'user_image'];
 var stats = [new StatInfo('mean_score', 0, "user_1's mean score is stat_diff higher than user_2's. Does user_2 watch worse shows or is user_1 just overly generous?", "user_1 and user_2 have the same mean score. Spooky.", "", ""), new StatInfo('days_watched', 1, "user_1 has watched stat_prod times as much anime as user_2. user_1 desperately needs to get a life.", "user_1 and user_2 have watched the same amount of anime. It's anyone's game.", "user_2 has never watched anime at all. user_1 wins, but user_2 is probably the true winner here.", "Both user_1 and user_2 have never watched anime. Let's hope it stays that way."), new StatInfo('episodes_watched', 1, "user_1 has watched stat_prod times as many episodes as user_2. Time for a stat_diff_int episode binge, user_2?", "user_1 and user_2 have watched the same number of episodes. Not all episodes are created equal though.", "user_2 has never watched an episode of anime. Good or bad? Probably good.", "Both user_1 and user_2 have never watched an episode of anime. Good on them."), new StatInfo('total_entries', 1, "user_1 has stat_prod times as many total entries as user_2. Total entries is a meaningless stat anyways.", "user_1 and user_2 have the same number of total entries. Total entries is a meaningless stat anyways.", "", ""), new StatInfo('completed', 1, "user_1 has completed stat_prod times as many entries as user_2. Time for user_2 to watch stat_diff_int 1-minute shorts?", "user_1 and user_2 have completed the same number of entries. Commence the argument on how some entries are way larger than others.", "", ""), new StatInfo('watching', 1, "user_1 is watching stat_prod times as many entries as user_2. How does user_1 do it?", "user_1 and user_2 are watching the same number of entries. We'll see how the situation develops next season.", "user_2 is not watching any anime right now. They'll be back. They always come back.", "Both user_1 and user_2 are not watching any anime right now. They'll be back. They always come back."), new StatInfo('on_hold', -1, "user_1 has stat_prod times as many entries on hold as user_2. user_1 bit off more than they could chew.", "user_1 and user_2 have the same number of entries on hold. They both have some work to do.", "user_2 has no entries on hold. user_1 has some work to do.", "Both user_1 and user_2 have no entries on hold. At least they commit all the way."), new StatInfo('rewatched', 1, "user_1 has rewatched stat_prod times as many entries as user_2. user_1, don't you have anything better to do?", "user_1 and user_2 have rewatched the same number of entries. They both need something better to do.", "user_2 has never rewatched anything. To user_2, watching something twice is apparently too far.", "Both user_1 and user_2 have never rewatched anything. Watching something twice is apparently too far."), new StatInfo('dropped', -1, "user_1 has dropped stat_prod times as many entries as user_2. user_1 really can't make up their mind.", "user_1 and user_2 have dropped the same number of entries. They really can't make up their mind.", "user_2 has never dropped anything. Dedication or masochism?", "Both user_1 and user_2 have never dropped anything. Dedication or masochism?"), new StatInfo('plan_to_watch', -1, "user_1 plans to watch stat_prod times as many entries as user_2. user_1 needs to get grinding.", "user_1 and user_2 plan to watch the same number of entries. Get grinding.", "user_2 doesn't plan to watch anything. user_2 has defeated anime (for now).", "Both user_1 and user_2 don't plan to watch anything. They've defeated anime (for now).")];
 
 // Updates CSS of stats
-function updateUserStatGraphics() {
+function updateStatCSS() {
+  // Updates each stat bar
   for (var i = 0; i < stats.length; i++) {
     // If a neutral stat, makes bars gray
     if (stats[i].compare_type == 0) {
@@ -130,33 +123,26 @@ function updateUserStatGraphics() {
   }
 
   // Shows/hides elements that only appear if 2 users have been inputted
-  var stat_facts = document.getElementsByClassName('stat_fact');
   if (document.getElementById('username_1').textContent != '' && document.getElementById('username_2').textContent != '') {
     document.getElementById('vs').style.display = 'inherit';
-
-    for (var _i = 0; _i < stat_facts.length; _i++) {
-      stat_facts[_i].style.visibility = 'inherit';
-    }
+    [].forEach.call(document.getElementsByClassName('stat_fact'), function (element) {
+      return element.style.visibility = 'inherit';
+    });
+    document.getElementById('score_differences').style.display = 'inherit';
   } else {
     document.getElementById('vs').style.display = 'none';
-
-    for (var _i2 = 0; _i2 < stat_facts.length; _i2++) {
-      stat_facts[_i2].style.visibility = 'hidden';
-    }
+    [].forEach.call(document.getElementsByClassName('stat_fact'), function (element) {
+      return element.style.visibility = 'hidden';
+    });
+    document.getElementById('score_differences').style.display = 'none';
   }
 }
 
 // Given a string like 'mean_score', returns 'Mean Score'
-function formatText(text) {
-  text = text.replaceAll('_', ' ');
-
-  for (var j = -1; j < text.length; j++) {
-    if (j == -1 || text.charAt(j) == ' ') {
-      text = text.slice(0, j + 1) + text.charAt(j + 1).toUpperCase() + text.slice(j + 2);
-    }
-  }
-
-  return text;
+function capitalize(text) {
+  return text.replaceAll('_', ' ').split(' ').map(function (word) {
+    return word.charAt(0).toUpperCase() + word.slice(1);
+  }).join(' ');
 }
 
 // Component for inputting username and updating user data
@@ -168,7 +154,6 @@ var UserSection = function (_React$Component) {
     _classCallCheck(this, UserSection);
 
     // username_input is necessary in order to keep the text inside the input form up to date
-    // No need to be a prop passed from a parent since it's only needed by this component
     var _this = _possibleConstructorReturn(this, (UserSection.__proto__ || Object.getPrototypeOf(UserSection)).call(this, props));
 
     _this.state = {
@@ -211,10 +196,10 @@ var UserSection = function (_React$Component) {
         if (user_data.user_id != '') {
           // Updates parent's state with info and stats using callback function in props
           for (var i = 0; i < info.length; i++) {
-            _this2.props.sendInfo(info[i], _this2.props.user, user_data[info[i]]);
+            _this2.props.sendInfo(_this2.props.user, info[i], user_data[info[i]]);
           }
-          for (var _i3 = 0; _i3 < stats.length; _i3++) {
-            _this2.props.sendStat(_i3, _this2.props.user, user_data[stats[_i3].stat]);
+          for (var _i = 0; _i < stats.length; _i++) {
+            _this2.props.sendStat(_this2.props.user, _i, user_data[stats[_i].stat]);
           }
           _this2.props.updateStatFacts();
 
@@ -226,7 +211,7 @@ var UserSection = function (_React$Component) {
             return element.style.display = 'inherit';
           });
           // Updates and shows stat graphics
-          updateUserStatGraphics();
+          updateStatCSS();
           document.getElementById('stats').style.display = 'inherit';
 
           // If update was unsuccessful
@@ -235,11 +220,11 @@ var UserSection = function (_React$Component) {
             _this2.sendRequest('update');
           } else {
             // Updates parent's state with blank strings and zeroes instead of actual stats
-            for (var _i4 = 0; _i4 < info.length; _i4++) {
-              _this2.props.sendInfo(info[_i4], _this2.props.user, '');
+            for (var _i2 = 0; _i2 < info.length; _i2++) {
+              _this2.props.sendInfo(_this2.props.user, info[_i2], '');
             }
-            for (var _i5 = 0; _i5 < stats.length; _i5++) {
-              _this2.props.sendStat(_i5, _this2.props.user, 0); // Stat bars break if an empty string is sent instead of a number
+            for (var _i3 = 0; _i3 < stats.length; _i3++) {
+              _this2.props.sendStat(_this2.props.user, _i3, 0);
             }
             _this2.props.updateStatFacts();
 
@@ -251,7 +236,7 @@ var UserSection = function (_React$Component) {
               return element.style.display = 'none';
             });
             // Updates stat graphics (no need to hide it; the other user may have stats to show)
-            updateUserStatGraphics();
+            updateStatCSS();
           }
         }
       };
@@ -260,10 +245,10 @@ var UserSection = function (_React$Component) {
       http_req.onerror = function () {
         // Updates parent's state with blank strings and zeroes instead of actual stats
         for (var i = 0; i < info.length; i++) {
-          _this2.props.sendInfo(info[i], _this2.props.user, '');
+          _this2.props.sendInfo(_this2.props.user, info[i], '');
         }
-        for (var _i6 = 0; _i6 < stats.length; _i6++) {
-          _this2.props.sendStat(_i6, _this2.props.user, 0); // Stat bars break if an empty string is sent instead of a number
+        for (var _i4 = 0; _i4 < stats.length; _i4++) {
+          _this2.props.sendStat(_this2.props.user, _i4, 0);
         }
         _this2.props.updateStatFacts();
 
@@ -275,7 +260,7 @@ var UserSection = function (_React$Component) {
           return element.style.display = 'none';
         });
         // Updates stat graphics (no need to hide it; the other user may have stats to show)
-        updateUserStatGraphics();
+        updateStatCSS();
       };
     }
 
@@ -294,10 +279,9 @@ var UserSection = function (_React$Component) {
       event.preventDefault();
     }
 
-    // Composed of three parts
-    // form.username_input is for inputting and selecting a user to display
-    // p.backend_error and p.username_error appear for self-explanatory reasons
-    // form.user_update_status displays how up to date the current stats are, and a button to update them
+    // 'form.username_input' is for inputting and selecting a user to display
+    // 'p.backend_error' and 'p.username_error' are usually not displayed
+    // 'form.user_update_status' displays how up to date the current stats are and a button to update them
 
   }, {
     key: 'render',
@@ -375,7 +359,7 @@ var Stat = function (_React$Component2) {
         React.createElement(
           'h3',
           null,
-          formatText(this.props.stat) + ':'
+          capitalize(this.props.stat) + ':'
         ),
         React.createElement(
           'div',
@@ -405,7 +389,7 @@ var Stat = function (_React$Component2) {
   return Stat;
 }(React.Component);
 
-// Component for body of page; uses the two components above
+// Component for body of page; uses the components above
 
 
 var Body = function (_React$Component3) {
@@ -421,11 +405,11 @@ var Body = function (_React$Component3) {
       _this4.state[info[i]] = ['', ''];
     }
     _this4.state.stats = [];
-    for (var _i7 = 0; _i7 < stats.length; _i7++) {
+    for (var _i5 = 0; _i5 < stats.length; _i5++) {
       _this4.state.stats.push([0, 0]);
     }
     _this4.state.stat_facts = [];
-    for (var _i8 = 0; _i8 < stats.length; _i8++) {
+    for (var _i6 = 0; _i6 < stats.length; _i6++) {
       _this4.state.stat_facts.push('');
     }
     return _this4;
@@ -433,19 +417,18 @@ var Body = function (_React$Component3) {
 
   // Following functions are used as callback functions by UserSection components to update this component's state
 
-
   _createClass(Body, [{
     key: 'setInfo',
-    value: function setInfo(info, user, info_value) {
+    value: function setInfo(user, i, info_value) {
       if (user == 1) {
-        this.setState(_defineProperty({}, info, [info_value, this.state[info][1]]));
+        this.setState(_defineProperty({}, i, [info_value, this.state[i][1]]));
       } else {
-        this.setState(_defineProperty({}, info, [this.state[info][0], info_value]));
+        this.setState(_defineProperty({}, i, [this.state[i][0], info_value]));
       }
     }
   }, {
     key: 'setStat',
-    value: function setStat(i, user, stat_value) {
+    value: function setStat(user, i, stat_value) {
       var new_stats = this.state.stats;
       if (user == 1) {
         new_stats[i] = [stat_value, this.state.stats[i][1]];
@@ -465,7 +448,7 @@ var Body = function (_React$Component3) {
     }
 
     // Info for user passed down as props to UserSection components; getInfo(), getStat(), updateStatFacts() passed to be used as callback functions
-    // The map function inside div#stats creates a Stat component for each item in the array 'stats'
+    // Map function inside div#stats creates a Stat component for each item in the array 'stats'
     // Corresponding stat passed down as prop to each Stat component
 
   }, {
@@ -494,7 +477,7 @@ var Body = function (_React$Component3) {
           React.createElement(
             'p',
             { className: 'main_p' },
-            '"Starting Life From 0.0"'
+            '"Starting Life From 0.00"'
           ),
           [].concat(_toConsumableArray(Array(stats.length).keys())).map(function (i) {
             return React.createElement(Stat, { key: stats[i].stat, stat: stats[i].stat, stat_values: _this5.state.stats[i], stat_fact: _this5.state.stat_facts[i] });
