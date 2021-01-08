@@ -122,7 +122,7 @@ var UserSection = function (_React$Component) {
       var _this2 = this;
 
       var http_req = new XMLHttpRequest();
-      // If request was 'get', uses (possibly newly entered) username in input form 
+      // If request was 'get', uses (possibly newly entered) username in input form rather than username in parent's state
       if (request == 'get') {
         http_req.open('GET', 'http://localhost:3000/?username=' + this.state.username_input.replace(' ', '+') + '&request=' + request);
       } else {
@@ -142,6 +142,7 @@ var UserSection = function (_React$Component) {
             return _this2.props.sendStat(_this2.props.user, s.stat, user_data[s.stat]);
           });
           _this2.props.updateStatFacts();
+          _this2.props.getScoreDiffs(request);
 
           document.getElementById('backend_error_' + _this2.props.user).style.display = 'none';
           document.getElementById('username_error_' + _this2.props.user).style.display = 'none';
@@ -162,6 +163,7 @@ var UserSection = function (_React$Component) {
               return _this2.props.sendStat(_this2.props.user, s.stat, 0);
             });
             _this2.props.updateStatFacts();
+            _this2.props.getScoreDiffs(request);
 
             document.getElementById('backend_error_' + _this2.props.user).style.display = 'none';
             document.getElementById('username_error_' + _this2.props.user).style.display = 'inherit';
@@ -182,6 +184,7 @@ var UserSection = function (_React$Component) {
           return _this2.props.sendStat(_this2.props.user, s.stat, 0);
         });
         _this2.props.updateStatFacts();
+        _this2.props.getScoreDiffs(request);
 
         document.getElementById('backend_error_' + _this2.props.user).style.display = 'inherit';
         document.getElementById('username_error_' + _this2.props.user).style.display = 'none';
@@ -190,36 +193,6 @@ var UserSection = function (_React$Component) {
         });
         _this2.props.updateCSS();
       };
-
-      if (this.props.usernames[0] != '' && this.props.usernames[1] != '') {
-        var http_req_2 = new XMLHttpRequest();
-        // If request was 'get', uses (possibly newly entered) username in input form 
-        http_req_2.open('GET', 'http://localhost:3000/?username1=' + this.props.usernames[0].replace(' ', '+') + '&username2=' + this.props.usernames[1].replace(' ', '+') + '&request=diff');
-        http_req_2.send();
-
-        http_req_2.onload = function () {
-          var results = JSON.parse(http_req_2.response);
-          _this2.props.sendScoreDiffs(results.results);
-        };
-
-        // Executes if backend is offline
-        http_req_2.onerror = function () {
-          info.forEach(function (i) {
-            return _this2.props.sendInfo(_this2.props.user, i, '');
-          });
-          stats.forEach(function (s) {
-            return _this2.props.sendStat(_this2.props.user, s.stat, 0);
-          });
-          _this2.props.updateStatFacts();
-
-          document.getElementById('backend_error_' + _this2.props.user).style.display = 'inherit';
-          document.getElementById('username_error_' + _this2.props.user).style.display = 'none';
-          document.querySelectorAll('#user_' + _this2.props.user + '_section .user_update_status').forEach(function (e) {
-            return e.style.display = 'none';
-          });
-          _this2.props.updateCSS();
-        };
-      }
     }
 
     // The following functions are used as shortcuts for the function above
@@ -350,16 +323,16 @@ var Stat = function (_React$Component2) {
 // Component that displays a title and the scores that each user gave it
 
 
-var ScoreDifference = function (_React$Component3) {
-  _inherits(ScoreDifference, _React$Component3);
+var ScoreDiff = function (_React$Component3) {
+  _inherits(ScoreDiff, _React$Component3);
 
-  function ScoreDifference() {
-    _classCallCheck(this, ScoreDifference);
+  function ScoreDiff() {
+    _classCallCheck(this, ScoreDiff);
 
-    return _possibleConstructorReturn(this, (ScoreDifference.__proto__ || Object.getPrototypeOf(ScoreDifference)).apply(this, arguments));
+    return _possibleConstructorReturn(this, (ScoreDiff.__proto__ || Object.getPrototypeOf(ScoreDiff)).apply(this, arguments));
   }
 
-  _createClass(ScoreDifference, [{
+  _createClass(ScoreDiff, [{
     key: 'render',
     value: function render() {
       return React.createElement(
@@ -394,7 +367,7 @@ var ScoreDifference = function (_React$Component3) {
     }
   }]);
 
-  return ScoreDifference;
+  return ScoreDiff;
 }(React.Component);
 
 // Component for body of page; uses the components above
@@ -461,11 +434,27 @@ var Body = function (_React$Component4) {
       }
     }
   }, {
-    key: 'setScoreDiffs',
-    value: function setScoreDiffs(entries) {
-      console.log(entries);
-      this.setState({ 'scoreDiffs': entries });
-      console.log(this.state.scoreDiffs);
+    key: 'getScoreDiffs',
+    value: function getScoreDiffs(request) {
+      var _this6 = this;
+
+      if (this.state.username[0] != '' && this.state.username[1] != '') {
+        var http_req = new XMLHttpRequest();
+        // If request was 'get', requests old info
+        if (request == 'get') {
+          http_req.open('GET', 'http://localhost:3000/?username1=' + this.state.username[0].replace(' ', '+') + '&username2=' + this.state.username[1].replace(' ', '+') + '&request=getdiff');
+        } else {
+          http_req.open('GET', 'http://localhost:3000/?username1=' + this.state.username[0].replace(' ', '+') + '&username2=' + this.state.username[1].replace(' ', '+') + '&request=updatediff');
+        }
+        http_req.send();
+
+        http_req.onload = function () {
+          var results = JSON.parse(http_req.response);
+          _this6.setState({ 'scoreDiffs': results.results });
+        };
+
+        http_req.onerror = function () {};
+      }
     }
   }, {
     key: 'updateCSS',
@@ -514,21 +503,21 @@ var Body = function (_React$Component4) {
         [].forEach.call(document.getElementsByClassName('stat_fact'), function (e) {
           return e.style.visibility = 'inherit';
         });
-        document.getElementById('score_differences').style.display = 'inherit';
+        document.getElementById('score_diffs').style.display = 'inherit';
       } else if (document.getElementById('username_1').textContent != '' || document.getElementById('username_2').textContent != '') {
         document.getElementById('vs').style.display = 'none';
         document.getElementById('stats').style.display = 'inherit';
         [].forEach.call(document.getElementsByClassName('stat_fact'), function (e) {
           return e.style.visibility = 'hidden';
         });
-        document.getElementById('score_differences').style.display = 'none';
+        document.getElementById('score_diffs').style.display = 'none';
       } else {
         document.getElementById('vs').style.display = 'none';
         document.getElementById('stats').style.display = 'none';
         [].forEach.call(document.getElementsByClassName('stat_fact'), function (e) {
           return e.style.visibility = 'hidden';
         });
-        document.getElementById('score_differences').style.display = 'none';
+        document.getElementById('score_diffs').style.display = 'none';
       }
     }
 
@@ -539,7 +528,7 @@ var Body = function (_React$Component4) {
   }, {
     key: 'render',
     value: function render() {
-      var _this6 = this;
+      var _this7 = this;
 
       return React.createElement(
         'div',
@@ -549,8 +538,8 @@ var Body = function (_React$Component4) {
           { id: 'vs' },
           'VS'
         ),
-        React.createElement(UserSection, { user: 1, usernames: this.state.username, user_id: this.state.user_id[0], last_updated: this.state.last_updated[0], user_image: this.state.user_image[0], sendInfo: this.setInfo.bind(this), sendStat: this.setStat.bind(this), updateStatFacts: this.updateStatFacts.bind(this), sendScoreDiffs: this.setScoreDiffs.bind(this), updateCSS: this.updateCSS.bind(this) }),
-        React.createElement(UserSection, { user: 2, usernames: this.state.username, user_id: this.state.user_id[1], last_updated: this.state.last_updated[1], user_image: this.state.user_image[1], sendInfo: this.setInfo.bind(this), sendStat: this.setStat.bind(this), updateStatFacts: this.updateStatFacts.bind(this), sendScoreDiffs: this.setScoreDiffs.bind(this), updateCSS: this.updateCSS.bind(this) }),
+        React.createElement(UserSection, { user: 1, usernames: this.state.username, user_id: this.state.user_id[0], last_updated: this.state.last_updated[0], user_image: this.state.user_image[0], sendInfo: this.setInfo.bind(this), sendStat: this.setStat.bind(this), updateStatFacts: this.updateStatFacts.bind(this), getScoreDiffs: this.getScoreDiffs.bind(this), updateCSS: this.updateCSS.bind(this) }),
+        React.createElement(UserSection, { user: 2, usernames: this.state.username, user_id: this.state.user_id[1], last_updated: this.state.last_updated[1], user_image: this.state.user_image[1], sendInfo: this.setInfo.bind(this), sendStat: this.setStat.bind(this), updateStatFacts: this.updateStatFacts.bind(this), getScoreDiffs: this.getScoreDiffs.bind(this), updateCSS: this.updateCSS.bind(this) }),
         React.createElement(
           'div',
           { id: 'stats' },
@@ -565,12 +554,12 @@ var Body = function (_React$Component4) {
             '"Starting Life From 0.00"'
           ),
           stats.map(function (stat) {
-            return React.createElement(Stat, { key: stat.stat, stat: stat.stat, stat_values: _this6.state[stat.stat], stat_fact: _this6.state[stat.stat + '_fact'] });
+            return React.createElement(Stat, { key: stat.stat, stat: stat.stat, stat_values: _this7.state[stat.stat], stat_fact: _this7.state[stat.stat + '_fact'] });
           })
         ),
         React.createElement(
           'div',
-          { id: 'score_differences' },
+          { id: 'score_diffs' },
           React.createElement(
             'h2',
             null,
@@ -582,7 +571,7 @@ var Body = function (_React$Component4) {
             '"Your Opinion Is Wrong As I Expected"'
           ),
           [].concat(_toConsumableArray(Array(5).keys())).map(function (i) {
-            return React.createElement(ScoreDifference, { key: 'score_diff_' + i, id: i, title: _this6.state.scoreDiffs[i].title, score_1: _this6.state.scoreDiffs[i].score_1, score_2: _this6.state.scoreDiffs[i].score_2, diff: _this6.state.scoreDiffs[i].score_difference });
+            return React.createElement(ScoreDiff, { key: 'score_diff_' + i, id: i, title: _this7.state.scoreDiffs[i].title, score_1: _this7.state.scoreDiffs[i].score_1, score_2: _this7.state.scoreDiffs[i].score_2, diff: _this7.state.scoreDiffs[i].score_difference });
           })
         )
       );

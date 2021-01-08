@@ -148,7 +148,7 @@ class UserSection extends React.Component {
   // Sends HTTP request to backend server to get or update data for the user that this component is for
   sendRequest(request) {
     const http_req = new XMLHttpRequest();
-    // If request was 'get', uses (possibly newly entered) username in input form 
+    // If request was 'get', uses (possibly newly entered) username in input form rather than username in parent's state
     if (request == 'get') {
       http_req.open('GET', `http://localhost:3000/?username=${this.state.username_input.replace(' ', '+')}&request=${request}`);
     } else {
@@ -164,6 +164,7 @@ class UserSection extends React.Component {
         info.forEach(i => this.props.sendInfo(this.props.user, i, user_data[i]));
         stats.forEach(s => this.props.sendStat(this.props.user, s.stat, user_data[s.stat]));
         this.props.updateStatFacts();
+        this.props.getScoreDiffs(request);
 
         document.getElementById(`backend_error_${this.props.user}`).style.display = 'none';
         document.getElementById(`username_error_${this.props.user}`).style.display = 'none';
@@ -179,6 +180,7 @@ class UserSection extends React.Component {
           info.forEach(i => this.props.sendInfo(this.props.user, i, ''));
           stats.forEach(s => this.props.sendStat(this.props.user, s.stat, 0));
           this.props.updateStatFacts();
+          this.props.getScoreDiffs(request);
 
           document.getElementById(`backend_error_${this.props.user}`).style.display = 'none';
           document.getElementById(`username_error_${this.props.user}`).style.display = 'inherit';
@@ -193,35 +195,12 @@ class UserSection extends React.Component {
       info.forEach(i => this.props.sendInfo(this.props.user, i, ''));
       stats.forEach(s => this.props.sendStat(this.props.user, s.stat, 0));
       this.props.updateStatFacts();
+      this.props.getScoreDiffs(request);
 
       document.getElementById(`backend_error_${this.props.user}`).style.display = 'inherit';
       document.getElementById(`username_error_${this.props.user}`).style.display = 'none';
       document.querySelectorAll(`#user_${this.props.user}_section .user_update_status`).forEach(e => e.style.display = 'none');
       this.props.updateCSS();
-    }
-
-    if (this.props.usernames[0] != '' && this.props.usernames[1] != '') {
-      const http_req_2 = new XMLHttpRequest();
-      // If request was 'get', uses (possibly newly entered) username in input form 
-      http_req_2.open('GET', `http://localhost:3000/?username1=${this.props.usernames[0].replace(' ', '+')}&username2=${this.props.usernames[1].replace(' ', '+')}&request=diff`);
-      http_req_2.send();
-    
-      http_req_2.onload = () => {
-        let results = JSON.parse(http_req_2.response);
-        this.props.sendScoreDiffs(results.results);
-      }
-
-      // Executes if backend is offline
-      http_req_2.onerror = () => {
-        info.forEach(i => this.props.sendInfo(this.props.user, i, ''));
-        stats.forEach(s => this.props.sendStat(this.props.user, s.stat, 0));
-        this.props.updateStatFacts();
-
-        document.getElementById(`backend_error_${this.props.user}`).style.display = 'inherit';
-        document.getElementById(`username_error_${this.props.user}`).style.display = 'none';
-        document.querySelectorAll(`#user_${this.props.user}_section .user_update_status`).forEach(e => e.style.display = 'none');
-        this.props.updateCSS();
-      }
     }
   }
 
@@ -280,7 +259,7 @@ class Stat extends React.Component {
 }
 
 // Component that displays a title and the scores that each user gave it
-class ScoreDifference extends React.Component {
+class ScoreDiff extends React.Component {
   render() {
     return (
       <div className='score_diff' id={`score_diff_${this.props.id}`}>
@@ -345,10 +324,25 @@ class Body extends React.Component {
     }
   }
 
-  setScoreDiffs(entries) {
-    console.log(entries);
-    this.setState({'scoreDiffs': entries});
-    console.log(this.state.scoreDiffs);
+  getScoreDiffs(request) {
+    if (this.state.username[0] != '' && this.state.username[1] != '') {
+      const http_req = new XMLHttpRequest();
+      // If request was 'get', requests old info
+      if (request == 'get') {
+        http_req.open('GET', `http://localhost:3000/?username1=${this.state.username[0].replace(' ', '+')}&username2=${this.state.username[1].replace(' ', '+')}&request=getdiff`);
+      } else {
+        http_req.open('GET', `http://localhost:3000/?username1=${this.state.username[0].replace(' ', '+')}&username2=${this.state.username[1].replace(' ', '+')}&request=updatediff`);
+      }
+        http_req.send();
+    
+      http_req.onload = () => {
+        let results = JSON.parse(http_req.response);
+        this.setState({'scoreDiffs': results.results});
+      }
+
+      http_req.onerror = () => {
+      }
+    }
   }
 
   updateCSS() {
@@ -394,19 +388,19 @@ class Body extends React.Component {
       document.getElementById('vs').style.display = 'inherit';
       document.getElementById('stats').style.display = 'inherit';
       [].forEach.call(document.getElementsByClassName('stat_fact'), e => e.style.visibility = 'inherit');
-      document.getElementById('score_differences').style.display = 'inherit';
+      document.getElementById('score_diffs').style.display = 'inherit';
 
     } else if (document.getElementById('username_1').textContent != '' || document.getElementById('username_2').textContent != '') {
       document.getElementById('vs').style.display = 'none';
       document.getElementById('stats').style.display = 'inherit';
       [].forEach.call(document.getElementsByClassName('stat_fact'), e => e.style.visibility = 'hidden');
-      document.getElementById('score_differences').style.display = 'none';
+      document.getElementById('score_diffs').style.display = 'none';
 
     } else {
       document.getElementById('vs').style.display = 'none';
       document.getElementById('stats').style.display = 'none';
       [].forEach.call(document.getElementsByClassName('stat_fact'), e => e.style.visibility = 'hidden');
-      document.getElementById('score_differences').style.display = 'none';
+      document.getElementById('score_diffs').style.display = 'none';
     }
   }
 
@@ -417,8 +411,8 @@ class Body extends React.Component {
     return (
       <div>
         <h3 id='vs'>VS</h3>
-        <UserSection user={1} usernames={this.state.username} user_id={this.state.user_id[0]} last_updated={this.state.last_updated[0]} user_image={this.state.user_image[0]} sendInfo={this.setInfo.bind(this)} sendStat={this.setStat.bind(this)} updateStatFacts={this.updateStatFacts.bind(this)} sendScoreDiffs={this.setScoreDiffs.bind(this)} updateCSS={this.updateCSS.bind(this)} />
-        <UserSection user={2} usernames={this.state.username} user_id={this.state.user_id[1]} last_updated={this.state.last_updated[1]} user_image={this.state.user_image[1]} sendInfo={this.setInfo.bind(this)} sendStat={this.setStat.bind(this)} updateStatFacts={this.updateStatFacts.bind(this)} sendScoreDiffs={this.setScoreDiffs.bind(this)} updateCSS={this.updateCSS.bind(this)} />
+        <UserSection user={1} usernames={this.state.username} user_id={this.state.user_id[0]} last_updated={this.state.last_updated[0]} user_image={this.state.user_image[0]} sendInfo={this.setInfo.bind(this)} sendStat={this.setStat.bind(this)} updateStatFacts={this.updateStatFacts.bind(this)} getScoreDiffs={this.getScoreDiffs.bind(this)} updateCSS={this.updateCSS.bind(this)} />
+        <UserSection user={2} usernames={this.state.username} user_id={this.state.user_id[1]} last_updated={this.state.last_updated[1]} user_image={this.state.user_image[1]} sendInfo={this.setInfo.bind(this)} sendStat={this.setStat.bind(this)} updateStatFacts={this.updateStatFacts.bind(this)} getScoreDiffs={this.getScoreDiffs.bind(this)} updateCSS={this.updateCSS.bind(this)} />
         
         <div id='stats'>
           <h2>Stat Face-Off</h2>
@@ -428,11 +422,11 @@ class Body extends React.Component {
           ))}
         
         </div>
-        <div id='score_differences'>
+        <div id='score_diffs'>
           <h2>Opinion Clash</h2>
           <p className='main_p'>"Your Opinion Is Wrong As I Expected"</p>
           {[...Array(5).keys()].map(i => (
-            <ScoreDifference key={'score_diff_' + i} id={i} title={this.state.scoreDiffs[i].title} score_1={this.state.scoreDiffs[i].score_1} score_2={this.state.scoreDiffs[i].score_2} diff={this.state.scoreDiffs[i].score_difference} />
+            <ScoreDiff key={'score_diff_' + i} id={i} title={this.state.scoreDiffs[i].title} score_1={this.state.scoreDiffs[i].score_1} score_2={this.state.scoreDiffs[i].score_2} diff={this.state.scoreDiffs[i].score_difference} />
           ))}
         </div>
       </div>
