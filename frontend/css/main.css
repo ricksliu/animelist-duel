@@ -42,3 +42,15 @@ p {
     font-weight: bold;
     color: #2E51A2;
 }
+
+hr {
+    margin: 2em 0em 0em;
+
+    border-style: solid;
+    border-width: 0.125em;
+    border-color: #2E51A2;
+}
+
+hr.no_margin {
+    margin: 0em;
+}

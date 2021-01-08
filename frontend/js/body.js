@@ -254,7 +254,8 @@ var UserSection = function (_React$Component) {
           React.createElement(
             'p',
             { id: 'last_updated_' + this.props.user },
-            'Data From ',
+            'Data From:',
+            React.createElement('br', null),
             this.props.last_updated
           ),
           React.createElement('input', { type: 'submit', className: 'input_submit', id: 'user_' + this.props.user + '_update', value: 'Update Data' })
@@ -284,10 +285,11 @@ var Stat = function (_React$Component2) {
       return React.createElement(
         'div',
         { className: 'stat', id: this.props.stat },
+        React.createElement('hr', null),
         React.createElement(
           'h3',
           null,
-          capitalize(this.props.stat) + ':'
+          '' + capitalize(this.props.stat)
         ),
         React.createElement(
           'div',
@@ -335,28 +337,33 @@ var ScoreDiff = function (_React$Component3) {
       return React.createElement(
         'div',
         { className: 'score_diff', id: 'score_diff_' + this.props.id },
+        React.createElement('hr', null),
         React.createElement(
           'h3',
           null,
           '' + capitalize(this.props.title)
         ),
         React.createElement(
-          'p',
-          { className: 'score_diff_score score_diff_score_1', id: 'score_diff_score_' + this.props.id + '_1' },
-          this.props.score_1,
-          '/10'
+          'div',
+          null,
+          React.createElement(
+            'p',
+            { className: 'score_diff_score score_diff_score_1', id: 'score_diff_score_' + this.props.id + '_1' },
+            this.props.score_1,
+            '/10'
+          ),
+          React.createElement('img', { src: this.props.image, alt: '' }),
+          React.createElement(
+            'p',
+            { className: 'score_diff_score score_diff_score_2', id: 'score_diff_score_' + this.props.id + '_2' },
+            this.props.score_2,
+            '/10'
+          )
         ),
-        React.createElement(
-          'p',
-          { className: 'score_diff_score score_diff_score_2', id: 'score_diff_score_' + this.props.id + '_2' },
-          this.props.score_2,
-          '/10'
-        ),
-        React.createElement('img', { src: this.props.image, alt: '' }),
         React.createElement(
           'p',
           { className: 'score_diff_diff', id: 'score_diff_' + this.props.id + '_diff' },
-          '\xB1',
+          'Difference: \xB1',
           this.props.diff
         )
       );
@@ -517,11 +524,22 @@ var Body = function (_React$Component4) {
           return e.style.visibility = 'inherit';
         });
         document.getElementById('score_diffs').style.display = 'inherit';
-        // Hides empty score difference entries
         for (var _i3 = 0; _i3 < 5; _i3++) {
           if (this.state.scoreDiffs[_i3].title != '') {
             document.getElementById('score_diff_' + _i3).style.display = 'inherit';
+            // Updates score colourrs to be green/red/gray
+            if (parseInt(this.state.scoreDiffs[_i3].score_1) > parseInt(this.state.scoreDiffs[_i3].score_2)) {
+              document.getElementById('score_diff_score_' + _i3 + '_1').style.color = '#6C6';
+              document.getElementById('score_diff_score_' + _i3 + '_2').style.color = '#C66';
+            } else if (parseInt(this.state.scoreDiffs[_i3].score_1) < parseInt(this.state.scoreDiffs[_i3].score_2)) {
+              document.getElementById('score_diff_score_' + _i3 + '_1').style.color = '#C66';
+              document.getElementById('score_diff_score_' + _i3 + '_2').style.color = '#6C6';
+            } else {
+              document.getElementById('score_diff_score_' + _i3 + '_1').style.color = '#999';
+              document.getElementById('score_diff_score_' + _i3 + '_2').style.color = '#999';
+            }
           } else {
+            // Hides empty score difference entries
             document.getElementById('score_diff_' + _i3).style.display = 'none';
           }
         }
@@ -555,15 +573,25 @@ var Body = function (_React$Component4) {
         'div',
         null,
         React.createElement(
-          'h3',
-          { id: 'vs' },
-          'VS'
+          'div',
+          null,
+          React.createElement('hr', { className: 'no_margin' })
         ),
-        React.createElement(UserSection, { user: 1, usernames: this.state.username, user_id: this.state.user_id[0], last_updated: this.state.last_updated[0], user_image: this.state.user_image[0], sendInfo: this.setInfo.bind(this), sendStat: this.setStat.bind(this), updateStatFacts: this.updateStatFacts.bind(this), getScoreDiffs: this.getScoreDiffs.bind(this) }),
-        React.createElement(UserSection, { user: 2, usernames: this.state.username, user_id: this.state.user_id[1], last_updated: this.state.last_updated[1], user_image: this.state.user_image[1], sendInfo: this.setInfo.bind(this), sendStat: this.setStat.bind(this), updateStatFacts: this.updateStatFacts.bind(this), getScoreDiffs: this.getScoreDiffs.bind(this) }),
+        React.createElement(
+          'div',
+          { id: 'user_sections' },
+          React.createElement(
+            'h3',
+            { id: 'vs' },
+            'vs'
+          ),
+          React.createElement(UserSection, { user: 1, usernames: this.state.username, user_id: this.state.user_id[0], last_updated: this.state.last_updated[0], user_image: this.state.user_image[0], sendInfo: this.setInfo.bind(this), sendStat: this.setStat.bind(this), updateStatFacts: this.updateStatFacts.bind(this), getScoreDiffs: this.getScoreDiffs.bind(this) }),
+          React.createElement(UserSection, { user: 2, usernames: this.state.username, user_id: this.state.user_id[1], last_updated: this.state.last_updated[1], user_image: this.state.user_image[1], sendInfo: this.setInfo.bind(this), sendStat: this.setStat.bind(this), updateStatFacts: this.updateStatFacts.bind(this), getScoreDiffs: this.getScoreDiffs.bind(this) })
+        ),
         React.createElement(
           'div',
           { id: 'stats' },
+          React.createElement('hr', { className: 'no_margin' }),
           React.createElement(
             'h2',
             null,
@@ -581,6 +609,7 @@ var Body = function (_React$Component4) {
         React.createElement(
           'div',
           { id: 'score_diffs' },
+          React.createElement('hr', null),
           React.createElement(
             'h2',
             null,
@@ -594,6 +623,11 @@ var Body = function (_React$Component4) {
           [].concat(_toConsumableArray(Array(5).keys())).map(function (i) {
             return React.createElement(ScoreDiff, { key: 'score_diff_' + i, id: i, title: _this7.state.scoreDiffs[i].title, image: _this7.state.scoreDiffs[i].title_image, score_1: _this7.state.scoreDiffs[i].score_1, score_2: _this7.state.scoreDiffs[i].score_2, diff: _this7.state.scoreDiffs[i].score_difference });
           })
+        ),
+        React.createElement(
+          'div',
+          null,
+          React.createElement('hr', { className: 'no_margin' })
         )
       );
     }

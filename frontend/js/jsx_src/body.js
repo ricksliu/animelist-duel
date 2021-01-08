@@ -229,7 +229,7 @@ class UserSection extends React.Component {
         <form className='user_update_status' onSubmit={this.updateUser}>
           <h3 id={`username_${this.props.user}`}>{this.props.usernames[this.props.user - 1]}</h3>
           <img id={`user_image_${this.props.user}`} src={this.props.user_image} alt='' />
-          <p id={`last_updated_${this.props.user}`}>Data From {this.props.last_updated}</p>
+          <p id={`last_updated_${this.props.user}`}>Data From:<br />{this.props.last_updated}</p>
           <input type='submit' className='input_submit' id={`user_${this.props.user}_update`} value='Update Data' />
         </form>
       </div>
@@ -242,7 +242,8 @@ class Stat extends React.Component {
   render() {
     return (
       <div className='stat' id={this.props.stat}>
-        <h3>{`${capitalize(this.props.stat)}:`}</h3>
+        <hr />
+        <h3>{`${capitalize(this.props.stat)}`}</h3>
         <div>
           <div className='stat_bar stat_1_bar' id={`${this.props.stat}_1_bar`}></div>
           <p className='stat_value stat_1_value' id={`${this.props.stat}_1`}>{this.props.stat_values[0]}</p>
@@ -260,11 +261,14 @@ class ScoreDiff extends React.Component {
   render() {
     return (
       <div className='score_diff' id={`score_diff_${this.props.id}`}>
+        <hr />
         <h3>{`${capitalize(this.props.title)}`}</h3>
-        <p className='score_diff_score score_diff_score_1' id={`score_diff_score_${this.props.id}_1`}>{this.props.score_1}/10</p>
-        <p className='score_diff_score score_diff_score_2' id={`score_diff_score_${this.props.id}_2`}>{this.props.score_2}/10</p>
-        <img src={this.props.image} alt='' />
-        <p className='score_diff_diff' id={`score_diff_${this.props.id}_diff`}>±{this.props.diff}</p>
+        <div>
+          <p className='score_diff_score score_diff_score_1' id={`score_diff_score_${this.props.id}_1`}>{this.props.score_1}/10</p>
+          <img src={this.props.image} alt='' />
+          <p className='score_diff_score score_diff_score_2' id={`score_diff_score_${this.props.id}_2`}>{this.props.score_2}/10</p>
+        </div>
+        <p className='score_diff_diff' id={`score_diff_${this.props.id}_diff`}>Difference: ±{this.props.diff}</p>
       </div>
     );
   }
@@ -401,11 +405,22 @@ class Body extends React.Component {
       document.getElementById('stats').style.display = 'inherit';
       [].forEach.call(document.getElementsByClassName('stat_fact'), e => e.style.visibility = 'inherit');
       document.getElementById('score_diffs').style.display = 'inherit';
-      // Hides empty score difference entries
       for (let i = 0; i < 5; i++) {
         if (this.state.scoreDiffs[i].title != '') {
           document.getElementById(`score_diff_${i}`).style.display = 'inherit';
+          // Updates score colourrs to be green/red/gray
+          if (parseInt(this.state.scoreDiffs[i].score_1) > parseInt(this.state.scoreDiffs[i].score_2)) {
+            document.getElementById(`score_diff_score_${i}_1`).style.color = '#6C6';
+            document.getElementById(`score_diff_score_${i}_2`).style.color = '#C66';
+          } else if (parseInt(this.state.scoreDiffs[i].score_1) < parseInt(this.state.scoreDiffs[i].score_2)) {
+            document.getElementById(`score_diff_score_${i}_1`).style.color = '#C66';
+            document.getElementById(`score_diff_score_${i}_2`).style.color = '#6C6';
+          } else {
+            document.getElementById(`score_diff_score_${i}_1`).style.color = '#999';
+            document.getElementById(`score_diff_score_${i}_2`).style.color = '#999';
+          }
         } else {
+          // Hides empty score difference entries
           document.getElementById(`score_diff_${i}`).style.display = 'none';
         }
       }
@@ -430,24 +445,34 @@ class Body extends React.Component {
   render() {
     return (
       <div>
-        <h3 id='vs'>VS</h3>
-        <UserSection user={1} usernames={this.state.username} user_id={this.state.user_id[0]} last_updated={this.state.last_updated[0]} user_image={this.state.user_image[0]} sendInfo={this.setInfo.bind(this)} sendStat={this.setStat.bind(this)} updateStatFacts={this.updateStatFacts.bind(this)} getScoreDiffs={this.getScoreDiffs.bind(this)} />
-        <UserSection user={2} usernames={this.state.username} user_id={this.state.user_id[1]} last_updated={this.state.last_updated[1]} user_image={this.state.user_image[1]} sendInfo={this.setInfo.bind(this)} sendStat={this.setStat.bind(this)} updateStatFacts={this.updateStatFacts.bind(this)} getScoreDiffs={this.getScoreDiffs.bind(this)} />
-        
+        <div>
+          <hr className='no_margin'/>
+        </div>
+        <div id='user_sections'>
+          <h3 id='vs'>vs</h3>
+          <UserSection user={1} usernames={this.state.username} user_id={this.state.user_id[0]} last_updated={this.state.last_updated[0]} user_image={this.state.user_image[0]} sendInfo={this.setInfo.bind(this)} sendStat={this.setStat.bind(this)} updateStatFacts={this.updateStatFacts.bind(this)} getScoreDiffs={this.getScoreDiffs.bind(this)} />
+          <UserSection user={2} usernames={this.state.username} user_id={this.state.user_id[1]} last_updated={this.state.last_updated[1]} user_image={this.state.user_image[1]} sendInfo={this.setInfo.bind(this)} sendStat={this.setStat.bind(this)} updateStatFacts={this.updateStatFacts.bind(this)} getScoreDiffs={this.getScoreDiffs.bind(this)} />
+        </div>
+
         <div id='stats'>
+          <hr className='no_margin'/>
           <h2>Stat Face-Off</h2>
           <p className='main_p'>"Starting Life From 0.00"</p>
           {stats.map(stat => (
             <Stat key={stat.stat} stat={stat.stat} stat_values={this.state[stat.stat]} stat_fact={this.state[stat.stat + '_fact']} />
           ))}
-        
         </div>
+
         <div id='score_diffs'>
+          <hr />
           <h2>Opinion Clash</h2>
           <p className='main_p'>"Your Opinion Is Wrong As I Expected"</p>
           {[...Array(5).keys()].map(i => (
             <ScoreDiff key={'score_diff_' + i} id={i} title={this.state.scoreDiffs[i].title} image={this.state.scoreDiffs[i].title_image} score_1={this.state.scoreDiffs[i].score_1} score_2={this.state.scoreDiffs[i].score_2} diff={this.state.scoreDiffs[i].score_difference} />
           ))}
+        </div>
+        <div>
+          <hr className='no_margin'/>
         </div>
       </div>
     );

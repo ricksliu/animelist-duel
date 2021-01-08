@@ -12,3 +12,13 @@ p.main_p {
 
     text-align: center;
 }
+
+#body > div > div:first-child {
+    padding-bottom: 2em;
+}
+
+#body > div > div:last-child {
+    clear: both;
+    padding-top: 2em;
+    margin: 0em;
+}

@@ -1,3 +1,7 @@
+#user_sections {
+    position: relative;
+}
+
 h3#vs {
     display: none;
     position: absolute;
