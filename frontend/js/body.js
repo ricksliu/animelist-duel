@@ -341,27 +341,26 @@ var ScoreDiff = function (_React$Component3) {
         React.createElement(
           'h3',
           null,
-          capitalize(this.props.title) + ':'
+          '' + capitalize(this.props.title)
         ),
         React.createElement(
           'p',
           { className: 'score_diff_score score_diff_score_1', id: 'score_diff_score_' + this.props.id + '_1' },
-          this.props.score_1
-        ),
-        React.createElement(
-          'div',
-          null,
-          React.createElement('img', { src: this.props.image, alt: '' }),
-          React.createElement(
-            'p',
-            { className: 'score_diff_diff', id: 'score_diff_' + this.props.id + '_diff' },
-            this.props.diff
-          )
+          this.props.score_1,
+          '/10'
         ),
         React.createElement(
           'p',
           { className: 'score_diff_score score_diff_score_2', id: 'score_diff_score_' + this.props.id + '_2' },
-          this.props.score_2
+          this.props.score_2,
+          '/10'
+        ),
+        React.createElement('img', { src: 'https://i.kym-cdn.com/entries/icons/mobile/000/027/108/anime.jpg', alt: '' }),
+        React.createElement(
+          'p',
+          { className: 'score_diff_diff', id: 'score_diff_' + this.props.id + '_diff' },
+          '\xB1',
+          this.props.diff
         )
       );
     }

@@ -263,13 +263,11 @@ class ScoreDiff extends React.Component {
   render() {
     return (
       <div className='score_diff' id={`score_diff_${this.props.id}`}>
-        <h3>{`${capitalize(this.props.title)}:`}</h3>
-        <p className='score_diff_score score_diff_score_1' id={`score_diff_score_${this.props.id}_1`}>{this.props.score_1}</p>
-        <div>
-          <img src={this.props.image} alt='' />
-          <p className='score_diff_diff' id={`score_diff_${this.props.id}_diff`}>{this.props.diff}</p>
-        </div>
-        <p className='score_diff_score score_diff_score_2' id={`score_diff_score_${this.props.id}_2`}>{this.props.score_2}</p>
+        <h3>{`${capitalize(this.props.title)}`}</h3>
+        <p className='score_diff_score score_diff_score_1' id={`score_diff_score_${this.props.id}_1`}>{this.props.score_1}/10</p>
+        <p className='score_diff_score score_diff_score_2' id={`score_diff_score_${this.props.id}_2`}>{this.props.score_2}/10</p>
+        <img src='https://i.kym-cdn.com/entries/icons/mobile/000/027/108/anime.jpg' alt='' />
+        <p className='score_diff_diff' id={`score_diff_${this.props.id}_diff`}>±{this.props.diff}</p>
       </div>
     );
   }

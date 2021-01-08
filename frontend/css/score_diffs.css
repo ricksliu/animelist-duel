@@ -1,0 +1,43 @@
+#score_diffs {
+    display: none;
+    clear: both;
+}
+
+.score_diff {
+    position: relative;
+}
+
+.score_diff h3 {
+    padding-top: 1em;
+}
+
+.score_diff p {
+    font-size: 4em;
+}
+
+p.score_diff_score {
+    position: absolute;
+    top: 1.75em;
+}
+
+p.score_diff_score_1 {
+    left: 0em;
+}
+
+p.score_diff_score_2 {
+    right: 0em;
+}
+
+.score_diff img {
+    display: block;
+    height: 8em;
+    margin: 1em auto 0em;
+}
+
+p.score_diff_diff {
+    position: absolute;
+    top: 1.75em;
+    width: 100%;
+
+    text-align: center;
+}
