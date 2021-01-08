@@ -352,7 +352,7 @@ var ScoreDiff = function (_React$Component3) {
           this.props.score_2,
           '/10'
         ),
-        React.createElement('img', { src: 'https://i.kym-cdn.com/entries/icons/mobile/000/027/108/anime.jpg', alt: '' }),
+        React.createElement('img', { src: this.props.image, alt: '' }),
         React.createElement(
           'p',
           { className: 'score_diff_diff', id: 'score_diff_' + this.props.id + '_diff' },
@@ -390,6 +390,7 @@ var Body = function (_React$Component4) {
       _this5.state.scoreDiffs.push({
         'title_id': 0,
         'title': '',
+        'title_image': '',
         'score_1': 0,
         'score_2': 0,
         'score_difference': 0
@@ -451,6 +452,7 @@ var Body = function (_React$Component4) {
             results.push({
               'title_id': 0,
               'title': '',
+              'title_image': '',
               'score_1': 0,
               'score_2': 0,
               'score_difference': 0
@@ -590,7 +592,7 @@ var Body = function (_React$Component4) {
             '"Your Opinion Is Wrong As I Expected"'
           ),
           [].concat(_toConsumableArray(Array(5).keys())).map(function (i) {
-            return React.createElement(ScoreDiff, { key: 'score_diff_' + i, id: i, title: _this7.state.scoreDiffs[i].title, score_1: _this7.state.scoreDiffs[i].score_1, score_2: _this7.state.scoreDiffs[i].score_2, diff: _this7.state.scoreDiffs[i].score_difference });
+            return React.createElement(ScoreDiff, { key: 'score_diff_' + i, id: i, title: _this7.state.scoreDiffs[i].title, image: _this7.state.scoreDiffs[i].title_image, score_1: _this7.state.scoreDiffs[i].score_1, score_2: _this7.state.scoreDiffs[i].score_2, diff: _this7.state.scoreDiffs[i].score_difference });
           })
         )
       );

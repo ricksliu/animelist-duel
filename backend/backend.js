@@ -263,7 +263,7 @@ function getScoreDiffs(req, res) {
 
   // Tries to get data from database
   mysql_connection_pool.query(
-    `SELECT username_1, username_2, title_id, title, score_1 AS score_${1 + flip}, score_2 AS score_${2 - flip}, score_difference
+    `SELECT title, title_image, score_1 AS score_${1 + flip}, score_2 AS score_${2 - flip}, score_difference
     FROM score_differences
     WHERE username_1 = '${usernames[0]}' AND username_2 = '${usernames[1]}' AND date = (
       SELECT MAX(date)
@@ -291,6 +291,34 @@ function getScoreDiffs(req, res) {
       }
     }
   );
+}
+
+// Used by 'getNewScoreDiffs()'; 'f' is a callback function
+function getAnimeImage(id, callback) {
+  const options = {
+    host: 'myanimelist.net',
+    path: `/anime/${id}`,
+    port: 443
+  };
+
+  // Sends HTTPS request to MyAnimeList
+  https.get(options, (mal_res) => {
+    // Gets HTML of page
+    let page_source;
+    mal_res.on('data', function (chunk) {
+      page_source += chunk;
+    });
+
+    mal_res.on('end', function() {
+      const link = scrapeString(page_source, '<img class="lazyload" data-src=', '"', '"', false, false);
+      console.log(`Found link to image for entry '${id}' on MyAnimeList.`);
+      callback(link);
+    });
+
+  }).on('error', (e) => {
+    console.log(`Failed to send HTTPS request to MyAnimeList. (${e})`);
+    callback('');
+  });
 }
 
 function getNewScoreDiffs(req, res) {
@@ -348,58 +376,71 @@ function getNewScoreDiffs(req, res) {
         }
       });
       entries = entries.slice(0, 5);  // Keeps top five
+      let linksObtained = 0;
 
-      // Formats 'entries' into array of objects for sending as response
-      let sentEntries = [];
-      entries.forEach(e => sentEntries.push({
-        'title_id': e[0],
-        'title': e[1],
-        'score_1': e[2 + flip],
-        'score_2': e[3 - flip],
-        'score_difference': e[4]
-      }));
+      for (let i = 0; i < entries.length; i++) {
+        getAnimeImage(entries[i][0], function(link) {
+          entries[i].push(link);
+          linksObtained++;
 
-      // Sends response
-      res.writeHead(200, headers);
-      res.write(JSON.stringify({
-        results: sentEntries
-      }));
-      res.end();
-      console.log(`Sent response with score difference data from MyAnimeList.`);
+          // Only executed once all links have been obtained; effectively waits for all HTTPS requests in all the getAnimeImage()
+          if (linksObtained == entries.length) {
+            // Formats 'entries' into array of objects for sending as response
+            let sentEntries = [];
+            entries.forEach(e => sentEntries.push({
+              'title': e[1],
+              'title_image': e[5],
+              'score_1': e[2 + flip],
+              'score_2': e[3 - flip],
+              'score_difference': e[4]
+            }));
 
-      const date = getDateTIMESTAMP();
+            // Sends response
+            res.writeHead(200, headers);
+            res.write(JSON.stringify({
+              results: sentEntries
+            }));
+            res.end();
+            console.log(`Sent response with score difference data from MyAnimeList.`);
 
-      // Tries to insert each entry into 'score_differences' database
-      entries.forEach(e => {
-        mysql_connection_pool.query(
-          `INSERT INTO score_differences (
-            date,
-            username_1,
-            username_2,
-            title_id,
-            title,
-            score_1,
-            score_2,
-            score_difference
-          ) VALUES (
-            ${mysql.escape(date)},
-            ${mysql.escape(usernames[0])},
-            ${mysql.escape(usernames[1])},
-            ${e[0]}, 
-            ${mysql.escape(e[1])},
-            ${e[2]},
-            ${e[3]},
-            ${e[4]}
-          )`,
-          (e, results, fields) => {
-            if (e) {
-              console.log(`Failed to insert score difference data for users '${usernames[0]}' and '${usernames[1]}' into database 'score_differences'. (${e})`);
-            } else {
-              console.log(`Inserted score difference data for users '${usernames[0]}' and '${usernames[1]}' into database 'score_differences'.`);
-            }
+            const date = getDateTIMESTAMP();
+
+            // Tries to insert each entry into 'score_differences' database
+            entries.forEach(e => {
+              mysql_connection_pool.query(
+                `INSERT INTO score_differences (
+                  date,
+                  username_1,
+                  username_2,
+                  title_id,
+                  title,
+                  title_image,
+                  score_1,
+                  score_2,
+                  score_difference
+                ) VALUES (
+                  ${mysql.escape(date)},
+                  ${mysql.escape(usernames[0])},
+                  ${mysql.escape(usernames[1])},
+                  ${e[0]}, 
+                  ${mysql.escape(e[1])},
+                  ${mysql.escape(e[5])},
+                  ${e[2]},
+                  ${e[3]},
+                  ${e[4]}
+                )`,
+                (e, results, fields) => {
+                  if (e) {
+                    console.log(`Failed to insert score difference data for users '${usernames[0]}' and '${usernames[1]}' into database 'score_differences'. (${e})`);
+                  } else {
+                    console.log(`Inserted score difference data for users '${usernames[0]}' and '${usernames[1]}' into database 'score_differences'.`);
+                  }
+                }
+              );
+            });
           }
-        );
-      });
+        });
+      }
     });
 
   // If could not send HTTPS request to MyAnimeList

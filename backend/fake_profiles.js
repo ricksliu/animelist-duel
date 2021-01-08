@@ -172,6 +172,7 @@ function createFakeProfiles() {
       username_2, 
       title_id,
       title,
+      title_image,
       score_1,
       score_2,
       score_difference
@@ -181,6 +182,7 @@ function createFakeProfiles() {
       'fakeuser2',
       32281,
       'Kimi no Na wa.',
+      'https://cdn.myanimelist.net/images/anime/5/87048.jpg',
       7,
       9,
       2

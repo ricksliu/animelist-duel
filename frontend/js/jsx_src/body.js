@@ -263,7 +263,7 @@ class ScoreDiff extends React.Component {
         <h3>{`${capitalize(this.props.title)}`}</h3>
         <p className='score_diff_score score_diff_score_1' id={`score_diff_score_${this.props.id}_1`}>{this.props.score_1}/10</p>
         <p className='score_diff_score score_diff_score_2' id={`score_diff_score_${this.props.id}_2`}>{this.props.score_2}/10</p>
-        <img src='https://i.kym-cdn.com/entries/icons/mobile/000/027/108/anime.jpg' alt='' />
+        <img src={this.props.image} alt='' />
         <p className='score_diff_diff' id={`score_diff_${this.props.id}_diff`}>±{this.props.diff}</p>
       </div>
     );
@@ -288,6 +288,7 @@ class Body extends React.Component {
       this.state.scoreDiffs.push({
         'title_id': 0,
         'title': '',
+        'title_image': '',
         'score_1': 0,
         'score_2': 0,
         'score_difference': 0
@@ -337,6 +338,7 @@ class Body extends React.Component {
           results.push({
             'title_id': 0,
             'title': '',
+            'title_image': '',
             'score_1': 0,
             'score_2': 0,
             'score_difference': 0
@@ -349,7 +351,7 @@ class Body extends React.Component {
       http_req.onerror = () => {
         this.updateCSS();
       }
-      
+
     } else {
       this.updateCSS();
     }
@@ -444,7 +446,7 @@ class Body extends React.Component {
           <h2>Opinion Clash</h2>
           <p className='main_p'>"Your Opinion Is Wrong As I Expected"</p>
           {[...Array(5).keys()].map(i => (
-            <ScoreDiff key={'score_diff_' + i} id={i} title={this.state.scoreDiffs[i].title} score_1={this.state.scoreDiffs[i].score_1} score_2={this.state.scoreDiffs[i].score_2} diff={this.state.scoreDiffs[i].score_difference} />
+            <ScoreDiff key={'score_diff_' + i} id={i} title={this.state.scoreDiffs[i].title} image={this.state.scoreDiffs[i].title_image} score_1={this.state.scoreDiffs[i].score_1} score_2={this.state.scoreDiffs[i].score_2} diff={this.state.scoreDiffs[i].score_difference} />
           ))}
         </div>
       </div>
