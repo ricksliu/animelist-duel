@@ -1,7 +1,7 @@
 const mysql = require('mysql');
 
 // Info for pool of connections to MySQL database
-let mysql_connection_pool = mysql.createPool({
+let mysqlConnectionPool = mysql.createPool({
   connectionLimit: 10,
   host: 'localhost',
   user: 'root',
@@ -11,7 +11,7 @@ let mysql_connection_pool = mysql.createPool({
 });
 
 function deleteFakeProfiles() {
-  mysql_connection_pool.query(
+  mysqlConnectionPool.query(
     `DELETE FROM profiles
     WHERE (user_id < 0)`,
     (e, results, fields) => {
@@ -23,7 +23,7 @@ function deleteFakeProfiles() {
     }
   );
 
-  mysql_connection_pool.query(
+  mysqlConnectionPool.query(
     `DELETE FROM profile_stats
     WHERE (user_id < 0)`,
     (e, results, fields) => {
@@ -35,7 +35,7 @@ function deleteFakeProfiles() {
     }
   );
 
-  mysql_connection_pool.query(
+  mysqlConnectionPool.query(
     `DELETE FROM score_differences
     WHERE (username_1 = 'fakeuser1')`,
     (e, results, fields) => {
@@ -49,7 +49,7 @@ function deleteFakeProfiles() {
 }
 
 function createFakeProfiles() {
-  mysql_connection_pool.query(
+  mysqlConnectionPool.query(
     `INSERT INTO profiles (
       user_id,
       last_updated,
@@ -70,7 +70,7 @@ function createFakeProfiles() {
     }
   );
 
-  mysql_connection_pool.query(
+  mysqlConnectionPool.query(
     `INSERT INTO profiles (
       user_id,
       last_updated,
@@ -91,7 +91,7 @@ function createFakeProfiles() {
     }
   );
 
-  mysql_connection_pool.query(
+  mysqlConnectionPool.query(
     `INSERT INTO profile_stats (
       date,
       user_id,
@@ -128,7 +128,7 @@ function createFakeProfiles() {
     }
   );
 
-  mysql_connection_pool.query(
+  mysqlConnectionPool.query(
     `INSERT INTO profile_stats (
       date,
       user_id,
@@ -165,7 +165,7 @@ function createFakeProfiles() {
     }
   );
 
-  mysql_connection_pool.query(
+  mysqlConnectionPool.query(
     `INSERT INTO score_differences (
       date,
       username_1,
@@ -198,4 +198,4 @@ function createFakeProfiles() {
 }
 
 // deleteFakeProfiles();
-createFakeProfiles();
+// createFakeProfiles();

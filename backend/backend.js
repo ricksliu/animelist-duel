@@ -11,7 +11,7 @@ const port = 3000;
 const headers = {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'};
 
 // Info for (pool of) connections to MySQL database
-let mysql_connection_pool = mysql.createPool({
+let mysqlConnectionPool = mysql.createPool({
   connectionLimit: 10,
   host: 'localhost',
   user: 'root',
@@ -23,6 +23,10 @@ let mysql_connection_pool = mysql.createPool({
 // Returns first substring surrounded by two chars
 // 'source' is the raw HTML, 'substring' is a substring to start searching from
 function scrapeString(source, substring, startChar, endChar, nonEmpty=false, numeric=true) {
+  if (source.indexOf(substring) < 0) {
+    return '';
+  }
+
   const str = source.slice(source.indexOf(substring) + substring.length);
   const len = str.length;
   const numbers = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0'];
@@ -30,14 +34,13 @@ function scrapeString(source, substring, startChar, endChar, nonEmpty=false, num
   // Finds start
   let start = 0;
   while (start < len) {
-    if (str[start] == startChar && (!nonEmpty || str[start + 1] != endChar) && (!numeric || numbers.includes(str[start + 1]))) {
-      start++;
+    start++;
+    if (str[start - 1] == startChar && (!nonEmpty || str[start] != endChar) && (!numeric || numbers.includes(str[start]))) {
       break;
     }
-    start++;
   }
   
-  if (start != len) {
+  if (start < len) {
     // Finds end
     let end = start;
     while (str[end] != endChar) {
@@ -60,7 +63,7 @@ function getInfo(req, res) {
   console.log(`\nRecieved request 'get' for user '${username}'.`);
 
   // Tries to get data from database
-  mysql_connection_pool.query(
+  mysqlConnectionPool.query(
     `SELECT *
     FROM (
       SELECT *
@@ -123,16 +126,16 @@ function getNewInfo(req, res) {
   };
 
   // Sends HTTPS request to MyAnimeList
-  https.get(options, (mal_res) => {
+  https.get(options, (malRes) => {
     // Gets HTML of user's profile page
-    let page_source;
-    mal_res.on('data', function (chunk) {
-      page_source += chunk;
+    let pageSource;
+    malRes.on('data', function (chunk) {
+      pageSource += chunk;
     });
 
-    mal_res.on('end', function() {
+    malRes.on('end', function() {
       // Scrapes for info
-      const scraping_info = [
+      const scrapingInfo = [
         ['userimages', '/', '.'],
         ['Mean Score', '>', '<'],
         ['Days', '>', '<'],
@@ -145,7 +148,7 @@ function getNewInfo(req, res) {
         ['Dropped', '>', '<'],
         ['Plan to Watch', '>', '<']
       ]
-      const info = scraping_info.map(i => scrapeString(page_source, ...i));
+      const info = scrapingInfo.map(i => scrapeString(pageSource, ...i));
 
       // If user does not exist, sends blank string as user_id
       if (info[0] == '') {
@@ -180,7 +183,7 @@ function getNewInfo(req, res) {
         console.log(`Sent response with data for user '${username}' from MyAnimeList.`);
 
         // Tries to update 'profile' database
-        mysql_connection_pool.query(
+        mysqlConnectionPool.query(
           `REPLACE INTO profiles (
             user_id,
             last_updated,
@@ -202,7 +205,7 @@ function getNewInfo(req, res) {
         );
 
         // Tries to insert into 'profile_stats' database
-        mysql_connection_pool.query(
+        mysqlConnectionPool.query(
           `INSERT INTO profile_stats (
             date,
             user_id,
@@ -262,7 +265,7 @@ function getScoreDiffs(req, res) {
   console.log(`\nRecieved request for 'score diffs' for users '${usernames[0]}' and '${usernames[1]}'.`);
 
   // Tries to get data from database
-  mysql_connection_pool.query(
+  mysqlConnectionPool.query(
     `SELECT title, title_image, score_1 AS score_${1 + flip}, score_2 AS score_${2 - flip}, score_difference
     FROM score_differences
     WHERE username_1 = '${usernames[0]}' AND username_2 = '${usernames[1]}' AND date = (
@@ -302,15 +305,15 @@ function getAnimeImage(id, callback) {
   };
 
   // Sends HTTPS request to MyAnimeList
-  https.get(options, (mal_res) => {
+  https.get(options, (malRes) => {
     // Gets HTML of page
-    let page_source;
-    mal_res.on('data', function (chunk) {
-      page_source += chunk;
+    let pageSource;
+    malRes.on('data', function (chunk) {
+      pageSource += chunk;
     });
 
-    mal_res.on('end', function() {
-      const link = scrapeString(page_source, '<img class="lazyload" data-src=', '"', '"', false, false);
+    malRes.on('end', function() {
+      const link = scrapeString(pageSource, '<img class="lazyload" data-src=', '"', '"', false, false);
       console.log(`Found link to image for entry '${id}' on MyAnimeList.`);
       callback(link);
     });
@@ -337,31 +340,31 @@ function getNewScoreDiffs(req, res) {
   };
 
   // Sends HTTPS request to MyAnimeList
-  https.get(options, (mal_res) => {
+  https.get(options, (malRes) => {
     // Gets HTML of page
-    let page_source;
-    mal_res.on('data', function (chunk) {
-      page_source += chunk;
+    let pageSource;
+    malRes.on('data', function (chunk) {
+      pageSource += chunk;
     });
 
-    mal_res.on('end', function() {
+    malRes.on('end', function() {
       let entries = [];
-      // Gets scores of all shared anime entries; values may be non-numeric; loop ends when 'page_source' has no more shared entries in it
-      page_source = page_source.slice(page_source.indexOf('Score Difference'));
-      while (page_source.indexOf('Mean Values') >= 0) {
+      // Gets scores of all shared anime entries; values may be non-numeric; loop ends when 'pageSource' has no more shared entries in it
+      pageSource = pageSource.slice(pageSource.indexOf('Score Difference'));
+      while (pageSource.indexOf('Mean Values') >= 0) {
         let entry = [];
-        let entry_source = page_source.slice(page_source.indexOf('<tr>') + 4, page_source.indexOf('</tr>'));
+        let entrySource = pageSource.slice(pageSource.indexOf('<tr>') + 4, pageSource.indexOf('</tr>'));
         // Gets ID and title of entry
-        entry.push(scrapeString(entry_source, 'anime', '/', '/', true));
-        entry.push(scrapeString(entry_source, 'anime', '>', '<', true, false));
-        // Gets the 3 scores from the entry; loop ends when 'entry_source' has no more scores in it
-        entry_source = entry_source.slice(entry_source.indexOf('</td>') + 5);
-        while (entry_source.indexOf('</td>') >= 0) {
-          entry.push(scrapeString(entry_source, 'align="center"', '>', '<', true, false));
-          entry_source = entry_source.slice(entry_source.indexOf('</td>') + 5);  // Slices score off of entry
+        entry.push(scrapeString(entrySource, 'anime', '/', '/', true));
+        entry.push(scrapeString(entrySource, 'anime', '>', '<', true, false));
+        // Gets the 3 scores from the entry; loop ends when 'entrySource' has no more scores in it
+        entrySource = entrySource.slice(entrySource.indexOf('</td>') + 5);
+        while (entrySource.indexOf('</td>') >= 0) {
+          entry.push(scrapeString(entrySource, 'align="center"', '>', '<', true, false));
+          entrySource = entrySource.slice(entrySource.indexOf('</td>') + 5);  // Slices score off of entry
         }
         entries.push(entry);
-        page_source = page_source.slice(page_source.indexOf('</tr>') + 5);  // Slices entry off of source
+        pageSource = pageSource.slice(pageSource.indexOf('</tr>') + 5);  // Slices entry off of source
       }
       // Removes first and last entries (not real entries)
       entries.shift();
@@ -407,7 +410,7 @@ function getNewScoreDiffs(req, res) {
 
             // Tries to insert each entry into 'score_differences' database
             entries.forEach(e => {
-              mysql_connection_pool.query(
+              mysqlConnectionPool.query(
                 `INSERT INTO score_differences (
                   date,
                   username_1,
