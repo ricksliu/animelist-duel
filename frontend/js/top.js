@@ -29,8 +29,8 @@ var Top = function (_React$Component) {
         ),
         React.createElement(
           'h3',
-          null,
-          '"Only the dead have seen the end of anime." -Sun Tzu'
+          { className: 'quote' },
+          '"Only the dead have seen the end of anime." \u2014Sun Tzu'
         )
       );
     }

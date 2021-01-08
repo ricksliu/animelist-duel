@@ -42,3 +42,16 @@ p {
     font-weight: bold;
     color: #2E51A2;
 }
+
+hr {
+    margin: 0em;
+    height: 0.25em;
+    background-color: #2E51A2;
+
+    border-style: none;
+    border-width: 0em;
+}
+
+.quote {
+    font-style: italic;
+}

@@ -1,5 +1,7 @@
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
+function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
+
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
 function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
@@ -9,17 +11,17 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 var StatInfo = function () {
-  function StatInfo(stat, compare_type, fact_not_tied, fact_tied, fact_one_zero, fact_both_zero) {
+  function StatInfo(stat, compareType, factNotTied, factTied, factOneZero, factBothZero) {
     _classCallCheck(this, StatInfo);
 
     this.stat = stat;
-    this.compare_type = compare_type; // How the bars are calculated; 1 = bigger is better, 0 = do not compare, -1 = smaller is better
+    this.compareType = compareType; // How the bars are calculated; 1 = bigger is better, 0 = do not compare, -1 = smaller is better
 
     // Strings that will be displayed under stat bars under certain conditions
-    this.fact_not_tied = fact_not_tied;
-    this.fact_tied = fact_tied;
-    this.fact_one_zero = fact_one_zero;
-    this.fact_both_zero = fact_both_zero;
+    this.factNotTied = factNotTied;
+    this.factTied = factTied;
+    this.factOneZero = factOneZero;
+    this.factBothZero = factBothZero;
   }
 
   // Returns applicable fun fact about a stat
@@ -27,39 +29,39 @@ var StatInfo = function () {
 
   _createClass(StatInfo, [{
     key: 'getFact',
-    value: function getFact(user_1, stat_1, user_2, stat_2) {
-      var diff = Math.abs(stat_1 - stat_2).toFixed(2);
-      var diff_int = Math.abs(stat_1 - stat_2).toFixed(0);
+    value: function getFact(user1, stat1, user2, stat2) {
+      var diff = Math.abs(stat1 - stat2).toFixed(2);
+      var diffInt = Math.abs(stat1 - stat2).toFixed(0);
 
       // Returns blank string if only one user is selected; although the string will be hidden, it will still affect the page layout
-      if (user_1 == '' || user_2 == '') {
+      if (user1 == '' || user2 == '') {
         return '';
       }
 
-      if (this.fact_one_zero != '') {
+      if (this.factOneZero != '') {
         // Both stats are 0
-        if (stat_1 == 0 && stat_2 == 0) {
-          return this.fact_both_zero.replaceAll('user_1', user_1).replaceAll('user_2', user_2);
+        if (stat1 == 0 && stat2 == 0) {
+          return this.factBothZero.replaceAll('user1', user1).replaceAll('user2', user2);
         }
         // One stat is 0
-        if (stat_1 == 0) {
-          return this.fact_one_zero.replaceAll('user_2', user_1).replaceAll('user_1', user_2).replaceAll('stat_diff_int', diff_int).replaceAll('stat_diff', diff);
+        if (stat1 == 0) {
+          return this.factOneZero.replaceAll('user2', user1).replaceAll('user1', user2).replaceAll('statDiffInt', diffInt).replaceAll('statDiff', diff);
         }
-        if (stat_2 == 0) {
-          return this.fact_one_zero.replaceAll('user_1', user_1).replaceAll('user_2', user_2).replaceAll('stat_diff_int', diff_int).replaceAll('stat_diff', diff);
+        if (stat2 == 0) {
+          return this.factOneZero.replaceAll('user1', user1).replaceAll('user2', user2).replaceAll('statDiffInt', diffInt).replaceAll('statDiff', diff);
         }
       }
 
       // Both stats are tied
-      if (stat_1 == stat_2) {
-        return this.fact_tied.replaceAll('user_1', user_1).replaceAll('user_2', user_2);
+      if (stat1 == stat2) {
+        return this.factTied.replaceAll('user1', user1).replaceAll('user2', user2);
         // Stats are not tied
-      } else if (parseFloat(stat_1) < parseFloat(stat_2)) {
-        var prod = (stat_2 / stat_1).toFixed(2);
-        return this.fact_not_tied.replaceAll('user_2', user_1).replaceAll('user_1', user_2).replaceAll('stat_diff_int', diff_int).replaceAll('stat_diff', diff).replaceAll('stat_prod', prod);
+      } else if (parseFloat(stat1) < parseFloat(stat2)) {
+        var prod = (stat2 / stat1).toFixed(2);
+        return this.factNotTied.replaceAll('user2', user1).replaceAll('user1', user2).replaceAll('statDiffInt', diffInt).replaceAll('statDiff', diff).replaceAll('statProd', prod);
       } else {
-        var _prod = (stat_1 / stat_2).toFixed(2);
-        return this.fact_not_tied.replaceAll('user_1', user_1).replaceAll('user_2', user_2).replaceAll('stat_diff_int', diff_int).replaceAll('stat_diff', diff).replaceAll('stat_prod', _prod);
+        var _prod = (stat1 / stat2).toFixed(2);
+        return this.factNotTied.replaceAll('user1', user1).replaceAll('user2', user2).replaceAll('statDiffInt', diffInt).replaceAll('statDiff', diff).replaceAll('statProd', _prod);
       }
     }
   }]);
@@ -72,7 +74,7 @@ var StatInfo = function () {
 
 var info = ['username', 'user_id', 'last_updated', 'user_image'];
 
-var stats = [new StatInfo('mean_score', 0, "user_1's mean score is stat_diff higher than user_2's. Does user_2 watch worse shows or is user_1 just overly generous?", "user_1 and user_2 have the same mean score. Spooky.", "", ""), new StatInfo('days_watched', 1, "user_1 has watched stat_prod times as much anime as user_2. user_1 desperately needs to get a life.", "user_1 and user_2 have watched the same amount of anime. It's anyone's game.", "user_2 has never watched anime at all. user_1 wins, but user_2 is probably the true winner here.", "Both user_1 and user_2 have never watched anime. Let's hope it stays that way."), new StatInfo('episodes_watched', 1, "user_1 has watched stat_prod times as many episodes as user_2. Time for a stat_diff_int episode binge, user_2?", "user_1 and user_2 have watched the same number of episodes. Not all episodes are created equal though.", "user_2 has never watched an episode of anime. Good or bad? Probably good.", "Both user_1 and user_2 have never watched an episode of anime. Good on them."), new StatInfo('total_entries', 1, "user_1 has stat_prod times as many total entries as user_2. Total entries is a meaningless stat anyways.", "user_1 and user_2 have the same number of total entries. Total entries is a meaningless stat anyways.", "", ""), new StatInfo('completed', 1, "user_1 has completed stat_prod times as many entries as user_2. Time for user_2 to watch stat_diff_int 1-minute shorts?", "user_1 and user_2 have completed the same number of entries. Commence the argument on how some entries are way larger than others.", "", ""), new StatInfo('watching', 1, "user_1 is watching stat_prod times as many entries as user_2. How does user_1 do it?", "user_1 and user_2 are watching the same number of entries. We'll see how the situation develops next season.", "user_2 is not watching any anime right now. They'll be back. They always come back.", "Both user_1 and user_2 are not watching any anime right now. They'll be back. They always come back."), new StatInfo('on_hold', -1, "user_1 has stat_prod times as many entries on hold as user_2. user_1 bit off more than they could chew.", "user_1 and user_2 have the same number of entries on hold. They both have some work to do.", "user_2 has no entries on hold. user_1 has some work to do.", "Both user_1 and user_2 have no entries on hold. At least they commit all the way."), new StatInfo('rewatched', 1, "user_1 has rewatched stat_prod times as many entries as user_2. user_1, don't you have anything better to do?", "user_1 and user_2 have rewatched the same number of entries. They both need something better to do.", "user_2 has never rewatched anything. To user_2, watching something twice is apparently too far.", "Both user_1 and user_2 have never rewatched anything. Watching something twice is apparently too far."), new StatInfo('dropped', -1, "user_1 has dropped stat_prod times as many entries as user_2. user_1 really can't make up their mind.", "user_1 and user_2 have dropped the same number of entries. They really can't make up their mind.", "user_2 has never dropped anything. Dedication or masochism?", "Both user_1 and user_2 have never dropped anything. Dedication or masochism?"), new StatInfo('plan_to_watch', -1, "user_1 plans to watch stat_prod times as many entries as user_2. user_1 needs to get grinding.", "user_1 and user_2 plan to watch the same number of entries. Get grinding.", "user_2 doesn't plan to watch anything. user_2 has defeated anime (for now).", "Both user_1 and user_2 don't plan to watch anything. They've defeated anime (for now).")];
+var stats = [new StatInfo('mean_score', 0, "user1's mean score is statDiff higher than user2's. Does user2 watch worse shows or is user1 just overly generous?", "user1 and user2 have the same mean score. Spooky.", "", ""), new StatInfo('days_watched', 1, "user1 has watched statProd times as much anime as user2. user1 desperately needs to get a life.", "user1 and user2 have watched the same amount of anime. It's anyone's game.", "user2 has never watched anime at all. user1 wins, but user2 is probably the true winner here.", "Both user1 and user2 have never watched anime. Let's hope it stays that way."), new StatInfo('episodes_watched', 1, "user1 has watched statProd times as many episodes as user2. Time for a statDiffInt episode binge, user2?", "user1 and user2 have watched the same number of episodes. Not all episodes are created equal though.", "user2 has never watched an episode of anime. Good or bad? Probably good.", "Both user1 and user2 have never watched an episode of anime. Good on them."), new StatInfo('total_entries', 1, "user1 has statProd times as many total entries as user2. Total entries is a meaningless stat anyways.", "user1 and user2 have the same number of total entries. Total entries is a meaningless stat anyways.", "", ""), new StatInfo('completed', 1, "user1 has completed statProd times as many entries as user2. Time for user2 to watch statDiffInt 1-minute shorts?", "user1 and user2 have completed the same number of entries. Commence the argument on how some entries are way larger than others.", "", ""), new StatInfo('watching', 1, "user1 is watching statProd times as many entries as user2. How does user1 do it?", "user1 and user2 are watching the same number of entries. We'll see how the situation develops next season.", "user2 is not watching any anime right now. They'll be back. They always come back.", "Both user1 and user2 are not watching any anime right now. They'll be back. They always come back."), new StatInfo('on_hold', -1, "user1 has statProd times as many entries on hold as user2. user1 bit off more than they could chew.", "user1 and user2 have the same number of entries on hold. They both have some work to do.", "user2 has no entries on hold. user1 has some work to do.", "Both user1 and user2 have no entries on hold. At least they commit all the way."), new StatInfo('rewatched', 1, "user1 has rewatched statProd times as many entries as user2. user1, don't you have anything better to do?", "user1 and user2 have rewatched the same number of entries. They both need something better to do.", "user2 has never rewatched anything. To user2, watching something twice is apparently too far.", "Both user1 and user2 have never rewatched anything. Watching something twice is apparently too far."), new StatInfo('dropped', -1, "user1 has dropped statProd times as many entries as user2. user1 really can't make up their mind.", "user1 and user2 have dropped the same number of entries. They really can't make up their mind.", "user2 has never dropped anything. Dedication or masochism?", "Both user1 and user2 have never dropped anything. Dedication or masochism?"), new StatInfo('plan_to_watch', -1, "user1 plans to watch statProd times as many entries as user2. user1 needs to get grinding.", "user1 and user2 plan to watch the same number of entries. Get grinding.", "user2 doesn't plan to watch anything. user2 has defeated anime (for now).", "Both user1 and user2 don't plan to watch anything. They've defeated anime (for now).")];
 
 // Given a string like 'mean_score', returns 'Mean Score'
 function capitalize(text) {
@@ -89,11 +91,11 @@ var UserSection = function (_React$Component) {
   function UserSection(props) {
     _classCallCheck(this, UserSection);
 
-    // username_input is necessary in order to keep the text inside the input form up to date
+    // usernameInput is necessary in order to keep the text inside the input form up to date
     var _this = _possibleConstructorReturn(this, (UserSection.__proto__ || Object.getPrototypeOf(UserSection)).call(this, props));
 
     _this.state = {
-      username_input: ''
+      usernameInput: ''
     };
 
     _this.updateUsernameInput = _this.updateUsernameInput.bind(_this);
@@ -109,7 +111,7 @@ var UserSection = function (_React$Component) {
   _createClass(UserSection, [{
     key: 'updateUsernameInput',
     value: function updateUsernameInput(event) {
-      this.setState({ username_input: event.target.value });
+      this.setState({ usernameInput: event.target.value });
     }
 
     // Sends HTTP request to backend server to get or update data for the user that this component is for
@@ -119,62 +121,56 @@ var UserSection = function (_React$Component) {
     value: function sendRequest(request) {
       var _this2 = this;
 
-      // Sends HTTP request
-      var http_req = new XMLHttpRequest();
-      // If request was 'get', uses (possibly newly entered) username in input form 
+      var httpReq = new XMLHttpRequest();
+      // If request was 'get', uses (possibly newly entered) username in input form rather than username in parent's state
       if (request == 'get') {
-        http_req.open('GET', 'http://localhost:3000/?username=' + this.state.username_input.replace(' ', '+') + '&request=' + request);
+        httpReq.open('GET', 'http://localhost:3000/?username=' + this.state.usernameInput.replace(' ', '+') + '&request=' + request);
       } else {
-        http_req.open('GET', 'http://localhost:3000/?username=' + this.props.username.replace(' ', '+') + '&request=' + request);
+        httpReq.open('GET', 'http://localhost:3000/?username=' + this.props.usernames[this.props.user - 1].replace(' ', '+') + '&request=' + request);
       }
-      http_req.send();
+      httpReq.send();
 
-      // Executes when a response (a JSON-encoded string) is recieved
-      http_req.onload = function () {
-        var user_data = JSON.parse(http_req.response);
+      httpReq.onload = function () {
+        var userData = JSON.parse(httpReq.response);
 
         // If update was successful (backend sets user_id to an empty string if it was unsuccessful)
-        if (user_data.user_id != '') {
+        if (userData.user_id != '') {
           info.forEach(function (i) {
-            return _this2.props.sendInfo(_this2.props.user, i, user_data[i]);
+            return _this2.props.sendInfo(_this2.props.user, i, userData[i]);
           });
           stats.forEach(function (s) {
-            return _this2.props.sendStat(_this2.props.user, s.stat, user_data[s.stat]);
+            return _this2.props.sendStat(_this2.props.user, s.stat, userData[s.stat]);
           });
           _this2.props.updateStatFacts();
+          _this2.props.getScoreDiffs(request);
 
           document.getElementById('backend_error_' + _this2.props.user).style.display = 'none';
           document.getElementById('username_error_' + _this2.props.user).style.display = 'none';
           document.querySelectorAll('#user_' + _this2.props.user + '_section .user_update_status').forEach(function (e) {
             return e.style.display = 'inherit';
           });
-          _this2.props.updateCSS();
 
           // If update was unsuccessful
         } else {
-          if (request == 'get') {
-            _this2.sendRequest('update');
-          } else {
-            info.forEach(function (i) {
-              return _this2.props.sendInfo(_this2.props.user, i, '');
-            });
-            stats.forEach(function (s) {
-              return _this2.props.sendStat(_this2.props.user, s.stat, 0);
-            });
-            _this2.props.updateStatFacts();
+          info.forEach(function (i) {
+            return _this2.props.sendInfo(_this2.props.user, i, '');
+          });
+          stats.forEach(function (s) {
+            return _this2.props.sendStat(_this2.props.user, s.stat, 0);
+          });
+          _this2.props.updateStatFacts();
+          _this2.props.getScoreDiffs(request);
 
-            document.getElementById('backend_error_' + _this2.props.user).style.display = 'none';
-            document.getElementById('username_error_' + _this2.props.user).style.display = 'inherit';
-            document.querySelectorAll('#user_' + _this2.props.user + '_section .user_update_status').forEach(function (e) {
-              return e.style.display = 'none';
-            });
-            _this2.props.updateCSS();
-          }
+          document.getElementById('backend_error_' + _this2.props.user).style.display = 'none';
+          document.getElementById('username_error_' + _this2.props.user).style.display = 'inherit';
+          document.querySelectorAll('#user_' + _this2.props.user + '_section .user_update_status').forEach(function (e) {
+            return e.style.display = 'none';
+          });
         }
       };
 
       // Executes if backend is offline
-      http_req.onerror = function () {
+      httpReq.onerror = function () {
         info.forEach(function (i) {
           return _this2.props.sendInfo(_this2.props.user, i, '');
         });
@@ -182,13 +178,13 @@ var UserSection = function (_React$Component) {
           return _this2.props.sendStat(_this2.props.user, s.stat, 0);
         });
         _this2.props.updateStatFacts();
+        _this2.props.getScoreDiffs(request);
 
         document.getElementById('backend_error_' + _this2.props.user).style.display = 'inherit';
         document.getElementById('username_error_' + _this2.props.user).style.display = 'none';
         document.querySelectorAll('#user_' + _this2.props.user + '_section .user_update_status').forEach(function (e) {
           return e.style.display = 'none';
         });
-        _this2.props.updateCSS();
       };
     }
 
@@ -228,7 +224,7 @@ var UserSection = function (_React$Component) {
           React.createElement(
             'div',
             null,
-            React.createElement('input', { type: 'text', className: 'input_text', id: 'username_' + this.props.user + '_input', value: this.state.username_input, onChange: this.updateUsernameInput }),
+            React.createElement('input', { type: 'text', className: 'input_text', id: 'username_' + this.props.user + '_input', value: this.state.usernameInput, onChange: this.updateUsernameInput }),
             React.createElement('input', { type: 'submit', className: 'input_submit', id: 'username_' + this.props.user + '_submit', value: 'Select' })
           )
         ),
@@ -248,14 +244,15 @@ var UserSection = function (_React$Component) {
           React.createElement(
             'h3',
             { id: 'username_' + this.props.user },
-            this.props.username
+            this.props.usernames[this.props.user - 1]
           ),
-          React.createElement('img', { id: 'user_image_' + this.props.user, src: this.props.user_image, alt: '' }),
+          React.createElement('img', { id: 'user_image_' + this.props.user, src: this.props.image, alt: '' }),
           React.createElement(
             'p',
             { id: 'last_updated_' + this.props.user },
-            'Data From ',
-            this.props.last_updated
+            'Data From:',
+            React.createElement('br', null),
+            this.props.lastUpdated
           ),
           React.createElement('input', { type: 'submit', className: 'input_submit', id: 'user_' + this.props.user + '_update', value: 'Update Data' })
         )
@@ -266,7 +263,7 @@ var UserSection = function (_React$Component) {
   return UserSection;
 }(React.Component);
 
-// Component that displaying a stat (two numbers and a bar for each number)
+// Component that displays two numbers and a bar for each number
 
 
 var Stat = function (_React$Component2) {
@@ -284,10 +281,11 @@ var Stat = function (_React$Component2) {
       return React.createElement(
         'div',
         { className: 'stat', id: this.props.stat },
+        React.createElement('hr', null),
         React.createElement(
           'h3',
           null,
-          capitalize(this.props.stat) + ':'
+          '' + capitalize(this.props.stat)
         ),
         React.createElement(
           'div',
@@ -296,19 +294,19 @@ var Stat = function (_React$Component2) {
           React.createElement(
             'p',
             { className: 'stat_value stat_1_value', id: this.props.stat + '_1' },
-            this.props.stat_values[0]
+            this.props.statValues[0]
           ),
           React.createElement('div', { className: 'stat_bar stat_2_bar', id: this.props.stat + '_2_bar' }),
           React.createElement(
             'p',
             { className: 'stat_value stat_2_value', id: this.props.stat + '_2' },
-            this.props.stat_values[1]
+            this.props.statValues[1]
           )
         ),
         React.createElement(
           'p',
           { className: 'stat_fact', id: this.props.stat + '_fact' },
-          this.props.stat_fact
+          this.props.statFact
         )
       );
     }
@@ -317,26 +315,91 @@ var Stat = function (_React$Component2) {
   return Stat;
 }(React.Component);
 
+// Component that displays a title and the scores that each user gave it
+
+
+var ScoreDiff = function (_React$Component3) {
+  _inherits(ScoreDiff, _React$Component3);
+
+  function ScoreDiff() {
+    _classCallCheck(this, ScoreDiff);
+
+    return _possibleConstructorReturn(this, (ScoreDiff.__proto__ || Object.getPrototypeOf(ScoreDiff)).apply(this, arguments));
+  }
+
+  _createClass(ScoreDiff, [{
+    key: 'render',
+    value: function render() {
+      return React.createElement(
+        'div',
+        { className: 'score_diff', id: 'score_diff_' + this.props.id },
+        React.createElement('hr', null),
+        React.createElement(
+          'h3',
+          null,
+          '' + capitalize(this.props.title)
+        ),
+        React.createElement(
+          'div',
+          null,
+          React.createElement(
+            'p',
+            { className: 'score_diff_score score_diff_score_1', id: 'score_diff_score_' + this.props.id + '_1' },
+            this.props.score1,
+            '/10'
+          ),
+          React.createElement('img', { src: this.props.image, alt: '' }),
+          React.createElement(
+            'p',
+            { className: 'score_diff_score score_diff_score_2', id: 'score_diff_score_' + this.props.id + '_2' },
+            this.props.score2,
+            '/10'
+          )
+        ),
+        React.createElement(
+          'p',
+          { className: 'score_diff_diff', id: 'score_diff_' + this.props.id + '_diff' },
+          'Difference: \xB1',
+          this.props.diff
+        )
+      );
+    }
+  }]);
+
+  return ScoreDiff;
+}(React.Component);
+
 // Component for body of page; uses the components above
 
 
-var Body = function (_React$Component3) {
-  _inherits(Body, _React$Component3);
+var Body = function (_React$Component4) {
+  _inherits(Body, _React$Component4);
 
   function Body(props) {
     _classCallCheck(this, Body);
 
-    var _this4 = _possibleConstructorReturn(this, (Body.__proto__ || Object.getPrototypeOf(Body)).call(this, props));
+    var _this5 = _possibleConstructorReturn(this, (Body.__proto__ || Object.getPrototypeOf(Body)).call(this, props));
 
-    _this4.state = {};
+    _this5.state = {};
     for (var i = 0; i < info.length; i++) {
-      _this4.state[info[i]] = ['', ''];
+      _this5.state[info[i]] = ['', ''];
     }
     for (var _i = 0; _i < stats.length; _i++) {
-      _this4.state[stats[_i].stat] = [0, 0];
-      _this4.state[stats[_i].stat + '_fact'] = '';
+      _this5.state[stats[_i].stat] = [0, 0];
+      _this5.state[stats[_i].stat + '_fact'] = '';
     }
-    return _this4;
+    _this5.state.scoreDiffs = [];
+    for (var _i2 = 0; _i2 < 5; _i2++) {
+      _this5.state.scoreDiffs.push({
+        'title_id': 0,
+        'title': '',
+        'title_image': '',
+        'score_1': 0,
+        'score_2': 0,
+        'score_difference': 0
+      });
+    }
+    return _this5;
   }
 
   // Sets specific info for specific user
@@ -363,9 +426,6 @@ var Body = function (_React$Component3) {
         this.setState(_defineProperty({}, stat, [this.state[stat][0], value]));
       }
     }
-
-    // Updates all stat facts for both users
-
   }, {
     key: 'updateStatFacts',
     value: function updateStatFacts() {
@@ -374,12 +434,51 @@ var Body = function (_React$Component3) {
       }
     }
   }, {
+    key: 'getScoreDiffs',
+    value: function getScoreDiffs(request) {
+      var _this6 = this;
+
+      if (this.state.username[0] != '' && this.state.username[1] != '') {
+        var httpReq = new XMLHttpRequest();
+        // If request was 'get', requests old info
+        if (request == 'get') {
+          httpReq.open('GET', 'http://localhost:3000/?username1=' + this.state.username[0].replace(' ', '+') + '&username2=' + this.state.username[1].replace(' ', '+') + '&request=getdiff');
+        } else {
+          httpReq.open('GET', 'http://localhost:3000/?username1=' + this.state.username[0].replace(' ', '+') + '&username2=' + this.state.username[1].replace(' ', '+') + '&request=updatediff');
+        }
+        httpReq.send();
+
+        httpReq.onload = function () {
+          var results = JSON.parse(httpReq.response).results;
+          // Adds empty entries if fewer than 5
+          while (results.length < 5) {
+            results.push({
+              'title_id': 0,
+              'title': '',
+              'title_image': '',
+              'score_1': 0,
+              'score_2': 0,
+              'score_difference': 0
+            });
+          }
+          _this6.setState({ 'scoreDiffs': results });
+          _this6.updateCSS();
+        };
+
+        httpReq.onerror = function () {
+          _this6.updateCSS();
+        };
+      } else {
+        this.updateCSS();
+      }
+    }
+  }, {
     key: 'updateCSS',
     value: function updateCSS() {
       // Updates stat bars
       for (var i = 0; i < stats.length; i++) {
         // If a neutral stat, makes bars gray
-        if (stats[i].compare_type == 0) {
+        if (stats[i].compareType == 0) {
           document.getElementById(stats[i].stat + '_1_bar').style.backgroundColor = '#999';
           document.getElementById(stats[i].stat + '_2_bar').style.backgroundColor = '#999';
 
@@ -390,7 +489,7 @@ var Body = function (_React$Component3) {
           if (Number(this.state[stats[i].stat][0]) != 0 || Number(this.state[stats[i].stat][1] != 0)) {
             scale = 1 + 98 * this.state[stats[i].stat][0] / (Number(this.state[stats[i].stat][0]) + Number(this.state[stats[i].stat][1]));
             // If a reversed stat, reverses the bar width
-            if (stats[i].compare_type == -1) {
+            if (stats[i].compareType == -1) {
               scale = 100 - scale;
             }
           }
@@ -414,27 +513,46 @@ var Body = function (_React$Component3) {
       }
 
       // Shows/hides elements based on how many valid users have been entered (2, 1, 0)
-      if (document.getElementById('username_1').textContent != '' && document.getElementById('username_2').textContent != '') {
+      if (this.state.username[0] != '' && this.state.username[1] != '') {
         document.getElementById('vs').style.display = 'inherit';
         document.getElementById('stats').style.display = 'inherit';
         [].forEach.call(document.getElementsByClassName('stat_fact'), function (e) {
-          return e.style.visibility = 'inherit';
+          return e.style.display = 'inherit';
         });
-        document.getElementById('score_differences').style.display = 'inherit';
-      } else if (document.getElementById('username_1').textContent != '' || document.getElementById('username_2').textContent != '') {
+        document.getElementById('score_diffs').style.display = 'inherit';
+        for (var _i3 = 0; _i3 < 5; _i3++) {
+          if (this.state.scoreDiffs[_i3].title != '') {
+            document.getElementById('score_diff_' + _i3).style.display = 'inherit';
+            // Updates score colourrs to be green/red/gray
+            if (parseInt(this.state.scoreDiffs[_i3].score_1) > parseInt(this.state.scoreDiffs[_i3].score_2)) {
+              document.getElementById('score_diff_score_' + _i3 + '_1').style.color = '#6C6';
+              document.getElementById('score_diff_score_' + _i3 + '_2').style.color = '#C66';
+            } else if (parseInt(this.state.scoreDiffs[_i3].score_1) < parseInt(this.state.scoreDiffs[_i3].score_2)) {
+              document.getElementById('score_diff_score_' + _i3 + '_1').style.color = '#C66';
+              document.getElementById('score_diff_score_' + _i3 + '_2').style.color = '#6C6';
+            } else {
+              document.getElementById('score_diff_score_' + _i3 + '_1').style.color = '#999';
+              document.getElementById('score_diff_score_' + _i3 + '_2').style.color = '#999';
+            }
+          } else {
+            // Hides empty score difference entries
+            document.getElementById('score_diff_' + _i3).style.display = 'none';
+          }
+        }
+      } else if (this.state.username[0] != '' || this.state.username[1] != '') {
         document.getElementById('vs').style.display = 'none';
         document.getElementById('stats').style.display = 'inherit';
         [].forEach.call(document.getElementsByClassName('stat_fact'), function (e) {
-          return e.style.visibility = 'hidden';
+          return e.style.display = 'none';
         });
-        document.getElementById('score_differences').style.display = 'none';
+        document.getElementById('score_diffs').style.display = 'none';
       } else {
         document.getElementById('vs').style.display = 'none';
         document.getElementById('stats').style.display = 'none';
         [].forEach.call(document.getElementsByClassName('stat_fact'), function (e) {
-          return e.style.visibility = 'hidden';
+          return e.style.display = 'none';
         });
-        document.getElementById('score_differences').style.display = 'none';
+        document.getElementById('score_diffs').style.display = 'none';
       }
     }
 
@@ -445,21 +563,31 @@ var Body = function (_React$Component3) {
   }, {
     key: 'render',
     value: function render() {
-      var _this5 = this;
+      var _this7 = this;
 
       return React.createElement(
         'div',
         null,
         React.createElement(
-          'h3',
-          { id: 'vs' },
-          'VS'
+          'div',
+          null,
+          React.createElement('hr', null)
         ),
-        React.createElement(UserSection, { user: 1, username: this.state.username[0], user_id: this.state.user_id[0], last_updated: this.state.last_updated[0], user_image: this.state.user_image[0], sendInfo: this.setInfo.bind(this), sendStat: this.setStat.bind(this), updateStatFacts: this.updateStatFacts.bind(this), updateCSS: this.updateCSS.bind(this) }),
-        React.createElement(UserSection, { user: 2, username: this.state.username[1], user_id: this.state.user_id[1], last_updated: this.state.last_updated[1], user_image: this.state.user_image[1], sendInfo: this.setInfo.bind(this), sendStat: this.setStat.bind(this), updateStatFacts: this.updateStatFacts.bind(this), updateCSS: this.updateCSS.bind(this) }),
+        React.createElement(
+          'div',
+          { id: 'user_sections' },
+          React.createElement(
+            'h3',
+            { id: 'vs' },
+            'vs'
+          ),
+          React.createElement(UserSection, { user: 1, usernames: this.state.username, lastUpdated: this.state.last_updated[0], image: this.state.user_image[0], sendInfo: this.setInfo.bind(this), sendStat: this.setStat.bind(this), updateStatFacts: this.updateStatFacts.bind(this), getScoreDiffs: this.getScoreDiffs.bind(this) }),
+          React.createElement(UserSection, { user: 2, usernames: this.state.username, lastUpdated: this.state.last_updated[1], image: this.state.user_image[1], sendInfo: this.setInfo.bind(this), sendStat: this.setStat.bind(this), updateStatFacts: this.updateStatFacts.bind(this), getScoreDiffs: this.getScoreDiffs.bind(this) })
+        ),
         React.createElement(
           'div',
           { id: 'stats' },
+          React.createElement('hr', null),
           React.createElement(
             'h2',
             null,
@@ -467,16 +595,17 @@ var Body = function (_React$Component3) {
           ),
           React.createElement(
             'p',
-            { className: 'main_p' },
-            '"Starting Life From 0.00"'
+            { className: 'main_p quote' },
+            '"Starting Life From 0.0"'
           ),
           stats.map(function (stat) {
-            return React.createElement(Stat, { key: stat.stat, stat: stat.stat, stat_values: _this5.state[stat.stat], stat_fact: _this5.state[stat.stat + '_fact'] });
+            return React.createElement(Stat, { key: stat.stat, stat: stat.stat, statValues: _this7.state[stat.stat], statFact: _this7.state[stat.stat + '_fact'] });
           })
         ),
         React.createElement(
           'div',
-          { id: 'score_differences' },
+          { id: 'score_diffs' },
+          React.createElement('hr', null),
           React.createElement(
             'h2',
             null,
@@ -484,9 +613,17 @@ var Body = function (_React$Component3) {
           ),
           React.createElement(
             'p',
-            { className: 'main_p' },
+            { className: 'main_p quote' },
             '"Your Opinion Is Wrong As I Expected"'
-          )
+          ),
+          [].concat(_toConsumableArray(Array(5).keys())).map(function (i) {
+            return React.createElement(ScoreDiff, { key: 'scoreDiff' + i, id: i, title: _this7.state.scoreDiffs[i].title, image: _this7.state.scoreDiffs[i].title_image, score1: _this7.state.scoreDiffs[i].score_1, score2: _this7.state.scoreDiffs[i].score_2, diff: _this7.state.scoreDiffs[i].score_difference });
+          })
+        ),
+        React.createElement(
+          'div',
+          null,
+          React.createElement('hr', null)
         )
       );
     }

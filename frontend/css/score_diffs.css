@@ -1,0 +1,54 @@
+#score_diffs {
+    display: none;
+    clear: both;
+    padding-top: 2em;
+}
+
+.score_diff {
+    text-align: center;
+}
+
+.score_diff > hr {
+    margin-top: 2em;
+}
+
+.score_diff h3 {
+    padding-top: 1em;
+}
+
+p.score_diff_diff {
+    margin-top: 1em;
+    font-size: 1em;
+    text-align: center;
+}
+
+.score_diff > div {
+    margin-top: 1em;
+}
+
+p.score_diff_score {
+    display: inline-block;
+    width: 20%;
+
+    font-size: 2em;
+    vertical-align: middle;
+}
+
+p.score_diff_score_1 {
+    margin-right: 0.5em;
+
+    text-align: right;
+}
+
+p.score_diff_score_2 {
+    margin-left: 0.5em;
+
+    text-align: left;
+}
+
+.score_diff img {
+    display: inline-block;
+    height: 16em;
+
+    vertical-align: middle;
+}
