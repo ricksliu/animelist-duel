@@ -147,17 +147,15 @@ class UserSection extends React.Component {
 
   // Sends HTTP request to backend server to get or update data for the user that this component is for
   sendRequest(request) {
-    // Sends HTTP request
     const http_req = new XMLHttpRequest();
     // If request was 'get', uses (possibly newly entered) username in input form 
     if (request == 'get') {
       http_req.open('GET', `http://localhost:3000/?username=${this.state.username_input.replace(' ', '+')}&request=${request}`);
     } else {
-      http_req.open('GET', `http://localhost:3000/?username=${this.props.username.replace(' ', '+')}&request=${request}`);
+      http_req.open('GET', `http://localhost:3000/?username=${this.props.usernames[this.props.user - 1].replace(' ', '+')}&request=${request}`);
     }
     http_req.send();
   
-    // Executes when a response (a JSON-encoded string) is recieved
     http_req.onload = () => {
       let user_data = JSON.parse(http_req.response);
 
@@ -201,6 +199,30 @@ class UserSection extends React.Component {
       document.querySelectorAll(`#user_${this.props.user}_section .user_update_status`).forEach(e => e.style.display = 'none');
       this.props.updateCSS();
     }
+
+    if (this.props.usernames[0] != '' && this.props.usernames[1] != '') {
+      const http_req_2 = new XMLHttpRequest();
+      // If request was 'get', uses (possibly newly entered) username in input form 
+      http_req_2.open('GET', `http://localhost:3000/?username1=${this.props.usernames[0].replace(' ', '+')}&username2=${this.props.usernames[1].replace(' ', '+')}&request=diff`);
+      http_req_2.send();
+    
+      http_req_2.onload = () => {
+        let results = JSON.parse(http_req_2.response);
+        this.props.sendScoreDiffs(results.results);
+      }
+
+      // Executes if backend is offline
+      http_req_2.onerror = () => {
+        info.forEach(i => this.props.sendInfo(this.props.user, i, ''));
+        stats.forEach(s => this.props.sendStat(this.props.user, s.stat, 0));
+        this.props.updateStatFacts();
+
+        document.getElementById(`backend_error_${this.props.user}`).style.display = 'inherit';
+        document.getElementById(`username_error_${this.props.user}`).style.display = 'none';
+        document.querySelectorAll(`#user_${this.props.user}_section .user_update_status`).forEach(e => e.style.display = 'none');
+        this.props.updateCSS();
+      }
+    }
   }
 
   // The following functions are used as shortcuts for the function above
@@ -229,7 +251,7 @@ class UserSection extends React.Component {
         <p className='backend_error' id={`backend_error_${this.props.user}`}>This Website Is Offline Right Now</p>
         <p className='username_error' id={`username_error_${this.props.user}`}>User Not Found</p>
         <form className='user_update_status' onSubmit={this.updateUser}>
-          <h3 id={`username_${this.props.user}`}>{this.props.username}</h3>
+          <h3 id={`username_${this.props.user}`}>{this.props.usernames[this.props.user - 1]}</h3>
           <img id={`user_image_${this.props.user}`} src={this.props.user_image} alt='' />
           <p id={`last_updated_${this.props.user}`}>Data From {this.props.last_updated}</p>
           <input type='submit' className='input_submit' id={`user_${this.props.user}_update`} value='Update Data' />
@@ -239,7 +261,7 @@ class UserSection extends React.Component {
   }
 }
 
-// Component that displaying a stat (two numbers and a bar for each number)
+// Component that displays two numbers and a bar for each number
 class Stat extends React.Component {
   render() {
     return (
@@ -257,6 +279,23 @@ class Stat extends React.Component {
   }
 }
 
+// Component that displays a title and the scores that each user gave it
+class ScoreDifference extends React.Component {
+  render() {
+    return (
+      <div className='score_diff' id={`score_diff_${this.props.id}`}>
+        <h3>{`${capitalize(this.props.title)}:`}</h3>
+        <p className='score_diff_score score_diff_score_1' id={`score_diff_score_${this.props.id}_1`}>{this.props.score_1}</p>
+        <div>
+          <img src={this.props.image} alt='' />
+          <p className='score_diff_diff' id={`score_diff_${this.props.id}_diff`}>{this.props.diff}</p>
+        </div>
+        <p className='score_diff_score score_diff_score_2' id={`score_diff_score_${this.props.id}_2`}>{this.props.score_2}</p>
+      </div>
+    );
+  }
+}
+
 // Component for body of page; uses the components above
 class Body extends React.Component {
   constructor(props) {
@@ -269,6 +308,16 @@ class Body extends React.Component {
     for (let i = 0; i < stats.length; i++) {
       this.state[stats[i].stat] = [0, 0];
       this.state[stats[i].stat + '_fact'] = '';
+    }
+    this.state.scoreDiffs = [];
+    for (let i = 0; i < 5; i++) {
+      this.state.scoreDiffs.push({
+        'title_id': 0,
+        'title': '',
+        'score_1': 0,
+        'score_2': 0,
+        'score_difference': 0
+      });
     }
   }
 
@@ -290,11 +339,16 @@ class Body extends React.Component {
     }
   }
 
-  // Updates all stat facts for both users
   updateStatFacts() {
     for (let i = 0; i < stats.length; i++) {
       this.setState({[stats[i].stat + '_fact']: stats[i].getFact(this.state.username[0], this.state[stats[i].stat][0], this.state.username[1], this.state[stats[i].stat][1])});
     }
+  }
+
+  setScoreDiffs(entries) {
+    console.log(entries);
+    this.setState({'scoreDiffs': entries});
+    console.log(this.state.scoreDiffs);
   }
 
   updateCSS() {
@@ -363,8 +417,8 @@ class Body extends React.Component {
     return (
       <div>
         <h3 id='vs'>VS</h3>
-        <UserSection user={1} username={this.state.username[0]} user_id={this.state.user_id[0]} last_updated={this.state.last_updated[0]} user_image={this.state.user_image[0]} sendInfo={this.setInfo.bind(this)} sendStat={this.setStat.bind(this)} updateStatFacts={this.updateStatFacts.bind(this)} updateCSS={this.updateCSS.bind(this)} />
-        <UserSection user={2} username={this.state.username[1]} user_id={this.state.user_id[1]} last_updated={this.state.last_updated[1]} user_image={this.state.user_image[1]} sendInfo={this.setInfo.bind(this)} sendStat={this.setStat.bind(this)} updateStatFacts={this.updateStatFacts.bind(this)} updateCSS={this.updateCSS.bind(this)} />
+        <UserSection user={1} usernames={this.state.username} user_id={this.state.user_id[0]} last_updated={this.state.last_updated[0]} user_image={this.state.user_image[0]} sendInfo={this.setInfo.bind(this)} sendStat={this.setStat.bind(this)} updateStatFacts={this.updateStatFacts.bind(this)} sendScoreDiffs={this.setScoreDiffs.bind(this)} updateCSS={this.updateCSS.bind(this)} />
+        <UserSection user={2} usernames={this.state.username} user_id={this.state.user_id[1]} last_updated={this.state.last_updated[1]} user_image={this.state.user_image[1]} sendInfo={this.setInfo.bind(this)} sendStat={this.setStat.bind(this)} updateStatFacts={this.updateStatFacts.bind(this)} sendScoreDiffs={this.setScoreDiffs.bind(this)} updateCSS={this.updateCSS.bind(this)} />
         
         <div id='stats'>
           <h2>Stat Face-Off</h2>
@@ -377,6 +431,9 @@ class Body extends React.Component {
         <div id='score_differences'>
           <h2>Opinion Clash</h2>
           <p className='main_p'>"Your Opinion Is Wrong As I Expected"</p>
+          {[...Array(5).keys()].map(i => (
+            <ScoreDifference key={'score_diff_' + i} id={i} title={this.state.scoreDiffs[i].title} score_1={this.state.scoreDiffs[i].score_1} score_2={this.state.scoreDiffs[i].score_2} diff={this.state.scoreDiffs[i].score_difference} />
+          ))}
         </div>
       </div>
     );

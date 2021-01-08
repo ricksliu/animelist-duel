@@ -35,17 +35,17 @@ const scraping_info = [
   ['Plan to Watch', '>', '<']
 ]
 
-// Returns first substring surrounded by the two chars in 'surrounding_chars'
+// Returns first substring surrounded by two chars
 // 'source' is the raw HTML, 'substring' is a substring to start searching from
-function scrapeNumber(source, substring, start_char, end_char) {
-  const str = source.slice(source.indexOf(substring));
+function scrapeString(source, substring, startChar, endChar, nonEmpty=false, numeric=true) {
+  const str = source.slice(source.indexOf(substring) + substring.length);
   const len = str.length;
   const numbers = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0'];
   
   // Finds start
   let start = 0;
   while (start < len) {
-    if (str[start] == start_char && numbers.includes(str[start + 1])) {
+    if (str[start] == startChar && (!nonEmpty || str[start + 1] != endChar) && (!numeric || numbers.includes(str[start + 1]))) {
       start++;
       break;
     }
@@ -55,7 +55,7 @@ function scrapeNumber(source, substring, start_char, end_char) {
   if (start != len) {
     // Finds end
     let end = start;
-    while (str[end] != end_char) {
+    while (str[end] != endChar) {
       end++;
     }
     return str.slice(start, end).replace(',', '');
@@ -67,12 +67,13 @@ function scrapeNumber(source, substring, start_char, end_char) {
 
 const server = http.createServer((req, res) => {
   // Gets info from query of HTTP request sent from frontend
-  const username = url.parse(req.url, true).query.username.toLowerCase();
   const request = url.parse(req.url, true).query.request;
-  console.log(`\nRecieved HTTP request for user '${username}' with request '${request}'.`);
 
   // If frontend requested data from database
   if (request == 'get') {
+    const username = url.parse(req.url, true).query.username.toLowerCase();
+    console.log(`\nRecieved HTTP request for user '${username}' with request '${request}'.`);
+
     // Tries to get data from database
     mysql_connection_pool.query(
       `SELECT *
@@ -131,6 +132,9 @@ const server = http.createServer((req, res) => {
 
   // If frontend requested new data from MyAnimeList
   } else if (request == 'update') {
+    const username = url.parse(req.url, true).query.username.toLowerCase();
+    console.log(`\nRecieved HTTP request for user '${username}' with request '${request}'.`);
+
     const options = {
       host: 'myanimelist.net',
       path: `/profile/${username}`,
@@ -147,7 +151,7 @@ const server = http.createServer((req, res) => {
 
       // When finished
       mal_res.on('end', function() {
-        const info = scraping_info.map(i => scrapeNumber(page_source, ...i));
+        const info = scraping_info.map(i => scrapeString(page_source, ...i));
 
         // If user does not exist, sends blank string as user_id
         if (info[0] == '') {
@@ -253,6 +257,158 @@ const server = http.createServer((req, res) => {
       res.end();
       console.log(`Failed to send HTTPS request to MyAnimeList. (${e})`);
     });
+
+  // If frontend requested data on score differences (assumed that both usernames are actual users)
+  } else if (request == 'diff') {
+    let usernames = [url.parse(req.url, true).query.username1.toLowerCase(), url.parse(req.url, true).query.username2.toLowerCase()];
+    let flip = 0;
+    if (usernames[0] > usernames[1]) {
+      usernames = usernames.reverse();
+      flip = 1;
+    }
+    console.log(`\nRecieved HTTP request for users '${usernames[0]}' and '${usernames[1]}' with request '${request}'.`);
+
+    // Tries to get data from database
+    mysql_connection_pool.query(
+      `SELECT *
+      FROM score_differences
+      WHERE username_1 = '${usernames[0]}' AND username_2 = '${usernames[1]}' AND date = (
+        SELECT MAX(date)
+        FROM score_differences
+        WHERE username_1 = '${usernames[0]}' AND username_2 = '${usernames[1]}'
+      ) ORDER BY ABS(score_1 - score_2) DESC`,
+      (e, results, fields) => {
+        if (e || results.length == 0) {
+          if (e) {
+            console.log(`Failed to get score difference data from databases. (${e})`);
+          } else {
+            console.log('Failed to find score difference data in databases.');
+          }
+          
+          const options = {
+            host: 'myanimelist.net',
+            path: `/shared.php?u1=${usernames[0]}&u2=${usernames[1]}`,
+            port: 443
+          };
+      
+          // Sends HTTPS request to MyAnimeList
+          https.get(options, (mal_res) => {
+            // Gets HTML of page as string
+            let page_source;
+            mal_res.on('data', function (chunk) {
+              page_source += chunk;
+            });
+
+            // When finished
+            mal_res.on('end', function() {
+              let entries = [];
+
+              // Gets scores of all shared anime entries; values may be non-numeric; loop ends when 'page_source' has no more shared entries in it
+              page_source = page_source.slice(page_source.indexOf('Score Difference'));
+              while (page_source.indexOf('Mean Values') >= 0) {
+                let entry = [];
+
+                let entry_source = page_source.slice(page_source.indexOf('<tr>') + 4, page_source.indexOf('</tr>'));
+                // Gets ID and title of entry
+                entry.push(scrapeString(entry_source, 'anime', '/', '/', true));
+                entry.push(scrapeString(entry_source, 'anime', '>', '<', true, false));
+                entry_source = entry_source.slice(entry_source.indexOf('</td>') + 5);
+                // Gets the 3 scores from the entry; loop ends when 'entry_source' has no more scores in it
+                while (entry_source.indexOf('</td>') >= 0) {
+                  entry.push(scrapeString(entry_source, 'align="center"', '>', '<', true, false));
+                  entry_source = entry_source.slice(entry_source.indexOf('</td>') + 5);  // Slices score off of entry
+                }
+                
+                entries.push(entry);
+
+                page_source = page_source.slice(page_source.indexOf('</tr>') + 5);  // Slices entry off of source
+              }
+              // Removes first and last entries (not actual entries) and all entries without score differences
+              entries.shift()
+              entries.pop();
+              entries = entries.filter(e => e[4] != '&nbsp;');
+
+              // Sorts by differences and score and keeps top 5
+              entries.sort((a, b) => {
+                if (parseInt(a[4]) == parseInt(b[4])) {
+                  return 0;
+                } else {
+                  return (parseInt(a[4]) > parseInt(b[4])) ? -1 : 1;
+                }
+              });
+              entries = entries.slice(0, 5);
+              let sentEntries = [];
+              entries.forEach(e => sentEntries.push({
+                'title_id': e[0],
+                'title': e[1],
+                'score_1': e[2 + flip],
+                'score_2': e[3 - flip],
+                'score_difference': e[4]
+              }));
+
+              // Formats date to a string consistent with the MySQL TIMESTAMP datatype
+              const date = new Date().toISOString().slice(0, 19).replace('T', ' ');
+
+              res.writeHead(200, headers);
+              res.write(JSON.stringify({
+                results: sentEntries
+              }));
+              res.end();
+              console.log(`Sent response with score difference data from MyAnimeList.`);
+
+              // Tries to insert into 'score_differences' database
+              entries.forEach(e => {
+                mysql_connection_pool.query(
+                  `INSERT INTO score_differences (
+                    date,
+                    username_1,
+                    username_2,
+                    title_id,
+                    title,
+                    score_1,
+                    score_2,
+                    score_difference
+                  ) VALUES (
+                    ${mysql.escape(date)},
+                    ${mysql.escape(usernames[0])},
+                    ${mysql.escape(usernames[1])},
+                    ${e[0]}, 
+                    ${mysql.escape(e[1])},
+                    ${e[2]},
+                    ${e[3]},
+                    ${e[4]}
+                  )`,
+                  (e, results, fields) => {
+                    if (e) {
+                      console.log(`Failed to insert score difference data for users '${usernames[0]}' and '${usernames[1]}' into database 'score_differences'. (${e})`);
+                    } else {
+                      console.log(`Inserted score difference data for users '${usernames[0]}' and '${usernames[1]}' into database 'score_differences'.`);
+                    }
+                  }
+                );
+              });
+            });
+
+          // If could not send HTTPS request to MyAnimeList
+          }).on('error', (e) => {
+            res.writeHead(200, headers);
+            res.write(JSON.stringify({
+              results: []
+            }));
+            res.end();
+            console.log(`Failed to send HTTPS request to MyAnimeList. (${e})`);
+          });
+
+        } else {
+          res.writeHead(200, headers);
+          res.write(JSON.stringify({
+            results: results.slice(0, 5)
+          }));
+          res.end();
+          console.log(`Sent response with score difference data from databases.`);
+        }
+      }
+    );
   }
 });
 

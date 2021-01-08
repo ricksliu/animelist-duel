@@ -1,5 +1,7 @@
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
+function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
+
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
 function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
@@ -119,17 +121,15 @@ var UserSection = function (_React$Component) {
     value: function sendRequest(request) {
       var _this2 = this;
 
-      // Sends HTTP request
       var http_req = new XMLHttpRequest();
       // If request was 'get', uses (possibly newly entered) username in input form 
       if (request == 'get') {
         http_req.open('GET', 'http://localhost:3000/?username=' + this.state.username_input.replace(' ', '+') + '&request=' + request);
       } else {
-        http_req.open('GET', 'http://localhost:3000/?username=' + this.props.username.replace(' ', '+') + '&request=' + request);
+        http_req.open('GET', 'http://localhost:3000/?username=' + this.props.usernames[this.props.user - 1].replace(' ', '+') + '&request=' + request);
       }
       http_req.send();
 
-      // Executes when a response (a JSON-encoded string) is recieved
       http_req.onload = function () {
         var user_data = JSON.parse(http_req.response);
 
@@ -190,6 +190,36 @@ var UserSection = function (_React$Component) {
         });
         _this2.props.updateCSS();
       };
+
+      if (this.props.usernames[0] != '' && this.props.usernames[1] != '') {
+        var http_req_2 = new XMLHttpRequest();
+        // If request was 'get', uses (possibly newly entered) username in input form 
+        http_req_2.open('GET', 'http://localhost:3000/?username1=' + this.props.usernames[0].replace(' ', '+') + '&username2=' + this.props.usernames[1].replace(' ', '+') + '&request=diff');
+        http_req_2.send();
+
+        http_req_2.onload = function () {
+          var results = JSON.parse(http_req_2.response);
+          _this2.props.sendScoreDiffs(results.results);
+        };
+
+        // Executes if backend is offline
+        http_req_2.onerror = function () {
+          info.forEach(function (i) {
+            return _this2.props.sendInfo(_this2.props.user, i, '');
+          });
+          stats.forEach(function (s) {
+            return _this2.props.sendStat(_this2.props.user, s.stat, 0);
+          });
+          _this2.props.updateStatFacts();
+
+          document.getElementById('backend_error_' + _this2.props.user).style.display = 'inherit';
+          document.getElementById('username_error_' + _this2.props.user).style.display = 'none';
+          document.querySelectorAll('#user_' + _this2.props.user + '_section .user_update_status').forEach(function (e) {
+            return e.style.display = 'none';
+          });
+          _this2.props.updateCSS();
+        };
+      }
     }
 
     // The following functions are used as shortcuts for the function above
@@ -248,7 +278,7 @@ var UserSection = function (_React$Component) {
           React.createElement(
             'h3',
             { id: 'username_' + this.props.user },
-            this.props.username
+            this.props.usernames[this.props.user - 1]
           ),
           React.createElement('img', { id: 'user_image_' + this.props.user, src: this.props.user_image, alt: '' }),
           React.createElement(
@@ -266,7 +296,7 @@ var UserSection = function (_React$Component) {
   return UserSection;
 }(React.Component);
 
-// Component that displaying a stat (two numbers and a bar for each number)
+// Component that displays two numbers and a bar for each number
 
 
 var Stat = function (_React$Component2) {
@@ -317,26 +347,86 @@ var Stat = function (_React$Component2) {
   return Stat;
 }(React.Component);
 
+// Component that displays a title and the scores that each user gave it
+
+
+var ScoreDifference = function (_React$Component3) {
+  _inherits(ScoreDifference, _React$Component3);
+
+  function ScoreDifference() {
+    _classCallCheck(this, ScoreDifference);
+
+    return _possibleConstructorReturn(this, (ScoreDifference.__proto__ || Object.getPrototypeOf(ScoreDifference)).apply(this, arguments));
+  }
+
+  _createClass(ScoreDifference, [{
+    key: 'render',
+    value: function render() {
+      return React.createElement(
+        'div',
+        { className: 'score_diff', id: 'score_diff_' + this.props.id },
+        React.createElement(
+          'h3',
+          null,
+          capitalize(this.props.title) + ':'
+        ),
+        React.createElement(
+          'p',
+          { className: 'score_diff_score score_diff_score_1', id: 'score_diff_score_' + this.props.id + '_1' },
+          this.props.score_1
+        ),
+        React.createElement(
+          'div',
+          null,
+          React.createElement('img', { src: this.props.image, alt: '' }),
+          React.createElement(
+            'p',
+            { className: 'score_diff_diff', id: 'score_diff_' + this.props.id + '_diff' },
+            this.props.diff
+          )
+        ),
+        React.createElement(
+          'p',
+          { className: 'score_diff_score score_diff_score_2', id: 'score_diff_score_' + this.props.id + '_2' },
+          this.props.score_2
+        )
+      );
+    }
+  }]);
+
+  return ScoreDifference;
+}(React.Component);
+
 // Component for body of page; uses the components above
 
 
-var Body = function (_React$Component3) {
-  _inherits(Body, _React$Component3);
+var Body = function (_React$Component4) {
+  _inherits(Body, _React$Component4);
 
   function Body(props) {
     _classCallCheck(this, Body);
 
-    var _this4 = _possibleConstructorReturn(this, (Body.__proto__ || Object.getPrototypeOf(Body)).call(this, props));
+    var _this5 = _possibleConstructorReturn(this, (Body.__proto__ || Object.getPrototypeOf(Body)).call(this, props));
 
-    _this4.state = {};
+    _this5.state = {};
     for (var i = 0; i < info.length; i++) {
-      _this4.state[info[i]] = ['', ''];
+      _this5.state[info[i]] = ['', ''];
     }
     for (var _i = 0; _i < stats.length; _i++) {
-      _this4.state[stats[_i].stat] = [0, 0];
-      _this4.state[stats[_i].stat + '_fact'] = '';
+      _this5.state[stats[_i].stat] = [0, 0];
+      _this5.state[stats[_i].stat + '_fact'] = '';
     }
-    return _this4;
+    _this5.state.scoreDiffs = [];
+    for (var _i2 = 0; _i2 < 5; _i2++) {
+      _this5.state.scoreDiffs.push({
+        'title_id': 0,
+        'title': '',
+        'score_1': 0,
+        'score_2': 0,
+        'score_difference': 0
+      });
+    }
+    return _this5;
   }
 
   // Sets specific info for specific user
@@ -363,15 +453,19 @@ var Body = function (_React$Component3) {
         this.setState(_defineProperty({}, stat, [this.state[stat][0], value]));
       }
     }
-
-    // Updates all stat facts for both users
-
   }, {
     key: 'updateStatFacts',
     value: function updateStatFacts() {
       for (var i = 0; i < stats.length; i++) {
         this.setState(_defineProperty({}, stats[i].stat + '_fact', stats[i].getFact(this.state.username[0], this.state[stats[i].stat][0], this.state.username[1], this.state[stats[i].stat][1])));
       }
+    }
+  }, {
+    key: 'setScoreDiffs',
+    value: function setScoreDiffs(entries) {
+      console.log(entries);
+      this.setState({ 'scoreDiffs': entries });
+      console.log(this.state.scoreDiffs);
     }
   }, {
     key: 'updateCSS',
@@ -445,7 +539,7 @@ var Body = function (_React$Component3) {
   }, {
     key: 'render',
     value: function render() {
-      var _this5 = this;
+      var _this6 = this;
 
       return React.createElement(
         'div',
@@ -455,8 +549,8 @@ var Body = function (_React$Component3) {
           { id: 'vs' },
           'VS'
         ),
-        React.createElement(UserSection, { user: 1, username: this.state.username[0], user_id: this.state.user_id[0], last_updated: this.state.last_updated[0], user_image: this.state.user_image[0], sendInfo: this.setInfo.bind(this), sendStat: this.setStat.bind(this), updateStatFacts: this.updateStatFacts.bind(this), updateCSS: this.updateCSS.bind(this) }),
-        React.createElement(UserSection, { user: 2, username: this.state.username[1], user_id: this.state.user_id[1], last_updated: this.state.last_updated[1], user_image: this.state.user_image[1], sendInfo: this.setInfo.bind(this), sendStat: this.setStat.bind(this), updateStatFacts: this.updateStatFacts.bind(this), updateCSS: this.updateCSS.bind(this) }),
+        React.createElement(UserSection, { user: 1, usernames: this.state.username, user_id: this.state.user_id[0], last_updated: this.state.last_updated[0], user_image: this.state.user_image[0], sendInfo: this.setInfo.bind(this), sendStat: this.setStat.bind(this), updateStatFacts: this.updateStatFacts.bind(this), sendScoreDiffs: this.setScoreDiffs.bind(this), updateCSS: this.updateCSS.bind(this) }),
+        React.createElement(UserSection, { user: 2, usernames: this.state.username, user_id: this.state.user_id[1], last_updated: this.state.last_updated[1], user_image: this.state.user_image[1], sendInfo: this.setInfo.bind(this), sendStat: this.setStat.bind(this), updateStatFacts: this.updateStatFacts.bind(this), sendScoreDiffs: this.setScoreDiffs.bind(this), updateCSS: this.updateCSS.bind(this) }),
         React.createElement(
           'div',
           { id: 'stats' },
@@ -471,7 +565,7 @@ var Body = function (_React$Component3) {
             '"Starting Life From 0.00"'
           ),
           stats.map(function (stat) {
-            return React.createElement(Stat, { key: stat.stat, stat: stat.stat, stat_values: _this5.state[stat.stat], stat_fact: _this5.state[stat.stat + '_fact'] });
+            return React.createElement(Stat, { key: stat.stat, stat: stat.stat, stat_values: _this6.state[stat.stat], stat_fact: _this6.state[stat.stat + '_fact'] });
           })
         ),
         React.createElement(
@@ -486,7 +580,10 @@ var Body = function (_React$Component3) {
             'p',
             { className: 'main_p' },
             '"Your Opinion Is Wrong As I Expected"'
-          )
+          ),
+          [].concat(_toConsumableArray(Array(5).keys())).map(function (i) {
+            return React.createElement(ScoreDifference, { key: 'score_diff_' + i, id: i, title: _this6.state.scoreDiffs[i].title, score_1: _this6.state.scoreDiffs[i].score_1, score_2: _this6.state.scoreDiffs[i].score_2, diff: _this6.state.scoreDiffs[i].score_difference });
+          })
         )
       );
     }
