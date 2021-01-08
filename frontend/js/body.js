@@ -521,7 +521,7 @@ var Body = function (_React$Component4) {
         document.getElementById('vs').style.display = 'inherit';
         document.getElementById('stats').style.display = 'inherit';
         [].forEach.call(document.getElementsByClassName('stat_fact'), function (e) {
-          return e.style.visibility = 'inherit';
+          return e.style.display = 'inherit';
         });
         document.getElementById('score_diffs').style.display = 'inherit';
         for (var _i3 = 0; _i3 < 5; _i3++) {
@@ -547,14 +547,14 @@ var Body = function (_React$Component4) {
         document.getElementById('vs').style.display = 'none';
         document.getElementById('stats').style.display = 'inherit';
         [].forEach.call(document.getElementsByClassName('stat_fact'), function (e) {
-          return e.style.visibility = 'hidden';
+          return e.style.display = 'none';
         });
         document.getElementById('score_diffs').style.display = 'none';
       } else {
         document.getElementById('vs').style.display = 'none';
         document.getElementById('stats').style.display = 'none';
         [].forEach.call(document.getElementsByClassName('stat_fact'), function (e) {
-          return e.style.visibility = 'hidden';
+          return e.style.display = 'none';
         });
         document.getElementById('score_diffs').style.display = 'none';
       }
@@ -575,7 +575,7 @@ var Body = function (_React$Component4) {
         React.createElement(
           'div',
           null,
-          React.createElement('hr', { className: 'no_margin' })
+          React.createElement('hr', null)
         ),
         React.createElement(
           'div',
@@ -591,7 +591,7 @@ var Body = function (_React$Component4) {
         React.createElement(
           'div',
           { id: 'stats' },
-          React.createElement('hr', { className: 'no_margin' }),
+          React.createElement('hr', null),
           React.createElement(
             'h2',
             null,
@@ -599,8 +599,8 @@ var Body = function (_React$Component4) {
           ),
           React.createElement(
             'p',
-            { className: 'main_p' },
-            '"Starting Life From 0.00"'
+            { className: 'main_p quote' },
+            '"Starting Life From 0.0"'
           ),
           stats.map(function (stat) {
             return React.createElement(Stat, { key: stat.stat, stat: stat.stat, stat_values: _this7.state[stat.stat], stat_fact: _this7.state[stat.stat + '_fact'] });
@@ -617,7 +617,7 @@ var Body = function (_React$Component4) {
           ),
           React.createElement(
             'p',
-            { className: 'main_p' },
+            { className: 'main_p quote' },
             '"Your Opinion Is Wrong As I Expected"'
           ),
           [].concat(_toConsumableArray(Array(5).keys())).map(function (i) {
@@ -627,7 +627,7 @@ var Body = function (_React$Component4) {
         React.createElement(
           'div',
           null,
-          React.createElement('hr', { className: 'no_margin' })
+          React.createElement('hr', null)
         )
       );
     }

@@ -4,7 +4,7 @@ class Top extends React.Component {
     return (
       <div>
         <h1>AnimeList Duel</h1>
-        <h3>"Only the dead have seen the end of anime." —Sun Tzu</h3>
+        <h3 className='quote'>"Only the dead have seen the end of anime." —Sun Tzu</h3>
       </div>
     );
   }

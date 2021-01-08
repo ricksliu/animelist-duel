@@ -1,0 +1,25 @@
+@import url("index.css");
+
+body {
+    font-size: xx-small;
+}
+
+h1 {
+    font-size: 2em;
+}
+
+h2 {
+    margin-top: 1em;
+
+    font-size: 2em;
+}
+
+#top h3 {
+    margin-top: 1em;
+
+    font-size: 1em;
+}
+
+h3#vs {
+    visibility: hidden;
+}

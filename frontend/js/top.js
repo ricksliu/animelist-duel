@@ -29,7 +29,7 @@ var Top = function (_React$Component) {
         ),
         React.createElement(
           'h3',
-          null,
+          { className: 'quote' },
           '"Only the dead have seen the end of anime." \u2014Sun Tzu'
         )
       );

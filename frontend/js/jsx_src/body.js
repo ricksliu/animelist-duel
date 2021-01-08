@@ -403,7 +403,7 @@ class Body extends React.Component {
     if (document.getElementById('username_1').textContent != '' && document.getElementById('username_2').textContent != '') {
       document.getElementById('vs').style.display = 'inherit';
       document.getElementById('stats').style.display = 'inherit';
-      [].forEach.call(document.getElementsByClassName('stat_fact'), e => e.style.visibility = 'inherit');
+      [].forEach.call(document.getElementsByClassName('stat_fact'), e => e.style.display = 'inherit');
       document.getElementById('score_diffs').style.display = 'inherit';
       for (let i = 0; i < 5; i++) {
         if (this.state.scoreDiffs[i].title != '') {
@@ -428,13 +428,13 @@ class Body extends React.Component {
     } else if (document.getElementById('username_1').textContent != '' || document.getElementById('username_2').textContent != '') {
       document.getElementById('vs').style.display = 'none';
       document.getElementById('stats').style.display = 'inherit';
-      [].forEach.call(document.getElementsByClassName('stat_fact'), e => e.style.visibility = 'hidden');
+      [].forEach.call(document.getElementsByClassName('stat_fact'), e => e.style.display = 'none');
       document.getElementById('score_diffs').style.display = 'none';
 
     } else {
       document.getElementById('vs').style.display = 'none';
       document.getElementById('stats').style.display = 'none';
-      [].forEach.call(document.getElementsByClassName('stat_fact'), e => e.style.visibility = 'hidden');
+      [].forEach.call(document.getElementsByClassName('stat_fact'), e => e.style.display = 'none');
       document.getElementById('score_diffs').style.display = 'none';
     }
   }
@@ -446,7 +446,7 @@ class Body extends React.Component {
     return (
       <div>
         <div>
-          <hr className='no_margin'/>
+          <hr/>
         </div>
         <div id='user_sections'>
           <h3 id='vs'>vs</h3>
@@ -455,9 +455,9 @@ class Body extends React.Component {
         </div>
 
         <div id='stats'>
-          <hr className='no_margin'/>
+          <hr/>
           <h2>Stat Face-Off</h2>
-          <p className='main_p'>"Starting Life From 0.00"</p>
+          <p className='main_p quote'>"Starting Life From 0.0"</p>
           {stats.map(stat => (
             <Stat key={stat.stat} stat={stat.stat} stat_values={this.state[stat.stat]} stat_fact={this.state[stat.stat + '_fact']} />
           ))}
@@ -466,13 +466,13 @@ class Body extends React.Component {
         <div id='score_diffs'>
           <hr />
           <h2>Opinion Clash</h2>
-          <p className='main_p'>"Your Opinion Is Wrong As I Expected"</p>
+          <p className='main_p quote'>"Your Opinion Is Wrong As I Expected"</p>
           {[...Array(5).keys()].map(i => (
             <ScoreDiff key={'score_diff_' + i} id={i} title={this.state.scoreDiffs[i].title} image={this.state.scoreDiffs[i].title_image} score_1={this.state.scoreDiffs[i].score_1} score_2={this.state.scoreDiffs[i].score_2} diff={this.state.scoreDiffs[i].score_difference} />
           ))}
         </div>
         <div>
-          <hr className='no_margin'/>
+          <hr/>
         </div>
       </div>
     );

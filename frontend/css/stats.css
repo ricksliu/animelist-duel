@@ -4,12 +4,17 @@
     padding-top: 2em;
 }
 
+.stat > hr {
+    margin-top: 2em;
+}
+
 .stat h3 {
     padding-top: 1em;
 }
 
 .stat > div {
     position: relative;
+    height: 5em;
 }
 
 .stat_bar {
@@ -47,8 +52,8 @@
 }
 
 .stat_fact {
-    visibility: hidden;
-    margin-top: 6em;
+    display: none;
+    margin-top: 1em;
 
     text-align: center;
 }
