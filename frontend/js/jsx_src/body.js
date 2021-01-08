@@ -334,8 +334,18 @@ class Body extends React.Component {
         http_req.send();
     
       http_req.onload = () => {
-        let results = JSON.parse(http_req.response);
-        this.setState({'scoreDiffs': results.results});
+        let results = JSON.parse(http_req.response).results;
+        // Adds empty entries if fewer than five
+        while (results.length < 5) {
+          results.push({
+            'title_id': 0,
+            'title': '',
+            'score_1': 0,
+            'score_2': 0,
+            'score_difference': 0
+          });
+        }
+        this.setState({'scoreDiffs': results});
       }
 
       http_req.onerror = () => {

@@ -34,6 +34,18 @@ function deleteFakeProfiles() {
             }
         }
     );
+
+    mysql_connection_pool.query(
+        `DELETE FROM score_differences
+        WHERE (username_1 = 'fakeuser1')`,
+        (e, results, fields) => {
+            if (e) {
+                console.log(`Failed to delete fake profiles from database 'score_differences'. (${e})`);
+            } else {
+                console.log(`Deleted fake profiles from database 'score_differences'.`);
+            }
+        }
+    );
 }
 
 function createFakeProfiles() {
@@ -54,6 +66,27 @@ function createFakeProfiles() {
                 console.log(`Failed to insert profile for user 'fakeuser1' in database 'profiles'. (${e})`);
             } else {
                 console.log(`Inserted profile for user 'fakeuser1' in database 'profiles'.`);
+            }
+        }
+    );
+
+    mysql_connection_pool.query(
+        `INSERT INTO profiles (
+            user_id,
+            last_updated,
+            username,
+            user_image
+        ) VALUES (
+            -2,
+            '2020-01-02 00:00:00',
+            'fakeuser2',
+            'media/fakeuser2.jpg'
+        )`,
+        (e, results, fields) => {
+            if (e) {
+                console.log(`Failed to insert profile for user 'fakeuser2' in database 'profiles'. (${e})`);
+            } else {
+                console.log(`Inserted profile for user 'fakeuser2' in database 'profiles'.`);
             }
         }
     );
@@ -96,27 +129,6 @@ function createFakeProfiles() {
     );
 
     mysql_connection_pool.query(
-        `INSERT INTO profiles (
-            user_id,
-            last_updated,
-            username,
-            user_image
-        ) VALUES (
-            -2,
-            '2020-01-02 00:00:00',
-            'fakeuser2',
-            'media/fakeuser2.jpg'
-        )`,
-        (e, results, fields) => {
-            if (e) {
-                console.log(`Failed to insert profile for user 'fakeuser2' in database 'profiles'. (${e})`);
-            } else {
-                console.log(`Inserted profile for user 'fakeuser2' in database 'profiles'.`);
-            }
-        }
-    );
-
-    mysql_connection_pool.query(
         `INSERT INTO profile_stats (
             date,
             user_id,
@@ -149,6 +161,35 @@ function createFakeProfiles() {
             console.log(`Failed to insert stats for user 'fakeuser2' into database 'profile_stats'. (${e})`);
             } else {
             console.log(`Inserted stats for user 'fakeuser2' into database 'profile_stats'.`);
+            }
+        }
+    );
+
+    mysql_connection_pool.query(
+        `INSERT INTO score_differences (
+            date,
+            username_1,
+            username_2, 
+            title_id,
+            title,
+            score_1,
+            score_2,
+            score_difference
+        ) VALUES (
+            '2020-01-03 00:00:00',
+            'fakeuser1',
+            'fakeuser2',
+            32281,
+            'Kimi no Na wa.',
+            7,
+            9,
+            2
+        )`,
+        (e, results, fields) => {
+            if (e) {
+            console.log(`Failed to insert score differences for users 'fakeuser1' and 'fakeuser2' into database 'score_differences'. (${e})`);
+            } else {
+            console.log(`Inserted score differences for users 'fakeuser1' and 'fakeuser2' into database 'score_differences'.`);
             }
         }
     );
