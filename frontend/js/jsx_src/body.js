@@ -169,7 +169,6 @@ class UserSection extends React.Component {
         document.getElementById(`backend_error_${this.props.user}`).style.display = 'none';
         document.getElementById(`username_error_${this.props.user}`).style.display = 'none';
         document.querySelectorAll(`#user_${this.props.user}_section .user_update_status`).forEach(e => e.style.display = 'inherit');
-        this.props.updateCSS();
       
       // If update was unsuccessful
       } else {
@@ -185,7 +184,6 @@ class UserSection extends React.Component {
           document.getElementById(`backend_error_${this.props.user}`).style.display = 'none';
           document.getElementById(`username_error_${this.props.user}`).style.display = 'inherit';
           document.querySelectorAll(`#user_${this.props.user}_section .user_update_status`).forEach(e => e.style.display = 'none');
-          this.props.updateCSS();
         }
       }
     }
@@ -200,7 +198,6 @@ class UserSection extends React.Component {
       document.getElementById(`backend_error_${this.props.user}`).style.display = 'inherit';
       document.getElementById(`username_error_${this.props.user}`).style.display = 'none';
       document.querySelectorAll(`#user_${this.props.user}_section .user_update_status`).forEach(e => e.style.display = 'none');
-      this.props.updateCSS();
     }
   }
 
@@ -335,7 +332,7 @@ class Body extends React.Component {
     
       http_req.onload = () => {
         let results = JSON.parse(http_req.response).results;
-        // Adds empty entries if fewer than five
+        // Adds empty entries if fewer than 5
         while (results.length < 5) {
           results.push({
             'title_id': 0,
@@ -346,10 +343,15 @@ class Body extends React.Component {
           });
         }
         this.setState({'scoreDiffs': results});
+        this.updateCSS();
       }
 
       http_req.onerror = () => {
+        this.updateCSS();
       }
+      
+    } else {
+      this.updateCSS();
     }
   }
 
@@ -397,6 +399,14 @@ class Body extends React.Component {
       document.getElementById('stats').style.display = 'inherit';
       [].forEach.call(document.getElementsByClassName('stat_fact'), e => e.style.visibility = 'inherit');
       document.getElementById('score_diffs').style.display = 'inherit';
+      // Hides empty score difference entries
+      for (let i = 0; i < 5; i++) {
+        if (this.state.scoreDiffs[i].title != '') {
+          document.getElementById(`score_diff_${i}`).style.display = 'inherit';
+        } else {
+          document.getElementById(`score_diff_${i}`).style.display = 'none';
+        }
+      }
 
     } else if (document.getElementById('username_1').textContent != '' || document.getElementById('username_2').textContent != '') {
       document.getElementById('vs').style.display = 'none';
@@ -419,8 +429,8 @@ class Body extends React.Component {
     return (
       <div>
         <h3 id='vs'>VS</h3>
-        <UserSection user={1} usernames={this.state.username} user_id={this.state.user_id[0]} last_updated={this.state.last_updated[0]} user_image={this.state.user_image[0]} sendInfo={this.setInfo.bind(this)} sendStat={this.setStat.bind(this)} updateStatFacts={this.updateStatFacts.bind(this)} getScoreDiffs={this.getScoreDiffs.bind(this)} updateCSS={this.updateCSS.bind(this)} />
-        <UserSection user={2} usernames={this.state.username} user_id={this.state.user_id[1]} last_updated={this.state.last_updated[1]} user_image={this.state.user_image[1]} sendInfo={this.setInfo.bind(this)} sendStat={this.setStat.bind(this)} updateStatFacts={this.updateStatFacts.bind(this)} getScoreDiffs={this.getScoreDiffs.bind(this)} updateCSS={this.updateCSS.bind(this)} />
+        <UserSection user={1} usernames={this.state.username} user_id={this.state.user_id[0]} last_updated={this.state.last_updated[0]} user_image={this.state.user_image[0]} sendInfo={this.setInfo.bind(this)} sendStat={this.setStat.bind(this)} updateStatFacts={this.updateStatFacts.bind(this)} getScoreDiffs={this.getScoreDiffs.bind(this)} />
+        <UserSection user={2} usernames={this.state.username} user_id={this.state.user_id[1]} last_updated={this.state.last_updated[1]} user_image={this.state.user_image[1]} sendInfo={this.setInfo.bind(this)} sendStat={this.setStat.bind(this)} updateStatFacts={this.updateStatFacts.bind(this)} getScoreDiffs={this.getScoreDiffs.bind(this)} />
         
         <div id='stats'>
           <h2>Stat Face-Off</h2>

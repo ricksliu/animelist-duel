@@ -149,7 +149,6 @@ var UserSection = function (_React$Component) {
           document.querySelectorAll('#user_' + _this2.props.user + '_section .user_update_status').forEach(function (e) {
             return e.style.display = 'inherit';
           });
-          _this2.props.updateCSS();
 
           // If update was unsuccessful
         } else {
@@ -170,7 +169,6 @@ var UserSection = function (_React$Component) {
             document.querySelectorAll('#user_' + _this2.props.user + '_section .user_update_status').forEach(function (e) {
               return e.style.display = 'none';
             });
-            _this2.props.updateCSS();
           }
         }
       };
@@ -191,7 +189,6 @@ var UserSection = function (_React$Component) {
         document.querySelectorAll('#user_' + _this2.props.user + '_section .user_update_status').forEach(function (e) {
           return e.style.display = 'none';
         });
-        _this2.props.updateCSS();
       };
     }
 
@@ -448,11 +445,26 @@ var Body = function (_React$Component4) {
         http_req.send();
 
         http_req.onload = function () {
-          var results = JSON.parse(http_req.response);
-          _this6.setState({ 'scoreDiffs': results.results });
+          var results = JSON.parse(http_req.response).results;
+          // Adds empty entries if fewer than 5
+          while (results.length < 5) {
+            results.push({
+              'title_id': 0,
+              'title': '',
+              'score_1': 0,
+              'score_2': 0,
+              'score_difference': 0
+            });
+          }
+          _this6.setState({ 'scoreDiffs': results });
+          _this6.updateCSS();
         };
 
-        http_req.onerror = function () {};
+        http_req.onerror = function () {
+          _this6.updateCSS();
+        };
+      } else {
+        this.updateCSS();
       }
     }
   }, {
@@ -503,6 +515,14 @@ var Body = function (_React$Component4) {
           return e.style.visibility = 'inherit';
         });
         document.getElementById('score_diffs').style.display = 'inherit';
+        // Hides empty score difference entries
+        for (var _i3 = 0; _i3 < 5; _i3++) {
+          if (this.state.scoreDiffs[_i3].title != '') {
+            document.getElementById('score_diff_' + _i3).style.display = 'inherit';
+          } else {
+            document.getElementById('score_diff_' + _i3).style.display = 'none';
+          }
+        }
       } else if (document.getElementById('username_1').textContent != '' || document.getElementById('username_2').textContent != '') {
         document.getElementById('vs').style.display = 'none';
         document.getElementById('stats').style.display = 'inherit';
@@ -537,8 +557,8 @@ var Body = function (_React$Component4) {
           { id: 'vs' },
           'VS'
         ),
-        React.createElement(UserSection, { user: 1, usernames: this.state.username, user_id: this.state.user_id[0], last_updated: this.state.last_updated[0], user_image: this.state.user_image[0], sendInfo: this.setInfo.bind(this), sendStat: this.setStat.bind(this), updateStatFacts: this.updateStatFacts.bind(this), getScoreDiffs: this.getScoreDiffs.bind(this), updateCSS: this.updateCSS.bind(this) }),
-        React.createElement(UserSection, { user: 2, usernames: this.state.username, user_id: this.state.user_id[1], last_updated: this.state.last_updated[1], user_image: this.state.user_image[1], sendInfo: this.setInfo.bind(this), sendStat: this.setStat.bind(this), updateStatFacts: this.updateStatFacts.bind(this), getScoreDiffs: this.getScoreDiffs.bind(this), updateCSS: this.updateCSS.bind(this) }),
+        React.createElement(UserSection, { user: 1, usernames: this.state.username, user_id: this.state.user_id[0], last_updated: this.state.last_updated[0], user_image: this.state.user_image[0], sendInfo: this.setInfo.bind(this), sendStat: this.setStat.bind(this), updateStatFacts: this.updateStatFacts.bind(this), getScoreDiffs: this.getScoreDiffs.bind(this) }),
+        React.createElement(UserSection, { user: 2, usernames: this.state.username, user_id: this.state.user_id[1], last_updated: this.state.last_updated[1], user_image: this.state.user_image[1], sendInfo: this.setInfo.bind(this), sendStat: this.setStat.bind(this), updateStatFacts: this.updateStatFacts.bind(this), getScoreDiffs: this.getScoreDiffs.bind(this) }),
         React.createElement(
           'div',
           { id: 'stats' },
