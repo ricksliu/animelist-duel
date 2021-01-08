@@ -172,19 +172,14 @@ class UserSection extends React.Component {
       
       // If update was unsuccessful
       } else {
-        if (request == 'get') {
-          this.sendRequest('update');
+        info.forEach(i => this.props.sendInfo(this.props.user, i, ''));
+        stats.forEach(s => this.props.sendStat(this.props.user, s.stat, 0));
+        this.props.updateStatFacts();
+        this.props.getScoreDiffs(request);
 
-        } else {
-          info.forEach(i => this.props.sendInfo(this.props.user, i, ''));
-          stats.forEach(s => this.props.sendStat(this.props.user, s.stat, 0));
-          this.props.updateStatFacts();
-          this.props.getScoreDiffs(request);
-
-          document.getElementById(`backend_error_${this.props.user}`).style.display = 'none';
-          document.getElementById(`username_error_${this.props.user}`).style.display = 'inherit';
-          document.querySelectorAll(`#user_${this.props.user}_section .user_update_status`).forEach(e => e.style.display = 'none');
-        }
+        document.getElementById(`backend_error_${this.props.user}`).style.display = 'none';
+        document.getElementById(`username_error_${this.props.user}`).style.display = 'inherit';
+        document.querySelectorAll(`#user_${this.props.user}_section .user_update_status`).forEach(e => e.style.display = 'none');
       }
     }
 
@@ -400,7 +395,7 @@ class Body extends React.Component {
     }
 
     // Shows/hides elements based on how many valid users have been entered (2, 1, 0)
-    if (document.getElementById('username_1').textContent != '' && document.getElementById('username_2').textContent != '') {
+    if (this.state.username[0] != '' && this.state.username[1] != '') {
       document.getElementById('vs').style.display = 'inherit';
       document.getElementById('stats').style.display = 'inherit';
       [].forEach.call(document.getElementsByClassName('stat_fact'), e => e.style.display = 'inherit');
@@ -425,7 +420,7 @@ class Body extends React.Component {
         }
       }
 
-    } else if (document.getElementById('username_1').textContent != '' || document.getElementById('username_2').textContent != '') {
+    } else if (this.state.username[0] != '' || this.state.username[1] != '') {
       document.getElementById('vs').style.display = 'none';
       document.getElementById('stats').style.display = 'inherit';
       [].forEach.call(document.getElementsByClassName('stat_fact'), e => e.style.display = 'none');

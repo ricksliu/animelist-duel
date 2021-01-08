@@ -152,24 +152,20 @@ var UserSection = function (_React$Component) {
 
           // If update was unsuccessful
         } else {
-          if (request == 'get') {
-            _this2.sendRequest('update');
-          } else {
-            info.forEach(function (i) {
-              return _this2.props.sendInfo(_this2.props.user, i, '');
-            });
-            stats.forEach(function (s) {
-              return _this2.props.sendStat(_this2.props.user, s.stat, 0);
-            });
-            _this2.props.updateStatFacts();
-            _this2.props.getScoreDiffs(request);
+          info.forEach(function (i) {
+            return _this2.props.sendInfo(_this2.props.user, i, '');
+          });
+          stats.forEach(function (s) {
+            return _this2.props.sendStat(_this2.props.user, s.stat, 0);
+          });
+          _this2.props.updateStatFacts();
+          _this2.props.getScoreDiffs(request);
 
-            document.getElementById('backend_error_' + _this2.props.user).style.display = 'none';
-            document.getElementById('username_error_' + _this2.props.user).style.display = 'inherit';
-            document.querySelectorAll('#user_' + _this2.props.user + '_section .user_update_status').forEach(function (e) {
-              return e.style.display = 'none';
-            });
-          }
+          document.getElementById('backend_error_' + _this2.props.user).style.display = 'none';
+          document.getElementById('username_error_' + _this2.props.user).style.display = 'inherit';
+          document.querySelectorAll('#user_' + _this2.props.user + '_section .user_update_status').forEach(function (e) {
+            return e.style.display = 'none';
+          });
         }
       };
 
@@ -517,7 +513,7 @@ var Body = function (_React$Component4) {
       }
 
       // Shows/hides elements based on how many valid users have been entered (2, 1, 0)
-      if (document.getElementById('username_1').textContent != '' && document.getElementById('username_2').textContent != '') {
+      if (this.state.username[0] != '' && this.state.username[1] != '') {
         document.getElementById('vs').style.display = 'inherit';
         document.getElementById('stats').style.display = 'inherit';
         [].forEach.call(document.getElementsByClassName('stat_fact'), function (e) {
@@ -543,7 +539,7 @@ var Body = function (_React$Component4) {
             document.getElementById('score_diff_' + _i3).style.display = 'none';
           }
         }
-      } else if (document.getElementById('username_1').textContent != '' || document.getElementById('username_2').textContent != '') {
+      } else if (this.state.username[0] != '' || this.state.username[1] != '') {
         document.getElementById('vs').style.display = 'none';
         document.getElementById('stats').style.display = 'inherit';
         [].forEach.call(document.getElementsByClassName('stat_fact'), function (e) {

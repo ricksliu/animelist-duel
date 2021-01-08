@@ -157,7 +157,7 @@ function getNewInfo(req, res) {
           user_id: ''
         }));
         res.end();
-        console.log(`Failed to find data for user '${username}' from MyAnimeList.`);
+        console.log(`Failed to find data for user '${username}' from MyAnimeList. Sent empty response.`);
       
       } else {
         // Sends response
@@ -251,7 +251,7 @@ function getNewInfo(req, res) {
       user_id: ''
     }));
     res.end();
-    console.log(`Failed to send HTTPS request to MyAnimeList. (${e})`);
+    console.log(`Failed to send HTTPS request to MyAnimeList. Sent empty response. (${e})`);
   });
 }
 
@@ -263,6 +263,16 @@ function getScoreDiffs(req, res) {
     flip = 1;
   }
   console.log(`\nRecieved request for 'score diffs' for users '${usernames[0]}' and '${usernames[1]}'.`);
+
+  // If same user, sends empty response
+  if (usernames[0] == usernames[1]) {
+    res.writeHead(200, headers);
+    res.write(JSON.stringify({
+      results: []
+    }));
+    res.end();
+    console.log(`Sent empty response.`);
+  }
 
   // Tries to get data from database
   mysqlConnectionPool.query(
@@ -332,6 +342,16 @@ function getNewScoreDiffs(req, res) {
     flip = 1;
   }
   console.log(`\nRecieved request for new 'score diffs' for users '${usernames[0]}' and '${usernames[1]}'.`);
+
+  // If same user, sends empty response
+  if (usernames[0] == usernames[1]) {
+    res.writeHead(200, headers);
+    res.write(JSON.stringify({
+      results: []
+    }));
+    res.end();
+    console.log(`Sent empty response.`);
+  }
 
   const options = {
     host: 'myanimelist.net',
@@ -453,7 +473,7 @@ function getNewScoreDiffs(req, res) {
       results: []
     }));
     res.end();
-    console.log(`Failed to send HTTPS request to MyAnimeList. (${e})`);
+    console.log(`Failed to send HTTPS request to MyAnimeList. Sent empty response. (${e})`);
   });
 }
 
