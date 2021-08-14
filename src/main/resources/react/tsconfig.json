@@ -1,15 +1,16 @@
 {
   "compilerOptions": {
-    "target": "ES2015",
-    "module": "commonjs",
-    "strict": true,
-    "esModuleInterop": true,
-    "skipLibCheck": true,
-    "forceConsistentCasingInFileNames": true,
     "allowJs": true,
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
     "jsx": "react",
-    "outDir": "../js",
-    "noImplicitAny": false
+    "target": "ES2015",
+    "module": "ES2015",
+    "moduleResolution": "node",
+    "noImplicitAny": false,
+    "outDir": "../static/js",
+    "sourceMap": true
   },
   "include": [
     "*.tsx"
