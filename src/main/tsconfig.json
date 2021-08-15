@@ -2,6 +2,7 @@
   "compilerOptions": {
     "allowJs": true,
     "allowSyntheticDefaultImports": true,
+    "allowUmdGlobalAccess": true,
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
     "jsx": "react",
@@ -9,11 +10,11 @@
     "module": "ES2015",
     "moduleResolution": "node",
     "noImplicitAny": false,
-    "outDir": "../static/js",
+    "outDir": "resources/static/js",
     "sourceMap": true
   },
   "include": [
-    "*.tsx"
+    "react/*.tsx"
   ],
   "$schema": "https://json.schemastore.org/tsconfig",
   "display": "Recommended"
