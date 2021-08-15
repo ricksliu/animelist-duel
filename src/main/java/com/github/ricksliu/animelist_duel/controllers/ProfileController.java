@@ -1,4 +1,4 @@
-package com.github.ricksliu.animelist_duel;
+package com.github.ricksliu.animelist_duel.controllers;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
