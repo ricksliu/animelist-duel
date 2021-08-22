@@ -1,22 +1,22 @@
 import axios from 'axios';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
+//
 import { Button } from '@material-ui/core';
+//
+import { User } from "./definitions.ts";
 
 declare const baseUrl: string;
 
-class Index extends React.Component {
-  constructor(props) {
-    super(props);
+const Index = (props: any) => {
+  const [users, setUsers] = React.useState(
+    null as User[]
+  );
 
-    this.state = {
-      value: null,
-    };
-  }
-
-  onGetUser() {
+  const onGetUser = () => {
     axios.get(`${baseUrl}/getuser`, {
         params: {
+          animeWebsite: 'MAL',
           username: 'derpmachine'
         }
       })
@@ -24,17 +24,15 @@ class Index extends React.Component {
         console.log(response.data);
       })
       .catch(function (error) {
-        alert(error);
+        console.log(error);
       });
   }
 
-  render() {
-    return <>
-      <Button onClick={() => this.onGetUser()} variant="contained" color="primary">
-        GetUser
-      </Button>
-    </>;
-  }
+  return <>
+    <Button onClick={() => onGetUser()} variant="contained" color="primary">
+      GetUser
+    </Button>
+  </>;
 }
 
 ReactDOM.render(

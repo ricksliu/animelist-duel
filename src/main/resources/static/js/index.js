@@ -100,32 +100,27 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
+//
 
-class Index extends react__WEBPACK_IMPORTED_MODULE_1__["Component"] {
-    constructor(props) {
-        super(props);
-        this.state = {
-            value: null,
-        };
-    }
-    onGetUser() {
+const Index = (props) => {
+    const [users, setUsers] = react__WEBPACK_IMPORTED_MODULE_1__["useState"](null);
+    const onGetUser = () => {
         axios__WEBPACK_IMPORTED_MODULE_0___default.a.get(`${baseUrl}/getuser`, {
             params: {
+                animeWebsite: 'MAL',
                 username: 'derpmachine'
             }
         })
             .then(function (response) {
-            console.log(response);
+            console.log(response.data);
         })
             .catch(function (error) {
-            alert(error);
+            console.log(error);
         });
-    }
-    render() {
-        return react__WEBPACK_IMPORTED_MODULE_1__["createElement"](react__WEBPACK_IMPORTED_MODULE_1__["Fragment"], null,
-            react__WEBPACK_IMPORTED_MODULE_1__["createElement"](_material_ui_core__WEBPACK_IMPORTED_MODULE_3__["Button"], { onClick: () => this.onGetUser(), variant: "contained", color: "primary" }, "GetUser"));
-    }
-}
+    };
+    return react__WEBPACK_IMPORTED_MODULE_1__["createElement"](react__WEBPACK_IMPORTED_MODULE_1__["Fragment"], null,
+        react__WEBPACK_IMPORTED_MODULE_1__["createElement"](_material_ui_core__WEBPACK_IMPORTED_MODULE_3__["Button"], { onClick: () => onGetUser(), variant: "contained", color: "primary" }, "GetUser"));
+};
 react_dom__WEBPACK_IMPORTED_MODULE_2__["render"](react__WEBPACK_IMPORTED_MODULE_1__["createElement"](Index, null), document.getElementById('react-root'));
 
 
