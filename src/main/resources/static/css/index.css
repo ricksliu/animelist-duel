@@ -1,3 +1,15 @@
+.index_ {
+  text-align: center;
+}
 
+.user_tile_ {
+  display: inline-block;
+  margin: 12px;
+  padding: 12px;
+  text-align: center;
+}
+.user_tile_ .button_ {
+  margin-top: 23px;
+}
 
 /*# sourceMappingURL=index.css.map */
