@@ -1,5 +1,11 @@
 .index_ {
   text-align: center;
+
+  .user_tiles_ {
+  }
+
+  .user_stats_ {
+  }
 }
 
 .user_tile_ {
@@ -10,5 +16,27 @@
 
   .button_ {
     margin-top: 23px;
+  }
+}
+
+.user_stat_ {
+  margin: 12px;
+
+  .label_ {
+    padding: 12px 0;
+  }
+
+  .bar_ {
+    display: inline-block;
+    width: 100%;
+
+    .bar_section_ {
+      display: inline-block;
+      padding: 12px 0;
+
+      .stat_ {
+        z-index: 100;
+      }
+    }
   }
 }

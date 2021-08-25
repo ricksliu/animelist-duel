@@ -29897,29 +29897,52 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var _material_ui_core__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(11);
 /* harmony import */ var _UserTile_tsx__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(493);
+/* harmony import */ var _UserStat_tsx__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(526);
 
 //
+
 
 
 const numUsers = 3;
 const Index = (props) => {
     const [users, setUsers] = react__WEBPACK_IMPORTED_MODULE_0__["useState"](null);
+    const [loadedUsers, setLoadedUsers] = react__WEBPACK_IMPORTED_MODULE_0__["useState"](null);
+    const [loading, setLoading] = react__WEBPACK_IMPORTED_MODULE_0__["useState"](true);
     react__WEBPACK_IMPORTED_MODULE_0__["useEffect"](() => {
         const newUsers = [];
         for (let i = 0; i < numUsers; i++) {
             newUsers.push(null);
         }
         setUsers(newUsers);
+        setLoading(false);
     }, []);
+    react__WEBPACK_IMPORTED_MODULE_0__["useEffect"](() => {
+        if (users == null || users.filter(e => e).length == 0) {
+            setLoadedUsers(null);
+        }
+        else {
+            setLoadedUsers(users.filter(e => e));
+        }
+    }, [users]);
     const setUser = (ix, user) => {
-        const newUsers = users;
+        const newUsers = [...users];
         newUsers[ix] = user;
         setUsers(newUsers);
     };
-    if (!users) {
-        return react__WEBPACK_IMPORTED_MODULE_0__["createElement"](_material_ui_core__WEBPACK_IMPORTED_MODULE_1__["LinearProgress"], null);
-    }
-    return react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("div", { className: 'index_' }, users.map((e, ix) => react__WEBPACK_IMPORTED_MODULE_0__["createElement"](_UserTile_tsx__WEBPACK_IMPORTED_MODULE_2__["UserTile"], { key: ix, ix: ix, user: e, setUser: setUser })));
+    return react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("div", { className: 'index_' },
+        users && react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("div", { className: 'user_tiles_' }, users.map((e, ix) => react__WEBPACK_IMPORTED_MODULE_0__["createElement"](_UserTile_tsx__WEBPACK_IMPORTED_MODULE_2__["UserTile"], { key: ix, ix: ix, user: e, setLoading: setLoading, setUser: setUser }))),
+        loadedUsers && react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("div", { className: 'user_stats_' },
+            react__WEBPACK_IMPORTED_MODULE_0__["createElement"](_UserStat_tsx__WEBPACK_IMPORTED_MODULE_3__["UserStat"], { stats: loadedUsers.map(e => e.meanScore), reversed: null, label: 'Mean Score', usernames: loadedUsers.map(e => e.username) }),
+            react__WEBPACK_IMPORTED_MODULE_0__["createElement"](_UserStat_tsx__WEBPACK_IMPORTED_MODULE_3__["UserStat"], { stats: loadedUsers.map(e => e.daysWatched), reversed: false, label: 'Days Watched', usernames: loadedUsers.map(e => e.username) }),
+            react__WEBPACK_IMPORTED_MODULE_0__["createElement"](_UserStat_tsx__WEBPACK_IMPORTED_MODULE_3__["UserStat"], { stats: loadedUsers.map(e => e.episodesWatched), reversed: false, label: 'Episodes Watched', usernames: loadedUsers.map(e => e.username) }),
+            react__WEBPACK_IMPORTED_MODULE_0__["createElement"](_UserStat_tsx__WEBPACK_IMPORTED_MODULE_3__["UserStat"], { stats: loadedUsers.map(e => e.entriesTotal), reversed: false, label: 'Total Entries', usernames: loadedUsers.map(e => e.username) }),
+            react__WEBPACK_IMPORTED_MODULE_0__["createElement"](_UserStat_tsx__WEBPACK_IMPORTED_MODULE_3__["UserStat"], { stats: loadedUsers.map(e => e.entriesCompleted), reversed: false, label: 'Completed', usernames: loadedUsers.map(e => e.username) }),
+            react__WEBPACK_IMPORTED_MODULE_0__["createElement"](_UserStat_tsx__WEBPACK_IMPORTED_MODULE_3__["UserStat"], { stats: loadedUsers.map(e => e.entriesWatching), reversed: false, label: 'Watching', usernames: loadedUsers.map(e => e.username) }),
+            react__WEBPACK_IMPORTED_MODULE_0__["createElement"](_UserStat_tsx__WEBPACK_IMPORTED_MODULE_3__["UserStat"], { stats: loadedUsers.map(e => e.entriesOnHold), reversed: true, label: 'On Hold', usernames: loadedUsers.map(e => e.username) }),
+            react__WEBPACK_IMPORTED_MODULE_0__["createElement"](_UserStat_tsx__WEBPACK_IMPORTED_MODULE_3__["UserStat"], { stats: loadedUsers.map(e => e.entriesDropped), reversed: true, label: 'Dropped', usernames: loadedUsers.map(e => e.username) }),
+            react__WEBPACK_IMPORTED_MODULE_0__["createElement"](_UserStat_tsx__WEBPACK_IMPORTED_MODULE_3__["UserStat"], { stats: loadedUsers.map(e => e.entriesPlanToWatch), reversed: true, label: 'Plan to Watch', usernames: loadedUsers.map(e => e.username) }),
+            react__WEBPACK_IMPORTED_MODULE_0__["createElement"](_UserStat_tsx__WEBPACK_IMPORTED_MODULE_3__["UserStat"], { stats: loadedUsers.map(e => e.entriesRewatched), reversed: false, label: 'Rewatched', usernames: loadedUsers.map(e => e.username) })),
+        (!users || loading) && react__WEBPACK_IMPORTED_MODULE_0__["createElement"](_material_ui_core__WEBPACK_IMPORTED_MODULE_1__["LinearProgress"], null));
 };
 
 
@@ -79838,26 +79861,32 @@ __webpack_require__.r(__webpack_exports__);
 const UserTile = (props) => {
     const [username, setUsername] = react__WEBPACK_IMPORTED_MODULE_1__["useState"]('');
     const onGetUser = () => {
+        props.setLoading(true);
         axios__WEBPACK_IMPORTED_MODULE_0___default.a.get(`${baseUrl}/getuser`, {
             params: {
                 animeWebsite: 'MAL',
                 username: username
             }
         })
-            .then(function (response) {
+            .then((response) => {
             const user = response.data;
             props.setUser(props.ix, user);
         })
-            .catch(function (error) {
+            .catch((error) => {
             alert(error);
+        }).finally(() => {
+            props.setLoading(false);
         });
     };
     return react__WEBPACK_IMPORTED_MODULE_1__["createElement"](_material_ui_core__WEBPACK_IMPORTED_MODULE_2__["Paper"], { className: 'user_tile_', elevation: 3 },
-        react__WEBPACK_IMPORTED_MODULE_1__["createElement"](_material_ui_core__WEBPACK_IMPORTED_MODULE_2__["TextField"], { value: username, onChange: e => setUsername(e.target.value), label: 'Username', size: 'small', margin: 'dense', InputLabelProps: {
+        react__WEBPACK_IMPORTED_MODULE_1__["createElement"](_material_ui_core__WEBPACK_IMPORTED_MODULE_2__["TextField"], { value: username, onChange: e => setUsername(e.target.value), onKeyUp: e => { if (e.key == 'Enter') {
+                onGetUser();
+            } }, label: 'Username', size: 'small', margin: 'dense', InputLabelProps: {
                 shrink: true
             } }),
-        react__WEBPACK_IMPORTED_MODULE_1__["createElement"](_material_ui_core__WEBPACK_IMPORTED_MODULE_2__["IconButton"], { className: 'button_', onClick: () => onGetUser(), size: 'small', color: 'primary' },
-            react__WEBPACK_IMPORTED_MODULE_1__["createElement"](_material_ui_icons_Search__WEBPACK_IMPORTED_MODULE_3___default.a, null)));
+        react__WEBPACK_IMPORTED_MODULE_1__["createElement"](_material_ui_core__WEBPACK_IMPORTED_MODULE_2__["Tooltip"], { title: 'Search' },
+            react__WEBPACK_IMPORTED_MODULE_1__["createElement"](_material_ui_core__WEBPACK_IMPORTED_MODULE_2__["IconButton"], { className: 'button_', onClick: () => onGetUser(), size: 'small', color: 'primary' },
+                react__WEBPACK_IMPORTED_MODULE_1__["createElement"](_material_ui_icons_Search__WEBPACK_IMPORTED_MODULE_3___default.a, null))));
 };
 
 
@@ -81892,6 +81921,40 @@ Object.defineProperty(exports, "default", {
 });
 
 var _utils = __webpack_require__(162);
+
+/***/ }),
+/* 526 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "UserStat", function() { return UserStat; });
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(1);
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _material_ui_core__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(11);
+
+//
+
+//
+const UserStat = (props) => {
+    const total = props.reversed ? props.stats.reduce((a, b) => a + 1.0 / (b + 1.0), 0.0) : props.stats.reduce((a, b) => a + b, 0.0);
+    const getWidth = (stat) => {
+        switch (props.reversed) {
+            case false:
+                return 100.0 * stat / total;
+            case true:
+                return 100.0 * (1.0 / (stat + 1.0)) / total;
+            default:
+                return 100.0 / props.stats.length;
+        }
+    };
+    return react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("div", { className: 'user_stat_' },
+        react__WEBPACK_IMPORTED_MODULE_0__["createElement"](_material_ui_core__WEBPACK_IMPORTED_MODULE_1__["Typography"], { className: 'label_' }, props.label),
+        react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("div", { className: 'bar_' }, props.stats.map((e, ix) => react__WEBPACK_IMPORTED_MODULE_0__["createElement"](_material_ui_core__WEBPACK_IMPORTED_MODULE_1__["Tooltip"], { key: ix, title: `${props.usernames[ix]}'s ${props.label}': ${e}` },
+            react__WEBPACK_IMPORTED_MODULE_0__["createElement"](_material_ui_core__WEBPACK_IMPORTED_MODULE_1__["Paper"], { className: 'bar_section_', elevation: 3, style: { width: `${getWidth(e)}%` } },
+                react__WEBPACK_IMPORTED_MODULE_0__["createElement"](_material_ui_core__WEBPACK_IMPORTED_MODULE_1__["Typography"], { className: 'stat_' }, e))))));
+};
+
 
 /***/ })
 /******/ ]);

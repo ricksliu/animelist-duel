@@ -1,7 +1,6 @@
 .index_ {
   text-align: center;
 }
-
 .user_tile_ {
   display: inline-block;
   margin: 12px;
@@ -10,6 +9,24 @@
 }
 .user_tile_ .button_ {
   margin-top: 23px;
+}
+
+.user_stat_ {
+  margin: 12px;
+}
+.user_stat_ .label_ {
+  padding: 12px 0;
+}
+.user_stat_ .bar_ {
+  display: inline-block;
+  width: 100%;
+}
+.user_stat_ .bar_ .bar_section_ {
+  display: inline-block;
+  padding: 12px 0;
+}
+.user_stat_ .bar_ .bar_section_ .stat_ {
+  z-index: 100;
 }
 
 /*# sourceMappingURL=index.css.map */
