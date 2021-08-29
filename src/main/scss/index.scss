@@ -1,29 +1,48 @@
 .index_ {
-  text-align: center;
+  .header_ {
+    padding: 12px 0;
+    text-align: center;
+    color: white;
+  }
 
   .user_tiles_ {
+    padding: 20px 0 12px;
+    text-align: center;
   }
 
   .user_stats_ {
+    padding: 12px;
+    text-align: center;
   }
 }
 
 .user_tile_ {
   display: inline-block;
-  margin: 12px;
+  vertical-align: top;
+  height: 156.2px;
+  margin: 0 6px 0;
   padding: 12px;
   text-align: center;
+
+  .text_field_ {
+    width: 180px;
+  }
 
   .button_ {
     margin-top: 23px;
   }
+
+  .profile_photo_ {
+    margin: 12px 0 0;
+    height: 64px;
+  }
 }
 
 .user_stat_ {
-  margin: 12px;
+  padding: 12px 0 0;
 
   .label_ {
-    padding: 12px 0;
+    padding: 0 0 6px;
   }
 
   .bar_ {
@@ -32,9 +51,10 @@
 
     .bar_section_ {
       display: inline-block;
-      padding: 12px 0;
 
       .stat_ {
+        padding: 12px 0;
+        text-align: center;
         z-index: 100;
       }
     }

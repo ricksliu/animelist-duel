@@ -1,3 +1,8 @@
 export enum AnimeWebsite {
-  MAL
+  MAL,
+}
+
+export enum Theme {
+  None,
+  MAL,
 }

@@ -1,13 +1,15 @@
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 //
-import { LinearProgress } from '@material-ui/core';
+import { IconButton, LinearProgress, Tooltip, Typography } from '@material-ui/core';
+import AddIcon from '@material-ui/icons/Add';
 //
-import { User } from "./definitions.ts";
+import { Theme } from "./enums.ts";
+import { getTheme, ThemeStyle, User, userStatInfo } from "./definitions.ts";
 import { UserTile } from "./UserTile.tsx";
 import { UserStat } from "./UserStat.tsx";
 
-const numUsers = 3;
+const initialUserTiles = 1;
 
 export const Index = (props: any) => {
   const [users, setUsers] = React.useState(null as User[]);
@@ -16,7 +18,7 @@ export const Index = (props: any) => {
 
   React.useEffect(() => {
     const newUsers = [];
-    for (let i = 0; i < numUsers; i++) {
+    for (let i = 0; i < initialUserTiles; i++) {
       newUsers.push(null);
     }
     setUsers(newUsers);
@@ -31,28 +33,68 @@ export const Index = (props: any) => {
     }
   }, [users]);
 
+  const theme = (variant: number = 3) => {
+    return getTheme(Theme.MAL, variant);
+  }
+
   const setUser = (ix: number, user: User) => {
     const newUsers = [...users];
     newUsers[ix] = user;
     setUsers(newUsers);
   }
 
+  const deleteUser = (ix: number) => {
+    const newUsers = [...users];
+    newUsers.splice(ix, 1);
+    setUsers(newUsers);
+  }
+
   return <div className='index_'>
+    <div className='header_' style={{ ...theme(0) }}>
+      <Typography variant='h2' style={{ ...theme(0) }}>
+        AnimeList Duel
+      </Typography>
+      <Typography variant='body1' style={{ ...theme(0) }}>
+        "Only the dead have seen the end of anime." —Sun Tzu
+      </Typography>
+    </div>
+
+    {(!users || loading) ? <LinearProgress /> : <div style={{ height: '4px' }} />}
+
     {users && <div className='user_tiles_'>
-      {users.map((e, ix) => <UserTile key={ix} ix={ix} user={e} setLoading={setLoading} setUser={setUser} />)}
+      {users.map((e, ix) => <UserTile
+        key={ix}
+        ix={ix}
+        user={e}
+        setLoading={setLoading}
+        setUser={setUser}
+        deleteUser={deleteUser}
+        theme={theme}
+      />)}
+      <Tooltip title='Add User'><IconButton
+        onClick={() => setUsers([ ...users, null ])}
+        size='small'
+        color='primary'
+      >
+        <AddIcon />
+      </IconButton></Tooltip>
     </div>}
+
     {loadedUsers && <div className='user_stats_'>
-      <UserStat stats={loadedUsers.map(e => e.meanScore)} reversed={null} label='Mean Score' usernames={loadedUsers.map(e => e.username)} />
-      <UserStat stats={loadedUsers.map(e => e.daysWatched)} reversed={false} label='Days Watched' usernames={loadedUsers.map(e => e.username)} />
-      <UserStat stats={loadedUsers.map(e => e.episodesWatched)} reversed={false} label='Episodes Watched' usernames={loadedUsers.map(e => e.username)} />
-      <UserStat stats={loadedUsers.map(e => e.entriesTotal)} reversed={false} label='Total Entries' usernames={loadedUsers.map(e => e.username)} />
-      <UserStat stats={loadedUsers.map(e => e.entriesCompleted)} reversed={false} label='Completed' usernames={loadedUsers.map(e => e.username)} />
-      <UserStat stats={loadedUsers.map(e => e.entriesWatching)} reversed={false} label='Watching' usernames={loadedUsers.map(e => e.username)} />
-      <UserStat stats={loadedUsers.map(e => e.entriesOnHold)} reversed={true} label='On Hold' usernames={loadedUsers.map(e => e.username)} />
-      <UserStat stats={loadedUsers.map(e => e.entriesDropped)} reversed={true} label='Dropped' usernames={loadedUsers.map(e => e.username)} />
-      <UserStat stats={loadedUsers.map(e => e.entriesPlanToWatch)} reversed={true} label='Plan to Watch' usernames={loadedUsers.map(e => e.username)} />
-      <UserStat stats={loadedUsers.map(e => e.entriesRewatched)} reversed={false} label='Rewatched' usernames={loadedUsers.map(e => e.username)} />
+      <Typography variant='h4' style={{ ...theme(1) }}>
+        Stat Face-Off
+      </Typography>
+      <Typography variant='caption' style={{ ...theme(1) }}>
+        Objectively determining your power levels.
+      </Typography>
+      {userStatInfo.map((e, ix) => <UserStat
+        key={ix}
+        stats={loadedUsers.map(f => f[e.name])}
+        label={e.label}
+        reversed={e.reversed}
+        usernames={loadedUsers.map(e => e.username)}
+        theme={theme}
+      />)}
     </div>}
-    {(!users || loading) && <LinearProgress />}
   </div>;
 }
