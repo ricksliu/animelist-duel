@@ -6,7 +6,7 @@
   }
 
   .user_tiles_ {
-    padding: 20px 0 12px;
+    padding: 20px 0 0;
     text-align: center;
   }
 
@@ -25,7 +25,7 @@
   display: inline-block;
   vertical-align: top;
   height: 156.2px;
-  margin: 0 6px 0;
+  margin: 0 6px 6px;
   padding: 12px;
   text-align: center;
 
@@ -74,19 +74,26 @@
     padding: 0 0 6px;
   }
 
-  .image_outer_ {
-    width: 50%;
+  .scores_ {
+    display: inline-block;
+    width: 40%;
+    padding-right: 3px;
+    text-align: right;
+    vertical-align: middle;
 
-    .image_ {
-      height: 128px;
+    .score_ {
     }
   }
 
-  .scores_ {
-    width: 50%;
+  .image_outer_ {
+    display: inline-block;
+    width: 40%;
+    padding-left: 3px;
+    text-align: left;
+    vertical-align: middle;
 
-    .score_ {
-      width: 100%;
+    .image_ {
+      height: 256px;
     }
   }
 }

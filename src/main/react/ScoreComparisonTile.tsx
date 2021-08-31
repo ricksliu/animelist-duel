@@ -1,8 +1,7 @@
-import axios from 'axios';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 //
-import { Paper, Tooltip, Typography } from '@material-ui/core';
+import { Tooltip, Typography } from '@material-ui/core';
 //
 import { ScoreComparison, ScoreComparisonScore, siteGreen, siteGreyDark, siteRed, ThemeStyle } from "./definitions.ts";
 
@@ -25,17 +24,19 @@ export const ScoreComparisonTile = (props: { info: ScoreComparison, theme: Funct
       {props.info.name}
     </Typography>
 
-    <div className='image_outer_'>
-      <img className='image_' src={props.info.image} /> : <div className='image_' />
-    </div>
     <div className='scores_'>
-      {props.info.scores.map((e, ix) => <Typography
+      {props.info.scores.sort((a, b) => b.score - a.score).map((e, ix) => <Typography
+        key={ix}
         className='score_'
-        variant='body1'
-        style={{ ...props.theme(), color: getColour(ix) }}
+        variant='h6'
+        style={{ ...props.theme(1), color: getColour(ix) }}
       >
-        {`${e.userId}: ${e.score}`}
+        {`${e.username}: ${e.score}/10`}
       </Typography>)}
+    </div>
+
+    <div className='image_outer_'>
+      <img className='image_' src={props.info.image} />
     </div>
   </div>;
 }

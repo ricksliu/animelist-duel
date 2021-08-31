@@ -1,8 +1,7 @@
-import axios from 'axios';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 //
-import { Paper, Tooltip, Typography } from '@material-ui/core';
+import { Tooltip, Typography } from '@material-ui/core';
 //
 import { siteGreen, siteGreyDark, siteGreyLight, siteRed, ThemeStyle } from "./definitions.ts";
 
@@ -26,7 +25,7 @@ export const UserStat = (props: { stats: number[], reversed: boolean, label: str
   const getColour = (ix: number) => {
     if (props.stats.length == 2) {
       if (props.reversed == null || props.stats[0] == props.stats[1]) {
-        return siteGreyDark;
+        return ix % 2 == 1 ? siteGreyDark : siteGreyLight;
       }
       if (props.stats[ix] > props.stats[1 - ix]) {
         return props.reversed ? siteRed : siteGreen;
@@ -42,15 +41,14 @@ export const UserStat = (props: { stats: number[], reversed: boolean, label: str
     </Typography>
 
     <div className='bar_'>
-      {props.stats.map((e, ix) => <Tooltip key={ix} title={`${props.usernames[ix]}'s ${props.label}: ${e}`}><Paper
+      {props.stats.map((e, ix) => <Tooltip key={ix} title={`${props.usernames[ix]}'s ${props.label}: ${e}`}><div
         className='bar_section_'
-        elevation={3}
         style={{ width: `${getWidth(e)}%` }}
       >
-        <Typography className='stat_' variant='body1' style={{ ...props.theme(2), backgroundColor: getColour(ix) }}>
+        <Typography className='stat_' variant='h6' style={{ ...props.theme(0), backgroundColor: getColour(ix) }}>
           {e}
         </Typography>
-      </Paper></Tooltip>)}
+      </div></Tooltip>)}
     </div>
   </div>;
 }

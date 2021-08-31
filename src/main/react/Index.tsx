@@ -11,19 +11,19 @@ import { UserStat } from "./UserStat.tsx";
 import { ScoreComparisonTile } from "./ScoreComparisonTile.tsx";
 
 declare const baseUrl: string;
-
-const initialUserTiles = 1;
-const numScoreComparisons = 3;
+declare const initialUsers: number;
+declare const maxScoreComparisons: number;
+declare const maxUsers: number;
 
 export const Index = (props: any) => {
   const [loading, setLoading] = React.useState(true);
   const [users, setUsers] = React.useState(null as User[]);
   const [loadedUsers, setLoadedUsers] = React.useState(null as User[]);
-  const [scoreComparisons, setScoreComparisons] = React.useState(null as ScoreComparison[]);
+  const [scoreComparisons, setScoreComparisons] = React.useState([] as ScoreComparison[]);
 
   React.useEffect(() => {
     const newUsers = [];
-    for (let i = 0; i < initialUserTiles; i++) {
+    for (let i = 0; i < initialUsers; i++) {
       newUsers.push(null);
     }
     setUsers(newUsers);
@@ -44,42 +44,46 @@ export const Index = (props: any) => {
 
   const getUser = (ix: number, username: string) => {
     setLoading(true);
+    const usernames = loadedUsers ? loadedUsers.map(e => e.username).filter(e => (!users[ix] || e != users[ix].username) && e.toLowerCase() != username.toLowerCase()) : null;
     axios.post(`${baseUrl}/getuser`, {
         animeWebsite: 'MAL',
         username: username,
-        usernames: loadedUsers ? loadedUsers.map(e => e.username) : null
+        usernames: usernames
       })
       .then((response) => {
         const newUsers = [...users];
         newUsers[ix] = response.data.user as User;
         setUsers(newUsers);
-        setScoreComparisons(response.data.scoreComparisons);
+        if (response.data.scoreComparisons) {
+          setScoreComparisons([...scoreComparisons, ...response.data.scoreComparisons]);
+        }
       })
       .catch((error) => {
-        alert('Could not find user.');
+        alert(`Error: ${error}`);
       }).finally(() => {
         setLoading(false);
       });
   }
 
   const deleteUser = (ix: number) => {
+    const newScoreComparisons = [...scoreComparisons].filter(e => !e.scores.map(f => f.username).includes(users[ix].username));
+    setScoreComparisons(newScoreComparisons);
+
     const newUsers = [...users];
     newUsers.splice(ix, 1);
     setUsers(newUsers);
-
-    //delete score comparisons
   }
 
-  const getScoreComparisons = () => {
-    const diffs = scoreComparisons.map(e => Math.max(...e.scores.map(e => e.score)) - Math.min(...e.scores.map(e => e.score)));
+  const getFilteredScoreComparisons = () => {
+    const diffs = scoreComparisons.map(e => Math.max(...e.scores.map(f => f.score)) - Math.min(...e.scores.map(f => f.score)));
     let diff = 10;
 
     let filteredScoreComparisons = [];
-    while (filteredScoreComparisons.length < Math.min(scoreComparisons.length, numScoreComparisons)) {
+    while (filteredScoreComparisons.length < Math.min(scoreComparisons.length, maxScoreComparisons)) {
       for (let i = 0; i < scoreComparisons.length; i++) {
         if (diffs[i] == diff) {
           filteredScoreComparisons.push(scoreComparisons[i]);
-          if (filteredScoreComparisons.length < Math.min(scoreComparisons.length, numScoreComparisons)) {
+          if (filteredScoreComparisons.length >= Math.min(scoreComparisons.length, maxScoreComparisons)) {
             break;
           }
         }
@@ -111,13 +115,13 @@ export const Index = (props: any) => {
         deleteUser={deleteUser}
         theme={theme}
       />)}
-      <Tooltip title='Add User'><IconButton
+      {users.length < maxUsers && <Tooltip title='Add User'><IconButton
         onClick={() => setUsers([ ...users, null ])}
         size='small'
         color='primary'
       >
         <AddIcon />
-      </IconButton></Tooltip>
+      </IconButton></Tooltip>}
     </div>}
 
     {loadedUsers && <div className='user_stats_'>
@@ -137,14 +141,14 @@ export const Index = (props: any) => {
       />)}
     </div>}
 
-    {scoreComparisons && <div className='score_comparisons_'>
+    {scoreComparisons && scoreComparisons.length > 0 && <div className='score_comparisons_'>
       <Typography variant='h4' style={{ ...theme(1) }}>
         Opinion Clash
       </Typography>
       <Typography variant='caption' style={{ ...theme(1) }}>
         "Your Opinion Is Wrong As I Expected"
       </Typography>
-      {getScoreComparisons().map((e, ix) => <ScoreComparisonTile
+      {getFilteredScoreComparisons().map((e, ix) => <ScoreComparisonTile
         key={ix}
         info={e}
         theme={theme}

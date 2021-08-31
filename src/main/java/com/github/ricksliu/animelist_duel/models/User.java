@@ -8,8 +8,8 @@ public class User {
     private String username;
     private Date lastUpdated;
     private String profilePhoto;
-    private Double daysWatched;
-    private Double meanScore;
+    private double daysWatched;
+    private double meanScore;
     private int entriesWatching;
     private int entriesCompleted;
     private int entriesOnHold;
@@ -59,19 +59,19 @@ public class User {
         this.profilePhoto = profilePhoto;
     }
 
-    public Double getDaysWatched() {
+    public double getDaysWatched() {
         return daysWatched;
     }
 
-    public void setDaysWatched(Double daysWatched) {
+    public void setDaysWatched(double daysWatched) {
         this.daysWatched = daysWatched;
     }
 
-    public Double getMeanScore() {
+    public double getMeanScore() {
         return meanScore;
     }
 
-    public void setMeanScore(Double meanScore) {
+    public void setMeanScore(double meanScore) {
         this.meanScore = meanScore;
     }
 

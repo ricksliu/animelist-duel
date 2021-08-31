@@ -29914,16 +29914,14 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
-const initialUserTiles = 1;
-const numScoreComparisons = 3;
 const Index = (props) => {
     const [loading, setLoading] = react__WEBPACK_IMPORTED_MODULE_1__["useState"](true);
     const [users, setUsers] = react__WEBPACK_IMPORTED_MODULE_1__["useState"](null);
     const [loadedUsers, setLoadedUsers] = react__WEBPACK_IMPORTED_MODULE_1__["useState"](null);
-    const [scoreComparisons, setScoreComparisons] = react__WEBPACK_IMPORTED_MODULE_1__["useState"](null);
+    const [scoreComparisons, setScoreComparisons] = react__WEBPACK_IMPORTED_MODULE_1__["useState"]([]);
     react__WEBPACK_IMPORTED_MODULE_1__["useEffect"](() => {
         const newUsers = [];
-        for (let i = 0; i < initialUserTiles; i++) {
+        for (let i = 0; i < initialUsers; i++) {
             newUsers.push(null);
         }
         setUsers(newUsers);
@@ -29942,37 +29940,42 @@ const Index = (props) => {
     };
     const getUser = (ix, username) => {
         setLoading(true);
+        const usernames = loadedUsers ? loadedUsers.map(e => e.username).filter(e => (!users[ix] || e != users[ix].username) && e.toLowerCase() != username.toLowerCase()) : null;
         axios__WEBPACK_IMPORTED_MODULE_0___default.a.post(`${baseUrl}/getuser`, {
             animeWebsite: 'MAL',
             username: username,
-            usernames: loadedUsers ? loadedUsers.map(e => e.username) : null,
+            usernames: usernames
         })
             .then((response) => {
-            const user = response.data.user;
             const newUsers = [...users];
-            newUsers[ix] = user;
+            newUsers[ix] = response.data.user;
             setUsers(newUsers);
+            if (response.data.scoreComparisons) {
+                setScoreComparisons([...scoreComparisons, ...response.data.scoreComparisons]);
+            }
         })
             .catch((error) => {
-            alert('Could not find user.');
+            alert(`Error: ${error}`);
         }).finally(() => {
             setLoading(false);
         });
     };
     const deleteUser = (ix) => {
+        const newScoreComparisons = [...scoreComparisons].filter(e => !e.scores.map(f => f.username).includes(users[ix].username));
+        setScoreComparisons(newScoreComparisons);
         const newUsers = [...users];
         newUsers.splice(ix, 1);
         setUsers(newUsers);
     };
-    const getScoreComparisons = () => {
-        const diffs = scoreComparisons.map(e => Math.max(...e.scores.map(e => e.score)) - Math.min(...e.scores.map(e => e.score)));
+    const getFilteredScoreComparisons = () => {
+        const diffs = scoreComparisons.map(e => Math.max(...e.scores.map(f => f.score)) - Math.min(...e.scores.map(f => f.score)));
         let diff = 10;
         let filteredScoreComparisons = [];
-        while (filteredScoreComparisons.length < Math.min(scoreComparisons.length, numScoreComparisons)) {
+        while (filteredScoreComparisons.length < Math.min(scoreComparisons.length, maxScoreComparisons)) {
             for (let i = 0; i < scoreComparisons.length; i++) {
                 if (diffs[i] == diff) {
                     filteredScoreComparisons.push(scoreComparisons[i]);
-                    if (filteredScoreComparisons.length < Math.min(scoreComparisons.length, numScoreComparisons)) {
+                    if (filteredScoreComparisons.length >= Math.min(scoreComparisons.length, maxScoreComparisons)) {
                         break;
                     }
                 }
@@ -29988,17 +29991,17 @@ const Index = (props) => {
         (!users || loading) ? react__WEBPACK_IMPORTED_MODULE_1__["createElement"](_material_ui_core__WEBPACK_IMPORTED_MODULE_2__["LinearProgress"], null) : react__WEBPACK_IMPORTED_MODULE_1__["createElement"]("div", { style: { height: '4px' } }),
         users && react__WEBPACK_IMPORTED_MODULE_1__["createElement"]("div", { className: 'user_tiles_' },
             users.map((e, ix) => react__WEBPACK_IMPORTED_MODULE_1__["createElement"](_UserTile_tsx__WEBPACK_IMPORTED_MODULE_5__["UserTile"], { key: ix, ix: ix, user: e, getUser: getUser, deleteUser: deleteUser, theme: theme })),
-            react__WEBPACK_IMPORTED_MODULE_1__["createElement"](_material_ui_core__WEBPACK_IMPORTED_MODULE_2__["Tooltip"], { title: 'Add User' },
+            users.length < maxUsers && react__WEBPACK_IMPORTED_MODULE_1__["createElement"](_material_ui_core__WEBPACK_IMPORTED_MODULE_2__["Tooltip"], { title: 'Add User' },
                 react__WEBPACK_IMPORTED_MODULE_1__["createElement"](_material_ui_core__WEBPACK_IMPORTED_MODULE_2__["IconButton"], { onClick: () => setUsers([...users, null]), size: 'small', color: 'primary' },
                     react__WEBPACK_IMPORTED_MODULE_1__["createElement"](_material_ui_icons_Add__WEBPACK_IMPORTED_MODULE_3___default.a, null)))),
         loadedUsers && react__WEBPACK_IMPORTED_MODULE_1__["createElement"]("div", { className: 'user_stats_' },
             react__WEBPACK_IMPORTED_MODULE_1__["createElement"](_material_ui_core__WEBPACK_IMPORTED_MODULE_2__["Typography"], { variant: 'h4', style: Object.assign({}, theme(1)) }, "Stat Face-Off"),
             react__WEBPACK_IMPORTED_MODULE_1__["createElement"](_material_ui_core__WEBPACK_IMPORTED_MODULE_2__["Typography"], { variant: 'caption', style: Object.assign({}, theme(1)) }, "\"Starting Life From 0.0\""),
             _definitions_ts__WEBPACK_IMPORTED_MODULE_4__["userStatInfo"].map((e, ix) => react__WEBPACK_IMPORTED_MODULE_1__["createElement"](_UserStat_tsx__WEBPACK_IMPORTED_MODULE_6__["UserStat"], { key: ix, stats: loadedUsers.map(f => f[e.name]), label: e.label, reversed: e.reversed, usernames: loadedUsers.map(e => e.username), theme: theme }))),
-        scoreComparisons && react__WEBPACK_IMPORTED_MODULE_1__["createElement"]("div", { className: 'score_comparisons_' },
+        scoreComparisons && scoreComparisons.length > 0 && react__WEBPACK_IMPORTED_MODULE_1__["createElement"]("div", { className: 'score_comparisons_' },
             react__WEBPACK_IMPORTED_MODULE_1__["createElement"](_material_ui_core__WEBPACK_IMPORTED_MODULE_2__["Typography"], { variant: 'h4', style: Object.assign({}, theme(1)) }, "Opinion Clash"),
             react__WEBPACK_IMPORTED_MODULE_1__["createElement"](_material_ui_core__WEBPACK_IMPORTED_MODULE_2__["Typography"], { variant: 'caption', style: Object.assign({}, theme(1)) }, "\"Your Opinion Is Wrong As I Expected\""),
-            getScoreComparisons().map((e, ix) => react__WEBPACK_IMPORTED_MODULE_1__["createElement"](_ScoreComparisonTile_tsx__WEBPACK_IMPORTED_MODULE_7__["ScoreComparisonTile"], { key: ix, info: e, theme: theme }))));
+            getFilteredScoreComparisons().map((e, ix) => react__WEBPACK_IMPORTED_MODULE_1__["createElement"](_ScoreComparisonTile_tsx__WEBPACK_IMPORTED_MODULE_7__["ScoreComparisonTile"], { key: ix, info: e, theme: theme }))));
 };
 
 
@@ -82156,7 +82159,7 @@ const UserStat = (props) => {
     const getColour = (ix) => {
         if (props.stats.length == 2) {
             if (props.reversed == null || props.stats[0] == props.stats[1]) {
-                return _definitions_ts__WEBPACK_IMPORTED_MODULE_2__["siteGreyDark"];
+                return ix % 2 == 1 ? _definitions_ts__WEBPACK_IMPORTED_MODULE_2__["siteGreyDark"] : _definitions_ts__WEBPACK_IMPORTED_MODULE_2__["siteGreyLight"];
             }
             if (props.stats[ix] > props.stats[1 - ix]) {
                 return props.reversed ? _definitions_ts__WEBPACK_IMPORTED_MODULE_2__["siteRed"] : _definitions_ts__WEBPACK_IMPORTED_MODULE_2__["siteGreen"];
@@ -82168,8 +82171,8 @@ const UserStat = (props) => {
     return react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("div", { className: 'user_stat_' },
         react__WEBPACK_IMPORTED_MODULE_0__["createElement"](_material_ui_core__WEBPACK_IMPORTED_MODULE_1__["Typography"], { className: 'label_', variant: 'h6', style: Object.assign({}, props.theme()) }, props.label),
         react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("div", { className: 'bar_' }, props.stats.map((e, ix) => react__WEBPACK_IMPORTED_MODULE_0__["createElement"](_material_ui_core__WEBPACK_IMPORTED_MODULE_1__["Tooltip"], { key: ix, title: `${props.usernames[ix]}'s ${props.label}: ${e}` },
-            react__WEBPACK_IMPORTED_MODULE_0__["createElement"](_material_ui_core__WEBPACK_IMPORTED_MODULE_1__["Paper"], { className: 'bar_section_', elevation: 3, style: { width: `${getWidth(e)}%` } },
-                react__WEBPACK_IMPORTED_MODULE_0__["createElement"](_material_ui_core__WEBPACK_IMPORTED_MODULE_1__["Typography"], { className: 'stat_', variant: 'body1', style: Object.assign(Object.assign({}, props.theme(2)), { backgroundColor: getColour(ix) }) }, e))))));
+            react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("div", { className: 'bar_section_', style: { width: `${getWidth(e)}%` } },
+                react__WEBPACK_IMPORTED_MODULE_0__["createElement"](_material_ui_core__WEBPACK_IMPORTED_MODULE_1__["Typography"], { className: 'stat_', variant: 'h6', style: Object.assign(Object.assign({}, props.theme(0)), { backgroundColor: getColour(ix) }) }, e))))));
 };
 
 
@@ -82204,11 +82207,9 @@ const ScoreComparisonTile = (props) => {
     };
     return react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("div", { className: 'score_comparison_' },
         react__WEBPACK_IMPORTED_MODULE_0__["createElement"](_material_ui_core__WEBPACK_IMPORTED_MODULE_1__["Typography"], { className: 'label_', variant: 'h6', style: Object.assign({}, props.theme()) }, props.info.name),
+        react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("div", { className: 'scores_' }, props.info.scores.sort((a, b) => b.score - a.score).map((e, ix) => react__WEBPACK_IMPORTED_MODULE_0__["createElement"](_material_ui_core__WEBPACK_IMPORTED_MODULE_1__["Typography"], { key: ix, className: 'score_', variant: 'h6', style: Object.assign(Object.assign({}, props.theme(1)), { color: getColour(ix) }) }, `${e.username}: ${e.score}/10`))),
         react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("div", { className: 'image_outer_' },
-            react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("img", { className: 'image_', src: props.info.image }),
-            " : ",
-            react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("div", { className: 'image_' })),
-        react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("div", { className: 'scores_' }, props.info.scores.map((e, ix) => react__WEBPACK_IMPORTED_MODULE_0__["createElement"](_material_ui_core__WEBPACK_IMPORTED_MODULE_1__["Typography"], { className: 'score_', variant: 'body1', style: Object.assign(Object.assign({}, props.theme()), { color: getColour(ix) }) }, `${e.userId}: ${e.score}`))));
+            react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("img", { className: 'image_', src: props.info.image })));
 };
 
 

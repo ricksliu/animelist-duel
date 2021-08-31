@@ -73,7 +73,7 @@ export interface ScoreComparison {
 }
 
 export interface ScoreComparisonScore {
-  userId: string;
+  username: string;
   score: number;
 }
 

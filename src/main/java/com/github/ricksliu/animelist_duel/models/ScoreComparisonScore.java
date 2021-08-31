@@ -1,18 +1,23 @@
 package com.github.ricksliu.animelist_duel.models;
 
 public class ScoreComparisonScore {
-    private String userId;
-    private Double score;
+    private String username;
+    private double score;
 
-    public String getUserId() {
-        return userId;
+    public ScoreComparisonScore(String username, double score) {
+        this.username = username;
+        this.score = score;
     }
 
-    public void setUserId(String userId) {
-        this.userId = userId;
+    public String getUsername() {
+        return username;
     }
 
-    public Double getScore() {
+    public void setUsername(String userId) {
+        this.username = userId;
+    }
+
+    public double getScore() {
         return score;
     }
 

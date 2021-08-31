@@ -10,7 +10,7 @@ import java.net.http.HttpResponse;
 import java.util.Date;
 
 public class HttpUtility {
-    public static String GetHtml(String uriString) {
+    public static String getHtml(String uriString) {
         String html = "";
         try {
             URI uri = new URI(uriString);
