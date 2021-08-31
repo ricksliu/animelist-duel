@@ -1,20 +1,25 @@
+import axios from 'axios';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 //
 import { IconButton, LinearProgress, Tooltip, Typography } from '@material-ui/core';
 import AddIcon from '@material-ui/icons/Add';
 //
-import { Theme } from "./enums.ts";
-import { getTheme, ThemeStyle, User, userStatInfo } from "./definitions.ts";
+import { getTheme, ScoreComparison, Theme, ThemeStyle, User, userStatInfo } from "./definitions.ts";
 import { UserTile } from "./UserTile.tsx";
 import { UserStat } from "./UserStat.tsx";
+import { ScoreComparisonTile } from "./ScoreComparisonTile.tsx";
+
+declare const baseUrl: string;
 
 const initialUserTiles = 1;
+const numScoreComparisons = 3;
 
 export const Index = (props: any) => {
+  const [loading, setLoading] = React.useState(true);
   const [users, setUsers] = React.useState(null as User[]);
   const [loadedUsers, setLoadedUsers] = React.useState(null as User[]);
-  const [loading, setLoading] = React.useState(true);
+  const [scoreComparisons, setScoreComparisons] = React.useState(null as ScoreComparison[]);
 
   React.useEffect(() => {
     const newUsers = [];
@@ -37,16 +42,52 @@ export const Index = (props: any) => {
     return getTheme(Theme.MAL, variant);
   }
 
-  const setUser = (ix: number, user: User) => {
-    const newUsers = [...users];
-    newUsers[ix] = user;
-    setUsers(newUsers);
+  const getUser = (ix: number, username: string) => {
+    setLoading(true);
+    axios.post(`${baseUrl}/getuser`, {
+        animeWebsite: 'MAL',
+        username: username,
+        usernames: loadedUsers ? loadedUsers.map(e => e.username) : null
+      })
+      .then((response) => {
+        const newUsers = [...users];
+        newUsers[ix] = response.data.user as User;
+        setUsers(newUsers);
+        setScoreComparisons(response.data.scoreComparisons);
+      })
+      .catch((error) => {
+        alert('Could not find user.');
+      }).finally(() => {
+        setLoading(false);
+      });
   }
 
   const deleteUser = (ix: number) => {
     const newUsers = [...users];
     newUsers.splice(ix, 1);
     setUsers(newUsers);
+
+    //delete score comparisons
+  }
+
+  const getScoreComparisons = () => {
+    const diffs = scoreComparisons.map(e => Math.max(...e.scores.map(e => e.score)) - Math.min(...e.scores.map(e => e.score)));
+    let diff = 10;
+
+    let filteredScoreComparisons = [];
+    while (filteredScoreComparisons.length < Math.min(scoreComparisons.length, numScoreComparisons)) {
+      for (let i = 0; i < scoreComparisons.length; i++) {
+        if (diffs[i] == diff) {
+          filteredScoreComparisons.push(scoreComparisons[i]);
+          if (filteredScoreComparisons.length < Math.min(scoreComparisons.length, numScoreComparisons)) {
+            break;
+          }
+        }
+      }
+      diff--;
+    }
+
+    return filteredScoreComparisons;
   }
 
   return <div className='index_'>
@@ -66,8 +107,7 @@ export const Index = (props: any) => {
         key={ix}
         ix={ix}
         user={e}
-        setLoading={setLoading}
-        setUser={setUser}
+        getUser={getUser}
         deleteUser={deleteUser}
         theme={theme}
       />)}
@@ -85,7 +125,7 @@ export const Index = (props: any) => {
         Stat Face-Off
       </Typography>
       <Typography variant='caption' style={{ ...theme(1) }}>
-        Objectively determining your power levels.
+        "Starting Life From 0.0"
       </Typography>
       {userStatInfo.map((e, ix) => <UserStat
         key={ix}
@@ -93,6 +133,20 @@ export const Index = (props: any) => {
         label={e.label}
         reversed={e.reversed}
         usernames={loadedUsers.map(e => e.username)}
+        theme={theme}
+      />)}
+    </div>}
+
+    {scoreComparisons && <div className='score_comparisons_'>
+      <Typography variant='h4' style={{ ...theme(1) }}>
+        Opinion Clash
+      </Typography>
+      <Typography variant='caption' style={{ ...theme(1) }}>
+        "Your Opinion Is Wrong As I Expected"
+      </Typography>
+      {getScoreComparisons().map((e, ix) => <ScoreComparisonTile
+        key={ix}
+        info={e}
         theme={theme}
       />)}
     </div>}

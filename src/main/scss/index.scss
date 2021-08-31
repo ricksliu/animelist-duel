@@ -14,6 +14,11 @@
     padding: 12px;
     text-align: center;
   }
+
+  .score_comparisons_ {
+    padding: 12px;
+    text-align: center;
+  }
 }
 
 .user_tile_ {
@@ -55,8 +60,33 @@
       .stat_ {
         padding: 12px 0;
         text-align: center;
+        overflow: hidden;
         z-index: 100;
       }
+    }
+  }
+}
+
+.score_comparison_ {
+  padding: 12px 0 0;
+
+  .label_ {
+    padding: 0 0 6px;
+  }
+
+  .image_outer_ {
+    width: 50%;
+
+    .image_ {
+      height: 128px;
+    }
+  }
+
+  .scores_ {
+    width: 50%;
+
+    .score_ {
+      width: 100%;
     }
   }
 }

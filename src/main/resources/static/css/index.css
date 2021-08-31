@@ -11,6 +11,10 @@
   padding: 12px;
   text-align: center;
 }
+.index_ .score_comparisons_ {
+  padding: 12px;
+  text-align: center;
+}
 
 .user_tile_ {
   display: inline-block;
@@ -47,7 +51,27 @@
 .user_stat_ .bar_ .bar_section_ .stat_ {
   padding: 12px 0;
   text-align: center;
+  overflow: hidden;
   z-index: 100;
+}
+
+.score_comparison_ {
+  padding: 12px 0 0;
+}
+.score_comparison_ .label_ {
+  padding: 0 0 6px;
+}
+.score_comparison_ .image_outer_ {
+  width: 50%;
+}
+.score_comparison_ .image_outer_ .image_ {
+  height: 128px;
+}
+.score_comparison_ .scores_ {
+  width: 50%;
+}
+.score_comparison_ .scores_ .score_ {
+  width: 100%;
 }
 
 /*# sourceMappingURL=index.css.map */

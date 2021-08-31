@@ -3,6 +3,22 @@ package com.github.ricksliu.animelist_duel.models;
 import java.util.Date;
 
 public class User {
+    private Enums.AnimeWebsite animeWebsite;
+    private String userId;
+    private String username;
+    private Date lastUpdated;
+    private String profilePhoto;
+    private Double daysWatched;
+    private Double meanScore;
+    private int entriesWatching;
+    private int entriesCompleted;
+    private int entriesOnHold;
+    private int entriesDropped;
+    private int entriesPlanToWatch;
+    private int entriesTotal;
+    private int entriesRewatched;
+    private int episodesWatched;
+
     public Enums.AnimeWebsite getAnimeWebsite() {
         return animeWebsite;
     }
@@ -122,20 +138,4 @@ public class User {
     public void setEpisodesWatched(int episodesWatched) {
         this.episodesWatched = episodesWatched;
     }
-
-    private Enums.AnimeWebsite animeWebsite;
-    private String userId;
-    private String username;
-    private Date lastUpdated;
-    private String profilePhoto;
-    private Double daysWatched;
-    private Double meanScore;
-    private int entriesWatching;
-    private int entriesCompleted;
-    private int entriesOnHold;
-    private int entriesDropped;
-    private int entriesPlanToWatch;
-    private int entriesTotal;
-    private int entriesRewatched;
-    private int episodesWatched;
 }

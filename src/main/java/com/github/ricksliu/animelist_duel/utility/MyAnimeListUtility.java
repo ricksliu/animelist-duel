@@ -1,31 +1,53 @@
 package com.github.ricksliu.animelist_duel.utility;
 
 import com.github.ricksliu.animelist_duel.models.Enums;
+import com.github.ricksliu.animelist_duel.models.ScoreComparison;
 import com.github.ricksliu.animelist_duel.models.User;
 
-import java.net.URI;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
+import java.util.regex.Pattern;
 
 public class MyAnimeListUtility {
-    public static String GetProfileHTML(String username) {
-        String html = "";
-        try {
-            URI uri = new URI(String.format("https://myanimelist.net/profile/%s", username));
-            HttpClient client = HttpClient.newHttpClient();
-            HttpRequest request = HttpRequest.newBuilder().uri(uri).GET().build();
-            HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-            html = response.body();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return html;
+    private static String GetScoreComparisonHTML(String username1, String username2) {
+        String uriString = String.format("https://myanimelist.net/shared.php?u1=%s&u2=%s", username1, username2);
+        return HttpUtility.GetHtml(uriString);
     }
 
-    public static User GetUserFromHTML(String username, String html)
+    public static List<ScoreComparison> GetScoreComparisons(String username1, List<String> usernames)
     {
+        ArrayList<ScoreComparison> scoreComparisons = new ArrayList<>();
+        for (String username2 : usernames)
+        {
+            String html = GetScoreComparisonHTML(username1, username2);
+            //ScoreComparison scoreComparison = new ScoreComparison();
+
+            String regex = "\t\t<tr>\r\n" +
+                    "\t\t\t<td class=\"borderClass\".*?><a href=\"/anime/([0-9]+?)/.*?\">(.+?)</a> <a.*?</a></td>\r\n" +
+                    "\t\t\t<td class=\"borderClass\".*?><span style=.*?>([0-9]+?)</span></td>\r\n" +
+                    "\t\t\t<td class=\"borderClass\".*?><span style=.*?>([0-9]+?)</span></td>\r\n" +
+                    "\t\t\t<td class=\"borderClass\".*?>([0-9]+?)</td>\r\n" +
+                    "\t\t\t\r\n" +
+                    "\t\t</tr>";
+
+            regex = "\t\t<tr>\n" +
+                    "\t\t\t<td class=\"borderClass\" ><a href=\"/anime/5680/K-On\">K-On!</a> </td>\n" +
+                    "\t\t\t<td class=\"borderClass\"  align=\"center\"><span style=\" color: #0000FF;\">8</span></td>\n" +
+                    "\t\t\t<td class=\"borderClass\"  align=\"center\"><span style=\" color: #FF0000;\">9</span></td>\n" +
+                    "\t\t\t<td class=\"borderClass\"  align=\"center\">1</td>\n" +
+                    "\t\t\t\n" +
+                    "\t\t</tr>";
+
+            List<String> matches = StringsUtility.GetMatches(html, "<strong>Diff.</strong>", "<h2>Unique to", regex, Pattern.DOTALL);
+        }
+
+        return null;
+    }
+
+    public static User GetUser(String username)
+    {
+        String html = GetUserHTML(username);
         User user = new User();
 
         user.setAnimeWebsite(Enums.AnimeWebsite.MAL);
@@ -45,5 +67,10 @@ public class MyAnimeListUtility {
         user.setEpisodesWatched(Integer.parseInt(StringsUtility.GetMatch(html, "Episodes", "\">(.+?)<", 1).replace(",", "")));
 
         return user;
+    }
+
+    private static String GetUserHTML(String username) {
+        String uriString = String.format("https://myanimelist.net/profile/%s", username);
+        return HttpUtility.GetHtml(uriString);
     }
 }

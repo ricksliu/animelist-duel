@@ -1,4 +1,19 @@
-import { AnimeWebsite, Theme } from "./enums.ts";
+export const siteBlue = '#2E86C1';
+export const MALBlue = '#2E51A2';
+
+export const siteRed = '#EC7063';
+export const siteGreen = '#52BE80';
+export const siteGreyDark = '#BDC3C7';
+export const siteGreyLight = '#A6ACAF';
+
+export enum AnimeWebsite {
+  MAL,
+}
+
+export enum Theme {
+  None,
+  MAL,
+}
 
 export interface ThemeStyle {
   fontWeight: any;
@@ -13,16 +28,16 @@ export function getTheme(theme: Theme, variant: number = 3): ThemeStyle {
       return {
         fontWeight: ['bold', 'bold', 'normal', 'normal'][variant],
         fontFamily:  'Verdana, sans-serif',
-        color: ['white', '#2E51A2', 'white', 'black'][variant],
-        backgroundColor: ['#2E51A2', null, null, null][variant],
+        color: ['white', MALBlue, 'white', 'black'][variant],
+        backgroundColor: [MALBlue, null, null, null][variant],
       };
     case Theme.None:
     default:
       return {
         fontWeight: ['bold', 'bold', 'normal', 'normal'][variant],
         fontFamily:  'Roboto, sans-serif',
-        color: ['white', '#2E86C1', 'white', 'black'][variant],
-        backgroundColor: ['#2E86C1', null, null, null][variant],
+        color: ['white', siteBlue, 'white', 'black'][variant],
+        backgroundColor: [siteBlue, null, null, null][variant],
       };
   }
 }
@@ -49,6 +64,17 @@ export interface UserStatInfo {
   name: string;
   label: string;
   reversed: boolean;
+}
+
+export interface ScoreComparison {
+  name: string;
+  image: string;
+  scores: ScoreComparisonScore[];
+}
+
+export interface ScoreComparisonScore {
+  userId: string;
+  score: number;
 }
 
 export const userStatInfo: UserStatInfo[] = [

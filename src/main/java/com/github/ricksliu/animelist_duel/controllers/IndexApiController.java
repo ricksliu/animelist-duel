@@ -1,23 +1,30 @@
 package com.github.ricksliu.animelist_duel.controllers;
 
 import com.github.ricksliu.animelist_duel.models.Enums;
+import com.github.ricksliu.animelist_duel.models.GetUserRequest;
+import com.github.ricksliu.animelist_duel.models.ScoreComparison;
 import com.github.ricksliu.animelist_duel.models.User;
 import com.github.ricksliu.animelist_duel.utility.MyAnimeListUtility;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.*;
 
 @RestController
 public class IndexApiController {
-    @GetMapping("/getuser")
-    public User getuser(@RequestParam(name="animeWebsite", required=true) Enums.AnimeWebsite animeWebsite, @RequestParam(name="username", required=true) String username) {
-        switch (animeWebsite) {
+    @PostMapping("/getuser")
+    public Map<String, Object> getuser(@RequestBody GetUserRequest body) {
+        switch (body.getAnimeWebsite()) {
             case MAL:
-                String html = MyAnimeListUtility.GetProfileHTML(username);
-                User user = MyAnimeListUtility.GetUserFromHTML(username, html);
-                return user;
+                User user = MyAnimeListUtility.GetUser(body.getUsername());
+                List<ScoreComparison> scoreComparisons = MyAnimeListUtility.GetScoreComparisons(body.getUsername(), body.getUsernames() != null ? body.getUsernames() : new ArrayList<>() );
+
+                HashMap<String, Object> result = new HashMap<>();
+                result.put("user", user);
+                result.put("scoreComparisons", scoreComparisons);
+                return result;
+
             default:
-                return new User();
+                return null;
         }
     }
 }

@@ -4,17 +4,20 @@ import * as ReactDOM from 'react-dom';
 //
 import { Paper, Tooltip, Typography } from '@material-ui/core';
 //
-import { ThemeStyle } from "./definitions.ts";
+import { siteGreen, siteGreyDark, siteGreyLight, siteRed, ThemeStyle } from "./definitions.ts";
 
 export const UserStat = (props: { stats: number[], reversed: boolean, label: string, usernames: string[], theme: Function }) => {
-  const total = props.reversed ? props.stats.reduce((a, b) => a + 1.0 / (b + 1.0), 0.0) : props.stats.reduce((a, b) => a + b, 0.0);
+  const modifier = props.stats.length + 1.0;
+  const total = props.reversed
+    ? props.stats.reduce((a, b) => a + 1.0 / (b + modifier), 0.0)
+    : props.stats.reduce((a, b) => a + b + modifier, 0.0);
 
   const getWidth = (stat: number) => {
     switch (props.reversed) {
       case false:
-        return 100.0 * stat / total;
+        return 100.0 * (stat + modifier) / total;
       case true:
-        return 100.0 * (1.0 / (stat + 1.0)) / total;
+        return 100.0 * (1.0 / (stat + modifier)) / total;
       default:
         return 100.0 / props.stats.length;
     }
@@ -23,15 +26,14 @@ export const UserStat = (props: { stats: number[], reversed: boolean, label: str
   const getColour = (ix: number) => {
     if (props.stats.length == 2) {
       if (props.reversed == null || props.stats[0] == props.stats[1]) {
-        return '#BDC3C7';
+        return siteGreyDark;
       }
       if (props.stats[ix] > props.stats[1 - ix]) {
-        return props.reversed ? '#EC7063' : '#52BE80';
+        return props.reversed ? siteRed : siteGreen;
       }
-      return props.reversed ? '#52BE80' : '#EC7063';
+      return props.reversed ? siteGreen : siteRed;
     }
-
-    return ix % 2 == 1 ? '#BDC3C7' : '#A6ACAF';
+    return ix % 2 == 1 ? siteGreyDark : siteGreyLight;
   }
 
   return <div className='user_stat_'>
