@@ -42,13 +42,14 @@ export const Index = (props: any) => {
     return getTheme(Theme.MAL, variant);
   }
 
-  const getUser = (ix: number, username: string) => {
+  const getUser = (ix: number, username: string, update: boolean) => {
     setLoading(true);
     const usernames = loadedUsers ? loadedUsers.map(e => e.username).filter(e => (!users[ix] || e != users[ix].username) && e.toLowerCase() != username.toLowerCase()) : null;
     axios.post(`${baseUrl}/getuser`, {
         animeWebsite: 'MAL',
         username: username,
-        usernames: usernames
+        usernames: usernames,
+        update: update
       })
       .then((response) => {
         const newUsers = [...users];

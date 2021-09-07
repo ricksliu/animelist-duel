@@ -3,6 +3,7 @@ import * as ReactDOM from 'react-dom';
 //
 import { IconButton, Paper, TextField, Tooltip, Typography } from '@material-ui/core';
 import DeleteIcon from '@material-ui/icons/Delete';
+import RefreshIcon from '@material-ui/icons/Refresh';
 import SearchIcon from '@material-ui/icons/Search';
 //
 import { ThemeStyle, User } from "./definitions.ts";
@@ -26,7 +27,7 @@ export const UserTile = (props: { ix: number, user: User, getUser: Function, del
 
     <Tooltip title='Search'><IconButton
       className='button_'
-      onClick={() => props.getUser(props.ix, username)}
+      onClick={() => props.getUser(props.ix, username, false)}
       size='small'
       color='primary'
     >
@@ -44,8 +45,15 @@ export const UserTile = (props: { ix: number, user: User, getUser: Function, del
 
     <br />
     {props.user ? <img className='profile_photo_' src={props.user.profilePhoto} /> : <div className='profile_photo_' />}
-    <Typography className='last_updated_' variant='caption' display='block' style={{ ...props.theme() }}>
-      {props.user ? `Last Updated: ${props.user.lastUpdated.toString().split('T')[0]}` : ''}
+    <br />
+    <Typography className='last_updated_' variant='caption' style={{ ...props.theme() }}>
+      {props.user ? `Updated: ${props.user.lastUpdated.toString().split('.')[0].replace('T', ' ')}` : ''}
     </Typography>
+    {props.user && <Tooltip title='Update'><IconButton
+      onClick={() => props.getUser(props.ix, username, true)}
+      size='small'
+    >
+      <RefreshIcon />
+    </IconButton></Tooltip>}
   </Paper>;
 }

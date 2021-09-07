@@ -29902,8 +29902,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _material_ui_icons_Add__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(_material_ui_icons_Add__WEBPACK_IMPORTED_MODULE_3__);
 /* harmony import */ var _definitions_ts__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(525);
 /* harmony import */ var _UserTile_tsx__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(526);
-/* harmony import */ var _UserStat_tsx__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(529);
-/* harmony import */ var _ScoreComparisonTile_tsx__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(530);
+/* harmony import */ var _UserStat_tsx__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(530);
+/* harmony import */ var _ScoreComparisonTile_tsx__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(531);
 
 
 //
@@ -29938,13 +29938,14 @@ const Index = (props) => {
     const theme = (variant = 3) => {
         return Object(_definitions_ts__WEBPACK_IMPORTED_MODULE_4__["getTheme"])(_definitions_ts__WEBPACK_IMPORTED_MODULE_4__["Theme"].MAL, variant);
     };
-    const getUser = (ix, username) => {
+    const getUser = (ix, username, update) => {
         setLoading(true);
         const usernames = loadedUsers ? loadedUsers.map(e => e.username).filter(e => (!users[ix] || e != users[ix].username) && e.toLowerCase() != username.toLowerCase()) : null;
         axios__WEBPACK_IMPORTED_MODULE_0___default.a.post(`${baseUrl}/getuser`, {
             animeWebsite: 'MAL',
             username: username,
-            usernames: usernames
+            usernames: usernames,
+            update: update
         })
             .then((response) => {
             const newUsers = [...users];
@@ -82046,10 +82047,13 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _material_ui_core__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(39);
 /* harmony import */ var _material_ui_icons_Delete__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(527);
 /* harmony import */ var _material_ui_icons_Delete__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(_material_ui_icons_Delete__WEBPACK_IMPORTED_MODULE_2__);
-/* harmony import */ var _material_ui_icons_Search__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(528);
-/* harmony import */ var _material_ui_icons_Search__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(_material_ui_icons_Search__WEBPACK_IMPORTED_MODULE_3__);
+/* harmony import */ var _material_ui_icons_Refresh__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(528);
+/* harmony import */ var _material_ui_icons_Refresh__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(_material_ui_icons_Refresh__WEBPACK_IMPORTED_MODULE_3__);
+/* harmony import */ var _material_ui_icons_Search__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(529);
+/* harmony import */ var _material_ui_icons_Search__WEBPACK_IMPORTED_MODULE_4___default = /*#__PURE__*/__webpack_require__.n(_material_ui_icons_Search__WEBPACK_IMPORTED_MODULE_4__);
 
 //
+
 
 
 
@@ -82062,14 +82066,18 @@ const UserTile = (props) => {
                 shrink: true
             } }),
         react__WEBPACK_IMPORTED_MODULE_0__["createElement"](_material_ui_core__WEBPACK_IMPORTED_MODULE_1__["Tooltip"], { title: 'Search' },
-            react__WEBPACK_IMPORTED_MODULE_0__["createElement"](_material_ui_core__WEBPACK_IMPORTED_MODULE_1__["IconButton"], { className: 'button_', onClick: () => props.getUser(props.ix, username), size: 'small', color: 'primary' },
-                react__WEBPACK_IMPORTED_MODULE_0__["createElement"](_material_ui_icons_Search__WEBPACK_IMPORTED_MODULE_3___default.a, null))),
+            react__WEBPACK_IMPORTED_MODULE_0__["createElement"](_material_ui_core__WEBPACK_IMPORTED_MODULE_1__["IconButton"], { className: 'button_', onClick: () => props.getUser(props.ix, username, false), size: 'small', color: 'primary' },
+                react__WEBPACK_IMPORTED_MODULE_0__["createElement"](_material_ui_icons_Search__WEBPACK_IMPORTED_MODULE_4___default.a, null))),
         react__WEBPACK_IMPORTED_MODULE_0__["createElement"](_material_ui_core__WEBPACK_IMPORTED_MODULE_1__["Tooltip"], { title: 'Delete' },
             react__WEBPACK_IMPORTED_MODULE_0__["createElement"](_material_ui_core__WEBPACK_IMPORTED_MODULE_1__["IconButton"], { className: 'button_', onClick: () => props.deleteUser(props.ix), size: 'small', color: 'secondary' },
                 react__WEBPACK_IMPORTED_MODULE_0__["createElement"](_material_ui_icons_Delete__WEBPACK_IMPORTED_MODULE_2___default.a, null))),
         react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("br", null),
         props.user ? react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("img", { className: 'profile_photo_', src: props.user.profilePhoto }) : react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("div", { className: 'profile_photo_' }),
-        react__WEBPACK_IMPORTED_MODULE_0__["createElement"](_material_ui_core__WEBPACK_IMPORTED_MODULE_1__["Typography"], { className: 'last_updated_', variant: 'caption', display: 'block', style: Object.assign({}, props.theme()) }, props.user ? `Last Updated: ${props.user.lastUpdated.toString().split('T')[0]}` : ''));
+        react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("br", null),
+        react__WEBPACK_IMPORTED_MODULE_0__["createElement"](_material_ui_core__WEBPACK_IMPORTED_MODULE_1__["Typography"], { className: 'last_updated_', variant: 'caption', style: Object.assign({}, props.theme()) }, props.user ? `Updated: ${props.user.lastUpdated.toString().split('.')[0].replace('T', ' ')}` : ''),
+        props.user && react__WEBPACK_IMPORTED_MODULE_0__["createElement"](_material_ui_core__WEBPACK_IMPORTED_MODULE_1__["Tooltip"], { title: 'Update' },
+            react__WEBPACK_IMPORTED_MODULE_0__["createElement"](_material_ui_core__WEBPACK_IMPORTED_MODULE_1__["IconButton"], { onClick: () => props.getUser(props.ix, username, true), size: 'small' },
+                react__WEBPACK_IMPORTED_MODULE_0__["createElement"](_material_ui_icons_Refresh__WEBPACK_IMPORTED_MODULE_3___default.a, null))));
 };
 
 
@@ -82120,13 +82128,39 @@ var React = _interopRequireWildcard(__webpack_require__(1));
 var _createSvgIcon = _interopRequireDefault(__webpack_require__(524));
 
 var _default = (0, _createSvgIcon.default)( /*#__PURE__*/React.createElement("path", {
+  d: "M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"
+}), 'Refresh');
+
+exports.default = _default;
+
+/***/ }),
+/* 529 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+var _interopRequireDefault = __webpack_require__(522);
+
+var _interopRequireWildcard = __webpack_require__(523);
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = void 0;
+
+var React = _interopRequireWildcard(__webpack_require__(1));
+
+var _createSvgIcon = _interopRequireDefault(__webpack_require__(524));
+
+var _default = (0, _createSvgIcon.default)( /*#__PURE__*/React.createElement("path", {
   d: "M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"
 }), 'Search');
 
 exports.default = _default;
 
 /***/ }),
-/* 529 */
+/* 530 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -82177,7 +82211,7 @@ const UserStat = (props) => {
 
 
 /***/ }),
-/* 530 */
+/* 531 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";

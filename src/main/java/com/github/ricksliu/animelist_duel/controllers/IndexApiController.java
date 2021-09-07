@@ -20,7 +20,7 @@ public class IndexApiController {
 
         switch (body.getAnimeWebsite()) {
             case MAL:
-                User user = MyAnimeListUtility.getUser(body.getUsername());
+                User user = MyAnimeListUtility.getUser(body.getUsername(), body.isUpdate());
                 List<ScoreComparison> scoreComparisons = MyAnimeListUtility.getScoreComparisons(body.getUsername(), body.getUsernames() != null ? body.getUsernames() : new ArrayList<>() );
 
                 HashMap<String, Object> result = new HashMap<>();

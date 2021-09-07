@@ -96,10 +96,15 @@ public class MyAnimeListUtility {
         return scoreComparisons;
     }
 
-    public static User getUser(String username)
+    public static User getUser(String username, boolean update)
     {
+        User user = update ? null : MongoDBUtility.GetUser(Enums.AnimeWebsite.MAL, username);
+        if (user != null) {
+            return user;
+        }
+
         String html = getUserHTML(username);
-        User user = new User();
+        user = new User();
 
         user.setAnimeWebsite(Enums.AnimeWebsite.MAL);
         user.setUserId(StringsUtility.getMatch(html, "userimages", "/(.+?)\\.", 1));
@@ -117,6 +122,7 @@ public class MyAnimeListUtility {
         user.setEntriesRewatched(Integer.parseInt(StringsUtility.getMatch(html, "Rewatched", "\">(.+?)<", 1).replace(",", "")));
         user.setEpisodesWatched(Integer.parseInt(StringsUtility.getMatch(html, "Episodes", "\">(.+?)<", 1).replace(",", "")));
 
+        MongoDBUtility.CreateUser(user);
         return user;
     }
 

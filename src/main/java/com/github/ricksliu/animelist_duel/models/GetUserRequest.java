@@ -6,6 +6,7 @@ public class GetUserRequest {
     private Enums.AnimeWebsite animeWebsite;
     private String username;
     private List<String> usernames;
+    private boolean update;
 
     public Enums.AnimeWebsite getAnimeWebsite() {
         return animeWebsite;
@@ -29,5 +30,13 @@ public class GetUserRequest {
 
     public void setUsernames(List<String> usernames) {
         this.usernames = usernames;
+    }
+
+    public boolean isUpdate() {
+        return update;
+    }
+
+    public void setUpdate(boolean update) {
+        this.update = update;
     }
 }

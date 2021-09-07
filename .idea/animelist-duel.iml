@@ -78,5 +78,9 @@
     <orderEntry type="library" name="Maven: org.springframework:spring-jcl:5.3.8" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: org.springframework:spring-test:5.3.8" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: org.xmlunit:xmlunit-core:2.7.0" level="project" />
+    <orderEntry type="library" name="Maven: org.mongodb:mongodb-driver-sync:4.1.2" level="project" />
+    <orderEntry type="library" name="Maven: org.mongodb:bson:4.1.2" level="project" />
+    <orderEntry type="library" name="Maven: org.mongodb:mongodb-driver-core:4.1.2" level="project" />
+    <orderEntry type="library" name="Maven: org.mongodb:mongodb-crypt:unknown" level="project" />
   </component>
 </module>

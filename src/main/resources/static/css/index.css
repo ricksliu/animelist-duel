@@ -34,6 +34,10 @@
   margin: 12px 0 0;
   height: 64px;
 }
+.user_tile_ .last_updated_ {
+  display: inline-block;
+  vertical-align: middle;
+}
 
 .user_stat_ {
   padding: 12px 0 0;
