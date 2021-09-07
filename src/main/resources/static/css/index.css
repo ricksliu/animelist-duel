@@ -1,0 +1,86 @@
+.index_ .header_ {
+  padding: 12px 0;
+  text-align: center;
+  color: white;
+}
+.index_ .user_tiles_ {
+  padding: 20px 0 0;
+  text-align: center;
+}
+.index_ .user_stats_ {
+  padding: 12px;
+  text-align: center;
+}
+.index_ .score_comparisons_ {
+  padding: 12px;
+  text-align: center;
+}
+
+.user_tile_ {
+  display: inline-block;
+  vertical-align: top;
+  height: 156.2px;
+  margin: 0 6px 6px;
+  padding: 12px;
+  text-align: center;
+}
+.user_tile_ .text_field_ {
+  width: 180px;
+}
+.user_tile_ .button_ {
+  margin-top: 23px;
+}
+.user_tile_ .profile_photo_ {
+  margin: 12px 0 0;
+  height: 64px;
+}
+.user_tile_ .last_updated_ {
+  display: inline-block;
+  vertical-align: middle;
+}
+
+.user_stat_ {
+  padding: 12px 0 0;
+}
+.user_stat_ .label_ {
+  padding: 0 0 6px;
+}
+.user_stat_ .bar_ {
+  display: inline-block;
+  width: 100%;
+}
+.user_stat_ .bar_ .bar_section_ {
+  display: inline-block;
+}
+.user_stat_ .bar_ .bar_section_ .stat_ {
+  padding: 12px 0;
+  text-align: center;
+  overflow: hidden;
+  z-index: 100;
+}
+
+.score_comparison_ {
+  padding: 12px 0 0;
+}
+.score_comparison_ .label_ {
+  padding: 0 0 6px;
+}
+.score_comparison_ .scores_ {
+  display: inline-block;
+  width: 40%;
+  padding-right: 3px;
+  text-align: right;
+  vertical-align: middle;
+}
+.score_comparison_ .image_outer_ {
+  display: inline-block;
+  width: 40%;
+  padding-left: 3px;
+  text-align: left;
+  vertical-align: middle;
+}
+.score_comparison_ .image_outer_ .image_ {
+  height: 256px;
+}
+
+/*# sourceMappingURL=index.css.map */
