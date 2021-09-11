@@ -1,15 +1,15 @@
 # animelist-duel
 
-A website that compares the stats of two MyAnimeList users.
+The premise was simple: Who's wasted more time watching Japanese cartoons?
+
+The solution? A website that pits your anime-watching stats head-to-head with another user by pulling data from the website MyAnimeList.
 
 ## Info:
 
-The frontend website uses HTML, CSS and React. The backend is composed of a Node.js application and a MySQL database. The backend scrapes various MyAnimeList pages for data. In addition to being sent back to the frontend, the data is stored in a database to speed up future requests.
+The frontend was built using React, SASS and Material UI.
 
-The website is meant to function with both the Node.js backend and the MySQL database running, though it still functions without the database.
+Inputted usernames are sent to a Spring Boot MVC backend that scrapes data from various MyAnimeList pages using regex expressions.
 
-The React portion was coded with JSX syntax. Running 'frontend/js/jsx_src/jsx_preprocessor.bat' in the background will automatically convert it.
-
-'backend/fake_profiles.js' contains queries to add and remove fake profiles 'fakeuser1' and 'fakeuser2'. This can be used for testing or for showcasing the website without having to use data from real users.
+The data is also stored as MongoDB documents so future queries for the same user are much faster.
 
 ![Screenshot of Website](docs/screenshot_1.png)
