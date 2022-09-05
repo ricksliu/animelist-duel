@@ -1,15 +1,9 @@
 # animelist-duel
 
-The premise was simple: Who's wasted more time watching Japanese cartoons?
+A website that compares the stats of MyAnimeList users. Made with React, Spring Boot and MongoDB.
 
-The solution? A website that pits your anime-watching stats head-to-head with another user by pulling data from the website MyAnimeList.
+## About
 
-## Info:
+The frontend is built using React, SASS and Material UI. Inputted usernames are sent to a Spring Boot MVC backend that scrapes data from various MyAnimeList pages using regex expressions. The data is also stored as MongoDB documents so future queries for the same user are much faster.
 
-The frontend was built using React, SASS and Material UI.
-
-Inputted usernames are sent to a Spring Boot MVC backend that scrapes data from various MyAnimeList pages using regex expressions.
-
-The data is also stored as MongoDB documents so future queries for the same user are much faster.
-
-![Screenshot of Website](docs/screenshot_1.png)
+![Screenshot of Project](docs/screenshot_1.png)
