@@ -1,9 +1,13 @@
 # animelist-duel
 
-A website that compares the stats of MyAnimeList users. Made with React, Spring Boot and MongoDB.
+Website that compares MyAnimeList users. Uses React, Spring Boot and MongoDB.
 
 ## About
 
-The frontend is built using React, SASS and Material UI. Inputted usernames are sent to a Spring Boot MVC backend that scrapes data from various MyAnimeList pages using regex expressions. The data is also stored as MongoDB documents so future queries for the same user are much faster.
+The frontend uses React, TypeScript, SASS and Material UI.
+The backend uses Spring Boot and MongoDB.
 
-![Screenshot of Project](docs/screenshot_1.png)
+The backend scrapes MyAnimeList pages and extracts the data for users using regular expressions.
+The results are stored using MongoDB for a period of time so the same data is not scraped repeatedly.
+
+![Image of the project.](docs/project.png)
