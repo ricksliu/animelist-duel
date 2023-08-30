@@ -8,4 +8,4 @@ The frontend uses React, TypeScript, SASS and Material UI. The backend uses Spri
 
 The backend scrapes MyAnimeList pages and extracts the data for users using regular expressions. The results are stored using MongoDB for a period of time so the same data is not scraped repeatedly.
 
-![Image of the project.](doc/project.png)
+![Image of the project.](docs/project.png)
